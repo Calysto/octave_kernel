@@ -42,11 +42,14 @@ class OctaveKernel(Kernel):
                    allow_stdin=False):
         if not code.strip():
             return {'status': 'ok', 'execution_count': self.execution_count,
-                    'payloads': [], 'user_expressions': {}}
+                    'payload': [], 'user_expressions': {}}
+
+        if code.strip() == 'exit':
+            # TODO: exit gracefully here
 
         interrupted = False
         try:
-            output = self.octavewrapper._eval(code.rstrip())
+            output = self.octavewrapper._eval([code.rstrip()])
         except KeyboardInterrupt:
             self.octavewrapper._session.proc.send_signal(signal.SIGINT)
             interrupted = True
@@ -56,7 +59,7 @@ class OctaveKernel(Kernel):
             #output = self.bashwrapper.child.before
 
         if not silent:
-            stream_content = {'name': 'stdout', 'data':output}
+            stream_content = {'name': 'stdout', 'data': output}
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
         if interrupted:
@@ -74,7 +77,7 @@ class OctaveKernel(Kernel):
                     'ename': '', 'evalue': str(exitcode), 'traceback': []}
         else:
             return {'status': 'ok', 'execution_count': self.execution_count,
-                    'payloads': [], 'user_expressions': {}}
+                    'payload': [], 'user_expressions': {}}
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
