@@ -1,4 +1,5 @@
 from IPython.kernel.zmq.kernelbase import Kernel
+from oct2py import octave
 
 import signal
 from subprocess import check_output
@@ -30,10 +31,10 @@ class OctaveKernel(Kernel):
         # Signal handlers are inherited by forked processes, and we can't easily
         # reset it from the subprocess. Since kernelapp ignores SIGINT except in
         # message handlers, we need to temporarily reset the SIGINT handler here
-        # so that bash and its children are interruptible.
+        # so that octave and its children are interruptible.
         sig = signal.signal(signal.SIGINT, signal.SIG_DFL)
         try:
-            self.bashwrapper = replwrap.bash()
+            self.octavewrapper = octave
         finally:
             signal.signal(signal.SIGINT, sig)
 
@@ -45,12 +46,14 @@ class OctaveKernel(Kernel):
 
         interrupted = False
         try:
-            output = self.bashwrapper.run_command(code.rstrip(), timeout=None)
+            output = self.octavewrapper._eval(code.rstrip())
         except KeyboardInterrupt:
-            self.bashwrapper.child.sendintr()
+            self.octavewrapper._session.proc.send_signal(signal.SIGINT)
             interrupted = True
-            self.bashwrapper._expect_prompt()
-            output = self.bashwrapper.child.before
+            # TODO: handle the output
+            output = 'Interrupted'
+            #self.bashwrapper._expect_prompt()
+            #output = self.bashwrapper.child.before
 
         if not silent:
             stream_content = {'name': 'stdout', 'data':output}
@@ -60,7 +63,9 @@ class OctaveKernel(Kernel):
             return {'status': 'abort', 'execution_count': self.execution_count}
 
         try:
-            exitcode = int(self.run_command('echo $?').rstrip())
+            # TODO: handle an exit code
+            exitcode = 0
+            #exitcode = int(self.run_command('echo $?').rstrip())
         except Exception:
             exitcode = 1
 
