@@ -66,10 +66,14 @@ class OctaveKernel(Kernel):
             output = 'Octave Session Interrupted'
         except Oct2PyError as e:
             err = str(e)
-            if 'Octave returned:' in err:
+            if 'parse error:' in err:
+                err = 'Parse Error'
+            elif 'Octave returned:' in err:
                 err = err[err.index('Octave returned:'):]
                 err = err[len('Octave returned:'):].lstrip()
-            stream_content = {'name': 'stdout', 'data': err}
+            elif 'Syntax Error' in err:
+                err = 'Syntax Error'
+            stream_content = {'name': 'stdout', 'data': err.strip()}
             self.send_response(self.iopub_socket, 'stream', stream_content)
             return {'status': 'error', 'execution_count': self.execution_count,
                     'ename': '', 'evalue': err, 'traceback': []}
