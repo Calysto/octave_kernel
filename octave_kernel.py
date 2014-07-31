@@ -98,7 +98,7 @@ class OctaveKernel(Kernel):
         # check for valid function name
         if not re.match('\A[a-zA-Z_]', token):
             return
-        start = cursor_pos - len(code)
+        start = cursor_pos - len(token)
         cmd = 'completion_matches("%s")' % token
         output = self.octavewrapper._eval([cmd])
         return {'matches': output.split(), 'cursor_start': start,
