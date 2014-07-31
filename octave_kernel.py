@@ -45,18 +45,35 @@ class OctaveKernel(Kernel):
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
         code = code.strip()
+        abort_msg = {'status': 'abort', 
+                     'execution_count': self.execution_count}
         if not code or code == 'keyboard' or code.startswith('keyboard('):
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
-
-        if (code == 'exit' or code.startswith('exit(')
+        elif (code == 'exit' or code.startswith('exit(')
                 or code == 'quit' or code.startswith('quit(')):
             # TODO: exit gracefully here
             self.do_shutdown(False)
-            return {'status': 'abort', 'execution_count': self.execution_count}
-
-        if code.endswith('?'):
-            code = 'help("' + code[:-1] + '")'
+            return abort_msg
+        elif code == 'restart':
+            self.octavewrapper.restart()
+            return abort_msg
+        elif code.endswith('?'):
+            if code[:-1] in dir(self.octavewrapper):
+                output = getattr(self.octavewrapper, code[:-1]).__doc__
+                stream_content = {'name': 'stdout', 'data': output}
+                self.send_response(self.iopub_socket, 'stream', stream_content)
+                return abort_msg
+            elif code.endswith('??') and code[:-2] in dir(self.octavewrapper):
+                output = getattr(self.octavewrapper, code[:-2]).__doc__
+                stream_content = {'name': 'stdout', 'data': output}
+                self.send_response(self.iopub_socket, 'stream', stream_content)
+                return abort_msg
+            else:
+                if code.endswith('??'):
+                    code = 'help("' + code[:-2] + '")\n\ntype ' + code[:-2]
+                else:
+                    code = 'help("' + code[:-1] + '")'
         interrupted = False
         try:
             output = self.octavewrapper._eval([code])
@@ -77,18 +94,18 @@ class OctaveKernel(Kernel):
             self.send_response(self.iopub_socket, 'stream', stream_content)
             return {'status': 'error', 'execution_count': self.execution_count,
                     'ename': '', 'evalue': err, 'traceback': []}
-
-        if output is None:
-            output = ''
-        elif output == 'Octave Session Interrupted':
-            interrupted = True
+        else:
+            if output is None:
+                output = ''
+            elif output == 'Octave Session Interrupted':
+                interrupted = True
 
         if not silent:
             stream_content = {'name': 'stdout', 'data': output}
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
         if interrupted:
-            return {'status': 'abort', 'execution_count': self.execution_count}
+            return abort_msg
 
         return {'status': 'ok', 'execution_count': self.execution_count,
                 'payload': [], 'user_expressions': {}}
@@ -107,7 +124,11 @@ class OctaveKernel(Kernel):
         start = cursor_pos - len(token)
         cmd = 'completion_matches("%s")' % token
         output = self.octavewrapper._eval([cmd])
-        return {'matches': output.split(), 'cursor_start': start,
+        output = output.split()
+        for item in dir(self.octavewrapper):
+            if item.startswith(token) and not item in output:
+                output.append(item)
+        return {'matches': output, 'cursor_start': start,
                 'cursor_end': cursor_pos, 'metadata': dict(),
                 'status': 'ok'}
 
