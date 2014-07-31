@@ -1,18 +1,18 @@
 from IPython.kernel.zmq.kernelbase import Kernel
-from pexpect import replwrap
 
 import signal
 from subprocess import check_output
 import re
 
-__version__ = '0.2'
+__version__ = '0.1'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
-class BashKernel(Kernel):
-    implementation = 'bash_kernel'
+
+class OctaveKernel(Kernel):
+    implementation = 'octave_kernel'
     implementation_version = __version__
-    language = 'bash'
+    language = 'octave'
     @property
     def language_version(self):
         m = version_pat.search(self.banner)
@@ -22,9 +22,9 @@ class BashKernel(Kernel):
     @property
     def banner(self):
         if self._banner is None:
-            self._banner = check_output(['bash', '--version']).decode('utf-8')
+            self._banner = check_output(['octave', '--version']).decode('utf-8')
         return self._banner
-    
+
     def __init__(self, **kwargs):
         Kernel.__init__(self, **kwargs)
         # Signal handlers are inherited by forked processes, and we can't easily
@@ -55,10 +55,10 @@ class BashKernel(Kernel):
         if not silent:
             stream_content = {'name': 'stdout', 'data':output}
             self.send_response(self.iopub_socket, 'stream', stream_content)
-        
+
         if interrupted:
             return {'status': 'abort', 'execution_count': self.execution_count}
-        
+
         try:
             exitcode = int(self.run_command('echo $?').rstrip())
         except Exception:
@@ -73,4 +73,4 @@ class BashKernel(Kernel):
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
-    IPKernelApp.launch_instance(kernel_class=BashKernel)
+    IPKernelApp.launch_instance(kernel_class=OctaveKernel)
