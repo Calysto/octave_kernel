@@ -38,9 +38,10 @@ class OctaveKernel(Kernel):
         finally:
             signal.signal(signal.SIGINT, sig)
 
-    def do_execute(self, code, silent, store_history=True, user_expressions=None,
-                   allow_stdin=False):
-        if not code.strip():
+    def do_execute(self, code, silent, store_history=True,
+                   user_expressions=None, allow_stdin=False):
+        if (not code.strip() or code.strip() == 'keyboard'
+                or code.strip().startswith('keyboard(')):
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
 
