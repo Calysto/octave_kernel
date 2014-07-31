@@ -52,7 +52,9 @@ class OctaveKernel(Kernel):
         if (code == 'exit' or code.startswith('exit(')
                 or code == 'quit' or code.startswith('quit(')):
             # TODO: exit gracefully here
-            pass
+            self.do_shutdown(False)
+            return {'status': 'abort', 'execution_count': self.execution_count}
+
         if code.endswith('?'):
             code = 'help("' + code[:-1] + '")'
         interrupted = False
@@ -104,6 +106,13 @@ class OctaveKernel(Kernel):
         return {'matches': output.split(), 'cursor_start': start,
                 'cursor_end': cursor_pos, 'metadata': dict(),
                 'status': 'ok'}
+
+    def do_shutdown(self, restart):
+        if restart:
+            self.octavewrapper.restart()
+        else:
+            self.octavewrapper.close()
+        return Kernel.do_shutdown(self, restart)
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
