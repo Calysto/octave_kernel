@@ -40,19 +40,20 @@ class OctaveKernel(Kernel):
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
-        if (not code.strip() or code.strip() == 'keyboard'
-                or code.strip().startswith('keyboard(')):
+        code = code.strip()
+        if not code or code == 'keyboard' or code.startswith('keyboard('):
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
 
-        if code.strip() == 'exit':
+        if (code == 'exit' or code.startswith('exit(')
+                or code == 'quit' or code.startswith('quit(')):
             # TODO: exit gracefully here
             pass
-        if code.strip().endswith('?'):
-            code = 'help("' + code.strip()[:-1] + '")'
+        if code.endswith('?'):
+            code = 'help("' + code[:-1] + '")'
         interrupted = False
         try:
-            output = self.octavewrapper._eval([code.rstrip()])
+            output = self.octavewrapper._eval([code])
         except KeyboardInterrupt:
             self.octavewrapper._session.proc.send_signal(signal.SIGINT)
             interrupted = True
@@ -81,6 +82,28 @@ class OctaveKernel(Kernel):
 
         return {'status': 'ok', 'execution_count': self.execution_count,
                 'payload': [], 'user_expressions': {}}
+
+    #def do_history(self, hist_access_type, output, raw, session=None,
+    #               start=None, stop=None, n=None, pattern=None, unique=False):
+    #    pass
+
+    def do_complete(self, code, cursor_pos):
+        code = code[:cursor_pos]
+        if code[-1] == ' ':
+            return
+        tokens = code.replace(';', ' ').split()
+        if not tokens:
+            return
+        token = tokens[-1]
+        # check for valid function name
+        if not re.match('\A[a-zA-Z_]', token):
+            return
+        start = cursor_pos - len(code)
+        cmd = 'completion_matches("%s")' % token
+        output = self.octavewrapper._eval([cmd])
+        return {'matches': output.split(), 'cursor_start': start,
+                'cursor_end': cursor_pos, 'metadata': dict(),
+                'status': 'ok'}
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
