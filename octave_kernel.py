@@ -14,23 +14,27 @@ class OctaveKernel(Kernel):
     implementation = 'octave_kernel'
     implementation_version = __version__
     language = 'octave'
+
     @property
     def language_version(self):
         m = version_pat.search(self.banner)
         return m.group(1)
 
     _banner = None
+
     @property
     def banner(self):
         if self._banner is None:
-            self._banner = check_output(['octave', '--version']).decode('utf-8')
+            self._banner = check_output(['octave',
+                                         '--version']).decode('utf-8')
         return self._banner
 
     def __init__(self, **kwargs):
         Kernel.__init__(self, **kwargs)
-        # Signal handlers are inherited by forked processes, and we can't easily
-        # reset it from the subprocess. Since kernelapp ignores SIGINT except in
-        # message handlers, we need to temporarily reset the SIGINT handler here
+        # Signal handlers are inherited by forked processes,
+        # and we can't easily reset it from the subprocess.
+        # Since kernelapp ignores SIGINT except in message handlers,
+        # we need to temporarily reset the SIGINT handler here
         # so that octave and its children are interruptible.
         sig = signal.signal(signal.SIGINT, signal.SIG_DFL)
         try:
@@ -82,10 +86,6 @@ class OctaveKernel(Kernel):
 
         return {'status': 'ok', 'execution_count': self.execution_count,
                 'payload': [], 'user_expressions': {}}
-
-    #def do_history(self, hist_access_type, output, raw, session=None,
-    #               start=None, stop=None, n=None, pattern=None, unique=False):
-    #    pass
 
     def do_complete(self, code, cursor_pos):
         code = code[:cursor_pos]
