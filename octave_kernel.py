@@ -1,5 +1,5 @@
 from IPython.kernel.zmq.kernelbase import Kernel
-from oct2py import octave
+from oct2py import octave, Oct2PyError
 
 import signal
 from subprocess import check_output
@@ -46,17 +46,28 @@ class OctaveKernel(Kernel):
 
         if code.strip() == 'exit':
             # TODO: exit gracefully here
-
+            pass
         interrupted = False
         try:
             output = self.octavewrapper._eval([code.rstrip()])
         except KeyboardInterrupt:
             self.octavewrapper._session.proc.send_signal(signal.SIGINT)
             interrupted = True
-            # TODO: handle the output
-            output = 'Interrupted'
-            #self.bashwrapper._expect_prompt()
-            #output = self.bashwrapper.child.before
+            output = 'Octave Session Interrupted'
+        except Oct2PyError as e:
+            err = str(e)
+            if 'Octave returned:' in err:
+                err = err[err.index('Octave returned:'):]
+                err = err[len('Octave returned:'):].lstrip()
+            stream_content = {'name': 'stdout', 'data': err}
+            self.send_response(self.iopub_socket, 'stream', stream_content)
+            return {'status': 'error', 'execution_count': self.execution_count,
+                    'ename': '', 'evalue': err, 'traceback': []}
+
+        if output is None:
+            output = ''
+        elif output == 'Octave Session Interrupted':
+            interrupted = True
 
         if not silent:
             stream_content = {'name': 'stdout', 'data': output}
@@ -65,19 +76,8 @@ class OctaveKernel(Kernel):
         if interrupted:
             return {'status': 'abort', 'execution_count': self.execution_count}
 
-        try:
-            # TODO: handle an exit code
-            exitcode = 0
-            #exitcode = int(self.run_command('echo $?').rstrip())
-        except Exception:
-            exitcode = 1
-
-        if exitcode:
-            return {'status': 'error', 'execution_count': self.execution_count,
-                    'ename': '', 'evalue': str(exitcode), 'traceback': []}
-        else:
-            return {'status': 'ok', 'execution_count': self.execution_count,
-                    'payload': [], 'user_expressions': {}}
+        return {'status': 'ok', 'execution_count': self.execution_count,
+                'payload': [], 'user_expressions': {}}
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
