@@ -47,6 +47,8 @@ class OctaveKernel(Kernel):
         if code.strip() == 'exit':
             # TODO: exit gracefully here
             pass
+        if code.strip().endswith('?'):
+            code = 'help("' + code.strip()[:-1] + '")'
         interrupted = False
         try:
             output = self.octavewrapper._eval([code.rstrip()])
