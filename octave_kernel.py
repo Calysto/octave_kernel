@@ -72,6 +72,9 @@ class OctaveKernel(Kernel):
             output = 'Octave Session Interrupted'
         except Oct2PyError as e:
             return self._handle_error(str(e))
+        except Exception:
+            self.octavewrapper.restart()
+            output = 'Uncaught Exception, Restarting Octave'
         else:
             if output is None:
                 output = ''
