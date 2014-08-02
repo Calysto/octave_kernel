@@ -1,4 +1,5 @@
 from IPython.kernel.zmq.kernelbase import Kernel
+from IPython.utils.path import locate_profile
 from IPython.core.oinspect import Inspector, cast_unicode
 from oct2py import octave, Oct2PyError
 
@@ -6,6 +7,7 @@ import os
 import signal
 from subprocess import check_output
 import re
+import logging
 
 __version__ = '0.1'
 
@@ -47,12 +49,22 @@ class OctaveKernel(Kernel):
         self.inspector = Inspector()
         self.inspector.set_active_scheme("Linux")
 
+        self.hist_file = os.path.join(locate_profile(), 'octave_kernel.hist')
+        self.max_cache = 1000
+        self.cache = []
+
+        self.log.setLevel(logging.ERROR)
+
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
         code = code.strip()
         abort_msg = {'status': 'abort',
                      'execution_count': self.execution_count}
 
+        if code:
+            self.cache.append(code)
+            if len(self.cache) > self.max_cache:
+                self.cache.pop(0)
         if not code or code == 'keyboard' or code.startswith('keyboard('):
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
@@ -153,11 +165,29 @@ class OctaveKernel(Kernel):
                 data = {'text/plain': docstring}
             return {'status': 'ok', 'data': data, 'metadata': dict()}
 
+    def do_history(self, hist_access_type, output, raw, session=None,
+                   start=None, stop=None, n=None, pattern=None, unique=False):
+        """Access history.
+        """
+        if not os.path.exists(self.hist_file):
+            with open(self.hist_file, 'wb') as fid:
+                fid.write('')
+        with open(self.hist_file, 'rb') as fid:
+            history = fid.readlines()
+        self.cache = history
+        self.log.debug('**HISTORY:')
+        self.log.debug(history)
+        history = [(None, None, h) for h in history]
+        return {'history': history}
+
     def do_shutdown(self, restart):
+        self.log.debug("**Shutting down")
         if restart:
             self.octavewrapper.restart()
         else:
             self.octavewrapper.close()
+        with open(self.hist_file, 'wb') as fid:
+            fid.write('\n'.join(self.cache))
         return Kernel.do_shutdown(self, restart)
 
     def _get_help(self, code):
