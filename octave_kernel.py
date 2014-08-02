@@ -264,14 +264,14 @@ class OctaveKernel(Kernel):
             return inspector._format_fields(displayfields)
 
     def _get_octave_info(self, obj, detail_level):
-        info_obj = dict(argspec=None, base_class=None, call_def=None,
-                        call_docstring=None, class_docstring=None,
-                        definition=None,
-                        docstring=None, file=None, found=False,
-                        init_definition=None, init_docstring=None, isalias=0,
-                        isclass=None,  ismagic=0, length=None, name='',
-                        namespace=None, source=None, string_form=None,
-                        type_name='')
+        info = dict(argspec=None, base_class=None, call_def=None,
+                    call_docstring=None, class_docstring=None,
+                    definition=None,
+                    docstring=None, file=None, found=False,
+                    init_definition=None, init_docstring=None, isalias=0,
+                    isclass=None,  ismagic=0, length=None, name='',
+                    namespace=None, source=None, string_form=None,
+                    type_name='')
 
         oc = self.octavewrapper
 
@@ -281,7 +281,7 @@ class OctaveKernel(Kernel):
 
         exist = oc.run('exist "%s"' % obj)
         if exist.endswith('0'):
-            return info_obj
+            return info
 
         try:
             help_str = oc.run('help %s' % obj)
@@ -294,20 +294,20 @@ class OctaveKernel(Kernel):
         type_str = '\n'.join(type_str.splitlines()[1:])
         is_var = 'is a variable' in type_first_line
 
-        info_obj['found'] = True
-        info_obj['docstring'] = help_str or type_first_line
-        info_obj['type_name'] = cls_str if is_var else 'built-in function'
-        info_obj['source'] = help_str
-        info_obj['string_form'] = obj if not is_var else type_str.rstrip()
+        info['found'] = True
+        info['docstring'] = help_str or type_first_line
+        info['type_name'] = cls_str if is_var else 'built-in function'
+        info['source'] = help_str
+        info['string_form'] = obj if not is_var else type_str.rstrip()
 
         if type_first_line.rstrip().endswith('.m'):
-            info_obj['file'] = type_first_line.split()[-1]
-            info_obj['type_name'] = 'function'
-            info_obj['source'] = type_str
+            info['file'] = type_first_line.split()[-1]
+            info['type_name'] = 'function'
+            info['source'] = type_str
             if not help_str:
-                info_obj['docstring'] = None
+                info['docstring'] = None
 
-        return info_obj
+        return info
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
