@@ -1,6 +1,6 @@
 A simple IPython kernel for Octave
 
-This requires IPython 3, which is not yet released.
+This requires IPython 3, which is not yet released, and `oct2py <http://pypi.python.org/pypi/oct2py>`_.
 
 To test it, install with ``setup.py``, then::
 
