@@ -62,11 +62,12 @@ class OctaveKernel(Kernel):
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
+        """Execute a line of code in Octave."""
         code = code.strip()
         abort_msg = {'status': 'abort',
                      'execution_count': self.execution_count}
 
-        if code:
+        if code and store_history:
             self.cache.append(code)
             if len(self.cache) > self.max_cache:
                 self.cache.pop(0)
@@ -121,6 +122,7 @@ class OctaveKernel(Kernel):
                 'payload': [], 'user_expressions': {}}
 
     def do_complete(self, code, cursor_pos):
+        """Get code completions using Octave's 'completion_matches'"""
         code = code[:cursor_pos]
         default = {'matches': [], 'cursor_start': 0,
                    'cursor_end': cursor_pos, 'metadata': dict(),
@@ -158,6 +160,7 @@ class OctaveKernel(Kernel):
                 'status': 'ok'}
 
     def do_inspect(self, code, cursor_pos, detail_level=0):
+        """If the code ends with a (, try to return a calltip docstring"""
         data = dict()
         if (not code or not len(code) >= cursor_pos or
                 not code[cursor_pos - 1] == '('):
@@ -172,7 +175,7 @@ class OctaveKernel(Kernel):
 
     def do_history(self, hist_access_type, output, raw, session=None,
                    start=None, stop=None, n=None, pattern=None, unique=False):
-        """Access history.
+        """Access history at startup.
         """
         if not self.hist_file:
             return {'history': []}
@@ -188,6 +191,8 @@ class OctaveKernel(Kernel):
         return {'history': history}
 
     def do_shutdown(self, restart):
+        """Shut down the app gracefully, saving history.
+        """
         self.log.debug("**Shutting down")
         if restart:
             self.octavewrapper.restart()
