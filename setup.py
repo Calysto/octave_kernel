@@ -18,7 +18,7 @@ if svem_flag in sys.argv:
     sys.argv.remove(svem_flag)
 
 setup(name='octave_kernel',
-      version='0.1',
+      version='0.2',
       description='An Octave kernel for IPython',
       long_description=readme,
       author='Steven Silvester',
