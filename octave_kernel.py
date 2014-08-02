@@ -111,6 +111,7 @@ class OctaveKernel(Kernel):
 
         if code[-1] == ' ':
             return default
+
         tokens = code.replace(';', ' ').split()
         if not tokens:
             return default
@@ -130,6 +131,7 @@ class OctaveKernel(Kernel):
             cmd = 'completion_matches("%s")' % token
             output = self.octavewrapper._eval([cmd])
             matches = output.split()
+
             for item in dir(self.octavewrapper):
                 if item.startswith(token) and not item in matches:
                     matches.append(item)
