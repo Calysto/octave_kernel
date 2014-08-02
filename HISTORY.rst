@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-0.2 (2014-08-xx)
+0.2 (2014-08-02)
 +++++++++++++++++
 - Add history capability
 
