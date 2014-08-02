@@ -266,12 +266,11 @@ class OctaveKernel(Kernel):
     def _get_octave_info(self, obj, detail_level):
         info = dict(argspec=None, base_class=None, call_def=None,
                     call_docstring=None, class_docstring=None,
-                    definition=None,
-                    docstring=None, file=None, found=False,
-                    init_definition=None, init_docstring=None, isalias=0,
-                    isclass=None,  ismagic=0, length=None, name='',
-                    namespace=None, source=None, string_form=None,
-                    type_name='')
+                    definition=None, docstring=None, file=None,
+                    found=False, init_definition=None,
+                    init_docstring=None, isalias=0, isclass=None,
+                    ismagic=0, length=None, name='', namespace=None,
+                    source=None, string_form=None, type_name='')
 
         oc = self.octavewrapper
 
