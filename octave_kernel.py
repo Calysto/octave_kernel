@@ -52,7 +52,8 @@ class OctaveKernel(Kernel):
         self.log.setLevel(logging.ERROR)
 
         try:
-            self.hist_file = os.path.join(locate_profile(), 'octave_kernel.hist')
+            self.hist_file = os.path.join(locate_profile(),
+                                          'octave_kernel.hist')
         except IOError:
             self.hist_file = None
             self.log.warn('No default profile found, history unavailable')
