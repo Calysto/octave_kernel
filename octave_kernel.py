@@ -49,11 +49,15 @@ class OctaveKernel(Kernel):
         self.inspector = Inspector()
         self.inspector.set_active_scheme("Linux")
 
-        self.hist_file = os.path.join(locate_profile(), 'octave_kernel.hist')
+        self.log.setLevel(logging.ERROR)
+
+        try:
+            self.hist_file = os.path.join(locate_profile(), 'octave_kernel.hist')
+        except IOError:
+            self.hist_file = None
+            self.log.warn('No default profile found, history unavailable')
         self.max_cache = 1000
         self.cache = []
-
-        self.log.setLevel(logging.ERROR)
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
@@ -169,6 +173,8 @@ class OctaveKernel(Kernel):
                    start=None, stop=None, n=None, pattern=None, unique=False):
         """Access history.
         """
+        if not self.hist_file:
+            return {'history': []}
         if not os.path.exists(self.hist_file):
             with open(self.hist_file, 'wb') as fid:
                 fid.write('')
@@ -186,8 +192,9 @@ class OctaveKernel(Kernel):
             self.octavewrapper.restart()
         else:
             self.octavewrapper.close()
-        with open(self.hist_file, 'wb') as fid:
-            fid.write('\n'.join(self.cache))
+        if self.hist_file:
+            with open(self.hist_file, 'wb') as fid:
+                fid.write('\n'.join(self.cache))
         return Kernel.do_shutdown(self, restart)
 
     def _get_help(self, code):
