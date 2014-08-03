@@ -1,7 +1,7 @@
 from IPython.kernel.zmq.kernelbase import Kernel
 from IPython.utils.path import locate_profile
 from IPython.core.oinspect import Inspector, cast_unicode
-from oct2py import octave, Oct2PyError
+from oct2py import Oct2PyError, octave
 
 import os
 import signal
@@ -43,6 +43,7 @@ class OctaveKernel(Kernel):
         sig = signal.signal(signal.SIGINT, signal.SIG_DFL)
         try:
             self.octavewrapper = octave
+            octave.restart()
         finally:
             signal.signal(signal.SIGINT, sig)
 
@@ -57,8 +58,10 @@ class OctaveKernel(Kernel):
         except IOError:
             self.hist_file = None
             self.log.warn('No default profile found, history unavailable')
-        self.max_cache = 1000
-        self.cache = []
+        self.max_hist_cache = 1000
+        self.hist_cache = []
+        self.docstring_cache = {}
+        self.help_cache = {}
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
@@ -68,9 +71,7 @@ class OctaveKernel(Kernel):
                      'execution_count': self.execution_count}
 
         if code and store_history:
-            self.cache.append(code)
-            if len(self.cache) > self.max_cache:
-                self.cache.pop(0)
+            self.hist_cache.append(code)
         if not code or code == 'keyboard' or code.startswith('keyboard('):
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
@@ -168,7 +169,14 @@ class OctaveKernel(Kernel):
 
         else:
             token = code[:cursor_pos - 1].replace(';', '').split()[-1]
-            docstring = self._get_octave_info(token, detail_level)['docstring']
+            if token in self.docstring_cache:
+                docstring = self.docstring_cache[token]
+            elif token in self.help_cache:
+                docstring = self.help_cache[token]['docstring']
+            else:
+                docstring = self._get_octave_info(token,
+                                                  detail_level)['docstring']
+                self.docstring_cache[token] = docstring
             if docstring:
                 data = {'text/plain': docstring}
             return {'status': 'ok', 'data': data, 'metadata': dict()}
@@ -184,7 +192,7 @@ class OctaveKernel(Kernel):
                 fid.write('')
         with open(self.hist_file, 'rb') as fid:
             history = fid.readlines()
-        self.cache = history
+        self.hist_cache = history
         self.log.debug('**HISTORY:')
         self.log.debug(history)
         history = [(None, None, h) for h in history]
@@ -200,7 +208,7 @@ class OctaveKernel(Kernel):
             self.octavewrapper.close()
         if self.hist_file:
             with open(self.hist_file, 'wb') as fid:
-                fid.write('\n'.join(self.cache))
+                fid.write('\n'.join(self.hist_cache[:self.max_hist_cache]))
         return Kernel.do_shutdown(self, restart)
 
     def _get_help(self, code):
@@ -210,8 +218,19 @@ class OctaveKernel(Kernel):
             detail_level = 0
 
         code = code.replace('?', '')
-        info = self._get_octave_info(code, detail_level)
-        output = self._get_printable_info(info, detail_level)
+        tokens = code.replace(';', ' ').split()
+        if not tokens:
+            return
+        token = tokens[-1]
+
+        if token in self.help_cache:
+            output = self.help_cache[token]
+        else:
+            info = self._get_octave_info(token, detail_level)
+            output = self._get_printable_info(info, detail_level)
+            self.help_cache[token] = output
+            if token in self.docstring_cache:
+                del self.docstring_cache[token]
         stream_content = {'name': 'stdout', 'data': output}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
