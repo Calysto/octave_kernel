@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-0.3 (2014-08-xx)
+0.3 (2014-08-03)
 +++++++++++++++++
 - Cache help strings and calltips for fast re-trigger.
 

@@ -9,7 +9,7 @@ from subprocess import check_output
 import re
 import logging
 
-__version__ = '0.2'
+__version__ = '0.3'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
