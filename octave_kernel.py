@@ -205,7 +205,7 @@ class OctaveKernel(Kernel):
         with open(self.hist_file, 'rb') as fid:
             history = fid.readlines()
 
-        self.hist_cache = history
+        self.hist_cache = history[:self.max_hist_cache]
         self.log.debug('**HISTORY:')
         self.log.debug(history)
         history = [(None, None, h) for h in history]
