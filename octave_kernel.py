@@ -50,7 +50,7 @@ class OctaveKernel(Kernel):
         self.inspector = Inspector()
         self.inspector.set_active_scheme("Linux")
 
-        self.log.setLevel(logging.ERROR)
+        self.log.setLevel(logging.CRITICAL)
 
         try:
             self.hist_file = os.path.join(locate_profile(),
@@ -162,10 +162,10 @@ class OctaveKernel(Kernel):
 
     def do_inspect(self, code, cursor_pos, detail_level=0):
         """If the code ends with a (, try to return a calltip docstring"""
-        data = dict()
+        default = {'status': 'aborted', 'data': dict(), 'metadata': dict()}
         if (not code or not len(code) >= cursor_pos or
                 not code[cursor_pos - 1] == '('):
-            return {'status': 'ok', 'data': data, 'metadata': dict()}
+            return default
 
         else:
             token = code[:cursor_pos - 1].replace(';', '').split()[-1]
@@ -179,7 +179,9 @@ class OctaveKernel(Kernel):
                 self.docstring_cache[token] = docstring
             if docstring:
                 data = {'text/plain': docstring}
-            return {'status': 'ok', 'data': data, 'metadata': dict()}
+                return {'status': 'ok', 'data': data, 'metadata': dict()}
+            else:
+                return default
 
     def do_history(self, hist_access_type, output, raw, session=None,
                    start=None, stop=None, n=None, pattern=None, unique=False):
@@ -209,7 +211,7 @@ class OctaveKernel(Kernel):
         if self.hist_file:
             with open(self.hist_file, 'wb') as fid:
                 fid.write('\n'.join(self.hist_cache[:self.max_hist_cache]))
-        return Kernel.do_shutdown(self, restart)
+        return {'status': 'ok', 'restart': restart}
 
     def _get_help(self, code):
         if code.startswith('??') or code.endswith('??'):
@@ -224,13 +226,13 @@ class OctaveKernel(Kernel):
         token = tokens[-1]
 
         if token in self.help_cache:
-            output = self.help_cache[token]
+            info = self.help_cache[token]
         else:
             info = self._get_octave_info(token, detail_level)
-            output = self._get_printable_info(info, detail_level)
-            self.help_cache[token] = output
+            self.help_cache[token] = info
             if token in self.docstring_cache:
                 del self.docstring_cache[token]
+        output = self._get_printable_info(info, detail_level)
         stream_content = {'name': 'stdout', 'data': output}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
