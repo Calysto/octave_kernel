@@ -58,6 +58,7 @@ class OctaveKernel(Kernel):
         except IOError:
             self.hist_file = None
             self.log.warn('No default profile found, history unavailable')
+
         self.max_hist_cache = 1000
         self.hist_cache = []
         self.docstring_cache = {}
@@ -72,6 +73,7 @@ class OctaveKernel(Kernel):
 
         if code and store_history:
             self.hist_cache.append(code)
+
         if not code or code == 'keyboard' or code.startswith('keyboard('):
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
@@ -140,12 +142,15 @@ class OctaveKernel(Kernel):
         if os.sep in token:
             dname = os.path.dirname(token)
             rest = os.path.basename(token)
+
             if os.path.exists(dname):
                 files = os.listdir(dname)
                 matches = [f for f in files if f.startswith(rest)]
                 start = cursor_pos - len(rest)
+
             else:
                 return default
+
         else:
             start = cursor_pos - len(token)
             cmd = 'completion_matches("%s")' % token
@@ -171,17 +176,20 @@ class OctaveKernel(Kernel):
             token = code[:cursor_pos - 1].replace(';', '').split()[-1]
             if token in self.docstring_cache:
                 docstring = self.docstring_cache[token]
+
             elif token in self.help_cache:
                 docstring = self.help_cache[token]['docstring']
+
             else:
                 docstring = self._get_octave_info(token,
                                                   detail_level)['docstring']
                 self.docstring_cache[token] = docstring
+
             if docstring:
                 data = {'text/plain': docstring}
                 return {'status': 'ok', 'data': data, 'metadata': dict()}
-            else:
-                return default
+
+        return default
 
     def do_history(self, hist_access_type, output, raw, session=None,
                    start=None, stop=None, n=None, pattern=None, unique=False):
@@ -189,28 +197,36 @@ class OctaveKernel(Kernel):
         """
         if not self.hist_file:
             return {'history': []}
+
         if not os.path.exists(self.hist_file):
             with open(self.hist_file, 'wb') as fid:
                 fid.write('')
+
         with open(self.hist_file, 'rb') as fid:
             history = fid.readlines()
+
         self.hist_cache = history
         self.log.debug('**HISTORY:')
         self.log.debug(history)
         history = [(None, None, h) for h in history]
+
         return {'history': history}
 
     def do_shutdown(self, restart):
         """Shut down the app gracefully, saving history.
         """
         self.log.debug("**Shutting down")
+
         if restart:
             self.octavewrapper.restart()
+
         else:
             self.octavewrapper.close()
+
         if self.hist_file:
             with open(self.hist_file, 'wb') as fid:
                 fid.write('\n'.join(self.hist_cache[:self.max_hist_cache]))
+
         return {'status': 'ok', 'restart': restart}
 
     def _get_help(self, code):
@@ -227,11 +243,13 @@ class OctaveKernel(Kernel):
 
         if token in self.help_cache:
             info = self.help_cache[token]
+
         else:
             info = self._get_octave_info(token, detail_level)
             self.help_cache[token] = info
             if token in self.docstring_cache:
                 del self.docstring_cache[token]
+
         output = self._get_printable_info(info, detail_level)
         stream_content = {'name': 'stdout', 'data': output}
         self.send_response(self.iopub_socket, 'stream', stream_content)
