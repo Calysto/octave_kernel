@@ -4,7 +4,7 @@ import os
 import sys
 
 if sys.argv[-1] == 'publish':
-    os.system('python setup.py sdist upload')
+    os.system('python setup.py register')
     os.system('python setup.py sdist --formats=gztar,zip upload')
     sys.exit()
 
@@ -23,7 +23,7 @@ with open('octave_kernel.py') as f:
     lines = f.readlines()
 for line in lines:
     if line.startswith('__version__'):
-        version = line.split()[-1]
+        version = line.split()[-1][1:-1]
 
 svem_flag = '--single-version-externally-managed'
 if svem_flag in sys.argv:
