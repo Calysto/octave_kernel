@@ -226,7 +226,7 @@ class OctaveKernel(Kernel):
 
         if self.hist_file:
             with open(self.hist_file, 'wb') as fid:
-                fid.write('\n'.join(self.hist_cache[:self.max_hist_cache]))
+                fid.write('\n'.join(self.hist_cache[-self.max_hist_cache:]))
 
         return {'status': 'ok', 'restart': restart}
 
