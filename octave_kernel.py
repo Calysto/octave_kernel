@@ -9,7 +9,7 @@ from subprocess import check_output
 import re
 import logging
 
-__version__ = '0.3'
+__version__ = '0.4'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
@@ -50,7 +50,7 @@ class OctaveKernel(Kernel):
         self.inspector = Inspector()
         self.inspector.set_active_scheme("Linux")
 
-        self.log.setLevel(logging.CRITICAL)
+        self.log.setLevel(logging.INFO)
 
         try:
             self.hist_file = os.path.join(locate_profile(),
@@ -94,7 +94,7 @@ class OctaveKernel(Kernel):
 
         interrupted = False
         try:
-            output = self.octavewrapper._eval([code])
+            output = self.octavewrapper._eval(str(code))
 
         except KeyboardInterrupt:
             self.octavewrapper._session.proc.send_signal(signal.SIGINT)
@@ -113,6 +113,8 @@ class OctaveKernel(Kernel):
                 output = ''
             elif output == 'Octave Session Interrupted':
                 interrupted = True
+            else:
+                output = str(output)
 
         if not silent:
             stream_content = {'name': 'stdout', 'data': output}
@@ -181,6 +183,7 @@ class OctaveKernel(Kernel):
                 docstring = self.help_cache[token]['docstring']
 
             else:
+                self.log.info(token)
                 docstring = self._get_octave_info(token,
                                                   detail_level)['docstring']
                 self.docstring_cache[token] = docstring
@@ -319,7 +322,7 @@ class OctaveKernel(Kernel):
             return self.inspector.info(obj, detail_level=detail_level)
 
         exist = oc.run('exist "%s"' % obj)
-        if exist.endswith('0'):
+        if exist == 0:
             return info
 
         try:

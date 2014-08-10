@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+0.4 (2014-08-10)
+++++++++++++++++
+- Add compatibility for oct2py >= 2.0.
+
+
 0.3 (2014-08-03)
 +++++++++++++++++
 - Cache help strings and calltips for fast re-trigger.
