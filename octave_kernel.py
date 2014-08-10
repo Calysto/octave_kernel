@@ -8,6 +8,10 @@ import signal
 from subprocess import check_output
 import re
 import logging
+import tempfile
+import sys
+from glob import glob
+from shutil import rmtree
 
 __version__ = '0.4'
 
@@ -44,6 +48,8 @@ class OctaveKernel(Kernel):
         try:
             self.octavewrapper = octave
             octave.restart()
+            # make sure the kernel is ready at startup
+            octave._eval('1')
         finally:
             signal.signal(signal.SIGINT, sig)
 
@@ -92,34 +98,21 @@ class OctaveKernel(Kernel):
             self._get_help(code)
             return abort_msg
 
-        interrupted = False
         try:
-            output = self.octavewrapper._eval(str(code))
-
-        except KeyboardInterrupt:
-            self.octavewrapper._session.proc.send_signal(signal.SIGINT)
-            interrupted = True
-            output = 'Octave Session Interrupted'
+            self._pre_call()
+            output = self._eval(code)
+            plot_dir, plot_format = self._post_call()
 
         except Oct2PyError as e:
             return self._handle_error(str(e))
-
-        except Exception:
-            self.octavewrapper.restart()
-            output = 'Uncaught Exception, Restarting Octave'
-
-        else:
-            if output is None:
-                output = ''
-            output = str(output)
-            if output == 'Octave Session Interrupted':
-                interrupted = True
 
         if not silent:
             stream_content = {'name': 'stdout', 'data': output}
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
-        if interrupted:
+            self._handle_figures(plot_dir, plot_format)
+
+        if output == 'Octave Session Interrupted':
             return abort_msg
 
         return {'status': 'ok', 'execution_count': self.execution_count,
@@ -127,7 +120,7 @@ class OctaveKernel(Kernel):
 
     def do_complete(self, code, cursor_pos):
         """Get code completions using Octave's 'completion_matches'"""
-        self.log.info(code)
+
         code = code[:cursor_pos]
         default = {'matches': [], 'cursor_start': 0,
                    'cursor_end': cursor_pos, 'metadata': dict(),
@@ -152,7 +145,6 @@ class OctaveKernel(Kernel):
                 if item.startswith(token) and not item in matches:
                     matches.append(item)
 
-        self.log.info(token)
         matches.extend(_complete_path(token))
 
         return {'matches': matches, 'cursor_start': start,
@@ -175,11 +167,9 @@ class OctaveKernel(Kernel):
                 docstring = self.help_cache[token]['docstring']
 
             else:
-                self.log.info(token)
                 info = _get_octave_info(self.octavewrapper,
                                         self.inspector,
                                         token, detail_level)
-                self.log.info(info)
                 docstring = info['docstring']
                 self.docstring_cache[token] = docstring
 
@@ -228,6 +218,69 @@ class OctaveKernel(Kernel):
 
         return {'status': 'ok', 'restart': restart}
 
+    def _eval(self, code):
+        output = ''
+
+        try:
+            output = self.octavewrapper._eval(str(code))
+
+        except KeyboardInterrupt:
+            self.octavewrapper._session.proc.send_signal(signal.SIGINT)
+            output = 'Octave Session Interrupted'
+
+        except Oct2PyError as e:
+            raise Oct2PyError(str(e))
+
+        except Exception:
+            self.octavewrapper.restart()
+            output = 'Uncaught Exception, Restarting Octave'
+
+        if output is None:
+            output = ''
+        output = str(output)
+
+        return output
+
+    def _pre_call(self):
+        pre_call = """
+        global __ipy_figures = [];
+        page_screen_output(0);
+
+        function fig_create(src, event)
+          global __ipy_figures;
+          __ipy_figures(size(__ipy_figures) + 1) = src;
+          set(src, "visible", "off");
+        end
+
+        set(0, 'DefaultFigureCreateFcn', @fig_create);
+
+        close all;
+        clear ans;
+        """
+        self._eval(pre_call)
+
+    def _post_call(self):
+        # generate plots in a temporary directory
+        plot_dir = tempfile.mkdtemp().replace('\\', '/')
+
+        if sys.platform == 'win32':
+            # Use svg by default due to lack of Ghostscript on Windows Octave
+            plot_format = 'svg'
+        else:
+            plot_format = 'png'
+
+        post_call = """
+        for f = __ipy_figures
+          outfile = sprintf('%s/__ipy_oct_fig_%%03d.png', f);
+          try
+            print(f, outfile, '-d%s', '-tight');
+          end
+        end
+        """ % (plot_dir, plot_format)
+
+        self._eval(post_call)
+        return plot_dir, plot_format
+
     def _get_help(self, code):
         if code.startswith('??') or code.endswith('??'):
             detail_level = 1
@@ -270,6 +323,30 @@ class OctaveKernel(Kernel):
 
         return {'status': 'error', 'execution_count': self.execution_count,
                 'ename': '', 'evalue': err, 'traceback': []}
+
+    def _handle_figures(self, plot_dir, plot_format):
+        _mimetypes = {'png': 'image/png',
+                      'svg': 'image/svg+xml',
+                      'jpg': 'image/jpeg',
+                      'jpeg': 'image/jpeg'}
+
+        images = []
+        for imgfile in glob("%s/*" % plot_dir):
+            with open(imgfile, 'rb') as fid:
+                images.append(fid.read())
+        rmtree(plot_dir)
+
+        plot_mime_type = _mimetypes.get(plot_format, 'image/png')
+
+        for image in images:
+            data = {plot_mime_type: image.encode('base64')}
+            metadata = {plot_mime_type: {'width': 640, 'height': 480}}
+
+            self.log.info('Sending a plot')
+            stream_content = {'source': 'octave_kernel', 'data': data,
+                              'metadata': metadata}
+            self.send_response(self.iopub_socket, 'display_data',
+                               stream_content)
 
 
 def _get_printable_info(inspector, info, detail_level=0):
@@ -327,7 +404,10 @@ def _get_octave_info(octave, inspector, obj, detail_level):
     except Oct2PyError:
         help_str = None
 
-    type_str = oc.type(obj)[0].strip()
+    try:
+        type_str = oc.type(obj)[0].strip()
+    except Oct2PyError:
+        type_str = ''
 
     try:
         cls_str = oc.run("class(%s)" % obj)
@@ -339,7 +419,10 @@ def _get_octave_info(octave, inspector, obj, detail_level):
 
     is_var = 'is a variable' in type_first_line
     if is_var:
-        var = oc.get(obj)
+        try:
+            var = oc.get(obj)
+        except Oct2PyError:
+            var = None
 
     info['found'] = True
     info['docstring'] = help_str or type_first_line
