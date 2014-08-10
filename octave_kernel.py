@@ -111,10 +111,9 @@ class OctaveKernel(Kernel):
         else:
             if output is None:
                 output = ''
-            elif output == 'Octave Session Interrupted':
+            output = str(output)
+            if output == 'Octave Session Interrupted':
                 interrupted = True
-            else:
-                output = str(output)
 
         if not silent:
             stream_content = {'name': 'stdout', 'data': output}
@@ -128,6 +127,7 @@ class OctaveKernel(Kernel):
 
     def do_complete(self, code, cursor_pos):
         """Get code completions using Octave's 'completion_matches'"""
+        self.log.info(code)
         code = code[:cursor_pos]
         default = {'matches': [], 'cursor_start': 0,
                    'cursor_end': cursor_pos, 'metadata': dict(),
@@ -141,27 +141,19 @@ class OctaveKernel(Kernel):
             return default
         token = tokens[-1]
 
-        if os.sep in token:
-            dname = os.path.dirname(token)
-            rest = os.path.basename(token)
+        start = cursor_pos - len(token)
+        cmd = 'completion_matches("%s")' % token
+        output = self.octavewrapper._eval(str(cmd))
+        matches = []
 
-            if os.path.exists(dname):
-                files = os.listdir(dname)
-                matches = [f for f in files if f.startswith(rest)]
-                start = cursor_pos - len(rest)
-
-            else:
-                return default
-
-        else:
-            start = cursor_pos - len(token)
-            cmd = 'completion_matches("%s")' % token
-            output = self.octavewrapper._eval([cmd])
+        if output:
             matches = output.split()
-
             for item in dir(self.octavewrapper):
                 if item.startswith(token) and not item in matches:
                     matches.append(item)
+
+        self.log.info(token)
+        matches.extend(_complete_path(token))
 
         return {'matches': matches, 'cursor_start': start,
                 'cursor_end': cursor_pos, 'metadata': dict(),
@@ -184,8 +176,11 @@ class OctaveKernel(Kernel):
 
             else:
                 self.log.info(token)
-                docstring = self._get_octave_info(token,
-                                                  detail_level)['docstring']
+                info = _get_octave_info(self.octavewrapper,
+                                        self.inspector,
+                                        token, detail_level)
+                self.log.info(info)
+                docstring = info['docstring']
                 self.docstring_cache[token] = docstring
 
             if docstring:
@@ -249,12 +244,13 @@ class OctaveKernel(Kernel):
             info = self.help_cache[token]
 
         else:
-            info = self._get_octave_info(token, detail_level)
+            info = _get_octave_info(self.octavewrapper, self.inspector,
+                                    token, detail_level)
             self.help_cache[token] = info
             if token in self.docstring_cache:
                 del self.docstring_cache[token]
 
-        output = self._get_printable_info(info, detail_level)
+        output = _get_printable_info(self.inspector, info, detail_level)
         stream_content = {'name': 'stdout', 'data': output}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
@@ -275,81 +271,124 @@ class OctaveKernel(Kernel):
         return {'status': 'error', 'execution_count': self.execution_count,
                 'ename': '', 'evalue': err, 'traceback': []}
 
-    def _get_printable_info(self, info, detail_level=0):
-        inspector = self.inspector
-        displayfields = []
 
-        def add_fields(fields):
-            for title, key in fields:
-                field = info[key]
-                if field is not None:
-                    displayfields.append((title, field.rstrip()))
+def _get_printable_info(inspector, info, detail_level=0):
+    displayfields = []
 
-        add_fields(inspector.pinfo_fields1)
-        add_fields(inspector.pinfo_fields2)
-        add_fields(inspector.pinfo_fields3)
+    def add_fields(fields):
+        for title, key in fields:
+            field = info[key]
+            if field is not None:
+                displayfields.append((title, field.rstrip()))
 
-        # Source or docstring, depending on detail level and whether
-        # source found.
-        if detail_level > 0 and info['source'] is not None:
-            source = cast_unicode(info['source'])
-            displayfields.append(("Source",  source))
+    add_fields(inspector.pinfo_fields1)
+    add_fields(inspector.pinfo_fields2)
+    add_fields(inspector.pinfo_fields3)
 
-        elif info['docstring'] is not None:
-            displayfields.append(("Docstring", info["docstring"]))
+    # Source or docstring, depending on detail level and whether
+    # source found.
+    if detail_level > 0 and info['source'] is not None:
+        source = cast_unicode(info['source'])
+        displayfields.append(("Source",  source))
 
-        # Info for objects:
-        else:
-            add_fields(inspector.pinfo_fields_obj)
+    elif info['docstring'] is not None:
+        displayfields.append(("Docstring", info["docstring"]))
 
-        # Finally send to printer/pager:
-        if displayfields:
-            return inspector._format_fields(displayfields)
+    # Info for objects:
+    else:
+        add_fields(inspector.pinfo_fields_obj)
 
-    def _get_octave_info(self, obj, detail_level):
-        info = dict(argspec=None, base_class=None, call_def=None,
-                    call_docstring=None, class_docstring=None,
-                    definition=None, docstring=None, file=None,
-                    found=False, init_definition=None,
-                    init_docstring=None, isalias=0, isclass=None,
-                    ismagic=0, length=None, name='', namespace=None,
-                    source=None, string_form=None, type_name='')
+    # Finally send to printer/pager:
+    if displayfields:
+        return inspector._format_fields(displayfields)
 
-        oc = self.octavewrapper
 
-        if obj in dir(oc):
-            obj = getattr(oc, obj)
-            return self.inspector.info(obj, detail_level=detail_level)
+def _get_octave_info(octave, inspector, obj, detail_level):
+    info = dict(argspec=None, base_class=None, call_def=None,
+                call_docstring=None, class_docstring=None,
+                definition=None, docstring=None, file=None,
+                found=False, init_definition=None,
+                init_docstring=None, isalias=0, isclass=None,
+                ismagic=0, length=None, name='', namespace=None,
+                source=None, string_form=None, type_name='')
 
-        exist = oc.run('exist "%s"' % obj)
-        if exist == 0:
-            return info
+    oc = octave
 
-        try:
-            help_str = oc.run('help %s' % obj)
-        except Oct2PyError:
-            help_str = None
-        type_str = oc.type(obj)[0].strip()
-        cls_str = oc.run("class %s" % obj)[6:]
+    if obj in dir(oc):
+        obj = getattr(oc, obj)
+        return inspector.info(obj, detail_level=detail_level)
 
-        type_first_line = type_str.splitlines()[0]
-        type_str = '\n'.join(type_str.splitlines()[1:])
-        is_var = 'is a variable' in type_first_line
-
-        info['found'] = True
-        info['docstring'] = help_str or type_first_line
-        info['type_name'] = cls_str if is_var else 'built-in function'
-        info['source'] = help_str
-        info['string_form'] = obj if not is_var else type_str.rstrip()
-
-        if type_first_line.rstrip().endswith('.m'):
-            info['file'] = type_first_line.split()[-1]
-            info['type_name'] = 'function'
-            info['source'] = type_str
-            if not help_str:
-                info['docstring'] = None
-
+    exist = oc.run('exist "%s"' % obj)
+    if exist == 0:
         return info
+
+    try:
+        help_str = oc.run('help %s' % obj)
+    except Oct2PyError:
+        help_str = None
+
+    type_str = oc.type(obj)[0].strip()
+
+    try:
+        cls_str = oc.run("class(%s)" % obj)
+    except Oct2PyError:
+        cls_str = ''
+
+    type_first_line = type_str.splitlines()[0]
+    type_str = '\n'.join(type_str.splitlines()[1:])
+
+    is_var = 'is a variable' in type_first_line
+    if is_var:
+        var = oc.get(obj)
+
+    info['found'] = True
+    info['docstring'] = help_str or type_first_line
+    info['type_name'] = cls_str if is_var else 'built-in function'
+    info['source'] = help_str
+    info['string_form'] = obj if not is_var else str(var)
+
+    if type_first_line.rstrip().endswith('.m'):
+        info['file'] = type_first_line.split()[-1]
+        info['type_name'] = 'function'
+        info['source'] = type_str
+
+        if not help_str:
+            info['docstring'] = None
+
+    return info
+
+
+def _listdir(root):
+    "List directory 'root' appending the path separator to subdirs."
+    res = []
+    for name in os.listdir(root):
+        path = os.path.join(root, name)
+        if os.path.isdir(path):
+            name += os.sep
+        res.append(name)
+    return res
+
+
+def _complete_path(path=None):
+    """Perform completion of filesystem path.
+
+    http://stackoverflow.com/questions/5637124/tab-completion-in-pythons-raw-input
+    """
+    if not path:
+        return _listdir('.')
+    dirname, rest = os.path.split(path)
+    tmp = dirname if dirname else '.'
+    res = [os.path.join(dirname, p)
+           for p in _listdir(tmp) if p.startswith(rest)]
+    # more than one match, or single match which does not exist (typo)
+    if len(res) > 1 or not os.path.exists(path):
+        return res
+    # resolved to a single directory, so return list of files below it
+    if os.path.isdir(path):
+        return [os.path.join(path, p) for p in _listdir(path)]
+    # exact file match terminates this completion
+    return [path + ' ']
+
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
