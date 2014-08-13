@@ -1,5 +1,0 @@
-{"argv":["python","-m","octave_kernel", "-f", "{connection_file}"],
- "display_name":"Octave",
- "language":"octave",
- "codemirror_mode":"octave"
-}
