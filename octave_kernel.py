@@ -12,6 +12,7 @@ import tempfile
 import sys
 from glob import glob
 from shutil import rmtree
+from xml.dom import minidom
 
 __version__ = '0.4'
 
@@ -167,9 +168,7 @@ class OctaveKernel(Kernel):
                 docstring = self.help_cache[token]['docstring']
 
             else:
-                info = _get_octave_info(self.octavewrapper,
-                                        self.inspector,
-                                        token, detail_level)
+                info =self. _get_octave_info(token, detail_level)
                 docstring = info['docstring']
                 self.docstring_cache[token] = docstring
 
@@ -263,8 +262,7 @@ class OctaveKernel(Kernel):
         # generate plots in a temporary directory
         plot_dir = tempfile.mkdtemp().replace('\\', '/')
 
-        if sys.platform == 'win32':
-            # Use svg by default due to lack of Ghostscript on Windows Octave
+        if os.name == 'nt':
             plot_format = 'svg'
         else:
             plot_format = 'png'
@@ -297,11 +295,11 @@ class OctaveKernel(Kernel):
             info = self.help_cache[token]
 
         else:
-            info = _get_octave_info(self.octavewrapper, self.inspector,
-                                    token, detail_level)
-            self.help_cache[token] = info
-            if token in self.docstring_cache:
-                del self.docstring_cache[token]
+            info = self. _get_octave_info(token, detail_level)
+            if info['type_name'] == 'built-in function':
+                self.help_cache[token] = info
+                if token in self.docstring_cache:
+                    del self.docstring_cache[token]
 
         output = _get_printable_info(self.inspector, info, detail_level)
         stream_content = {'name': 'stdout', 'data': output}
@@ -325,6 +323,9 @@ class OctaveKernel(Kernel):
                 'ename': '', 'evalue': err, 'traceback': []}
 
     def _handle_figures(self, plot_dir, plot_format):
+
+        width, height = 640, 480
+
         _mimetypes = {'png': 'image/png',
                       'svg': 'image/svg+xml',
                       'jpg': 'image/jpeg',
@@ -339,14 +340,82 @@ class OctaveKernel(Kernel):
         plot_mime_type = _mimetypes.get(plot_format, 'image/png')
 
         for image in images:
-            data = {plot_mime_type: image.encode('base64')}
-            metadata = {plot_mime_type: {'width': 640, 'height': 480}}
+            if plot_format == 'svg':
+                image = _fix_gnuplot_svg_size(image, size=(width, height))
+            else:
+                image = image.encode('base64')
+            data = {plot_mime_type: image}
+            metadata = {plot_mime_type: {'width': width, 'height': height}}
 
             self.log.info('Sending a plot')
             stream_content = {'source': 'octave_kernel', 'data': data,
                               'metadata': metadata}
             self.send_response(self.iopub_socket, 'display_data',
                                stream_content)
+
+    def _get_octave_info(self, obj, detail_level):
+        info = dict(argspec=None, base_class=None, call_def=None,
+                    call_docstring=None, class_docstring=None,
+                    definition=None, docstring=None, file=None,
+                    found=False, init_definition=None,
+                    init_docstring=None, isalias=0, isclass=None,
+                    ismagic=0, length=None, name='', namespace=None,
+                    source=None, string_form=None, type_name='')
+
+        oc = self.octavewrapper
+
+        if obj in dir(oc):
+            obj = getattr(oc, obj)
+            return self.inspector.info(obj, detail_level=detail_level)
+
+        exist = oc.run('exist "%s"' % obj)
+        if exist == 0:
+            return info
+
+        try:
+            help_str = oc.run('help %s' % obj)
+        except Oct2PyError:
+            help_str = None
+
+        try:
+            type_str = oc.type(obj)[0].strip()
+        except Oct2PyError:
+            type_str = ''
+
+        try:
+            cls_str = oc.run("class(%s)" % obj)
+        except Oct2PyError:
+            cls_str = ''
+
+        if type_str:
+            type_first_line = type_str.splitlines()[0]
+            type_str = '\n'.join(type_str.splitlines()[1:])
+        else:
+            type_first_line = ''
+
+        try:
+            var = oc.get(obj)
+        except Oct2PyError:
+            var = None
+
+        if var:
+            help_str = '%s is a variable' % obj
+
+        info['found'] = True
+        info['docstring'] = help_str or type_first_line
+        info['type_name'] = cls_str if not var is None else 'built-in function'
+        info['source'] = help_str
+        info['string_form'] = obj if var is None else str(var)
+
+        if type_first_line.rstrip().endswith('.m'):
+            info['file'] = type_first_line.split()[-1]
+            info['type_name'] = 'function'
+            info['source'] = type_str
+
+            if not help_str:
+                info['docstring'] = None
+
+        return info
 
 
 def _get_printable_info(inspector, info, detail_level=0):
@@ -380,67 +449,6 @@ def _get_printable_info(inspector, info, detail_level=0):
         return inspector._format_fields(displayfields)
 
 
-def _get_octave_info(octave, inspector, obj, detail_level):
-    info = dict(argspec=None, base_class=None, call_def=None,
-                call_docstring=None, class_docstring=None,
-                definition=None, docstring=None, file=None,
-                found=False, init_definition=None,
-                init_docstring=None, isalias=0, isclass=None,
-                ismagic=0, length=None, name='', namespace=None,
-                source=None, string_form=None, type_name='')
-
-    oc = octave
-
-    if obj in dir(oc):
-        obj = getattr(oc, obj)
-        return inspector.info(obj, detail_level=detail_level)
-
-    exist = oc.run('exist "%s"' % obj)
-    if exist == 0:
-        return info
-
-    try:
-        help_str = oc.run('help %s' % obj)
-    except Oct2PyError:
-        help_str = None
-
-    try:
-        type_str = oc.type(obj)[0].strip()
-    except Oct2PyError:
-        type_str = ''
-
-    try:
-        cls_str = oc.run("class(%s)" % obj)
-    except Oct2PyError:
-        cls_str = ''
-
-    type_first_line = type_str.splitlines()[0]
-    type_str = '\n'.join(type_str.splitlines()[1:])
-
-    is_var = 'is a variable' in type_first_line
-    if is_var:
-        try:
-            var = oc.get(obj)
-        except Oct2PyError:
-            var = None
-
-    info['found'] = True
-    info['docstring'] = help_str or type_first_line
-    info['type_name'] = cls_str if is_var else 'built-in function'
-    info['source'] = help_str
-    info['string_form'] = obj if not is_var else str(var)
-
-    if type_first_line.rstrip().endswith('.m'):
-        info['file'] = type_first_line.split()[-1]
-        info['type_name'] = 'function'
-        info['source'] = type_str
-
-        if not help_str:
-            info['docstring'] = None
-
-    return info
-
-
 def _listdir(root):
     "List directory 'root' appending the path separator to subdirs."
     res = []
@@ -472,6 +480,32 @@ def _complete_path(path=None):
     # exact file match terminates this completion
     return [path + ' ']
 
+
+def _fix_gnuplot_svg_size(image, size=None):
+        """
+        GnuPlot SVGs do not have height/width attributes.  Set
+        these to be the same as the viewBox, so that the browser
+        scales the image correctly.
+
+        Parameters
+        ----------
+        image : str
+            SVG data.
+        size : tuple of int
+            Image width, height.
+
+        """
+        (svg,) = minidom.parseString(image).getElementsByTagName('svg')
+        viewbox = svg.getAttribute('viewBox').split(' ')
+
+        if size is not None:
+            width, height = size
+        else:
+            width, height = viewbox[2:]
+
+        svg.setAttribute('width', '%dpx' % width)
+        svg.setAttribute('height', '%dpx' % height)
+        return svg.toxml()
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
