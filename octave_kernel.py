@@ -58,7 +58,7 @@ class OctaveKernel(Kernel):
         self.inspector = Inspector()
         self.inspector.set_active_scheme("Linux")
 
-        self.log.setLevel(logging.CRITICAL)
+        self.log.setLevel(logging.INFO)
 
         try:
             self.hist_file = os.path.join(locate_profile(),
@@ -71,6 +71,7 @@ class OctaveKernel(Kernel):
         self.hist_cache = []
         self.docstring_cache = {}
         self.help_cache = {}
+        self.inline = False
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
@@ -92,8 +93,15 @@ class OctaveKernel(Kernel):
             self.do_shutdown(False)
             return abort_msg
 
-        elif code == 'restart':
+        elif code == 'restart' or code.startswith('restart('):
             self.octavewrapper.restart()
+            return abort_msg
+
+        elif code == '%inline':
+            self.inline = not self.inline
+            output = "Inline is set to %s" % self.inline
+            stream_content = {'name': 'stdout', 'data': output}
+            self.send_response(self.iopub_socket, 'stream', stream_content)
             return abort_msg
 
         elif code.endswith('?') or code.startswith('?'):
@@ -101,9 +109,9 @@ class OctaveKernel(Kernel):
             return abort_msg
 
         try:
-            self._pre_call()
             output = self._eval(code)
-            plot_dir, plot_format = self._post_call()
+            if self.inline:
+                plot_dir, plot_format = self._post_call()
 
         except Oct2PyError as e:
             return self._handle_error(str(e))
@@ -111,8 +119,8 @@ class OctaveKernel(Kernel):
         if not silent:
             stream_content = {'name': 'stdout', 'data': output}
             self.send_response(self.iopub_socket, 'stream', stream_content)
-
-            self._handle_figures(plot_dir, plot_format)
+            if self.inline:
+                self._handle_figures(plot_dir, plot_format)
 
         if output == 'Octave Session Interrupted':
             return abort_msg
@@ -138,7 +146,12 @@ class OctaveKernel(Kernel):
 
         start = cursor_pos - len(token)
         cmd = 'completion_matches("%s")' % token
-        output = self.octavewrapper._eval(str(cmd))
+        try:
+            output = self.octavewrapper._eval(str(cmd), timeout=2)
+        except Oct2PyError as e:
+            self.log.error(e)
+            return default
+
         matches = []
 
         if output:
@@ -169,7 +182,12 @@ class OctaveKernel(Kernel):
                 docstring = self.help_cache[token]['docstring']
 
             else:
-                info =self. _get_octave_info(token, detail_level)
+                try:
+                    info = self. _get_octave_info(token, detail_level)
+                except Exception as e:
+                    self.log.error(e)
+                    return default
+
                 docstring = info['docstring']
                 self.docstring_cache[token] = docstring
 
@@ -231,7 +249,8 @@ class OctaveKernel(Kernel):
         except Oct2PyError as e:
             raise Oct2PyError(str(e))
 
-        except Exception:
+        except Exception as e:
+            self.log.error(e)
             self.octavewrapper.restart()
             output = 'Uncaught Exception, Restarting Octave'
 
@@ -241,26 +260,8 @@ class OctaveKernel(Kernel):
 
         return output
 
-    def _pre_call(self):
-        pre_call = """
-        global __ipy_figures = [];
-        page_screen_output(0);
-
-        function fig_create(src, event)
-          global __ipy_figures;
-          __ipy_figures(size(__ipy_figures) + 1) = src;
-          set(src, "visible", "off");
-        end
-
-        set(0, 'DefaultFigureCreateFcn', @fig_create);
-
-        close all;
-        clear ans;
-        """
-        self._eval(pre_call)
-
     def _post_call(self):
-        # generate plots in a temporary directory
+        '''Generate plots in a temporary directory.'''
         plot_dir = tempfile.mkdtemp().replace('\\', '/')
 
         if os.name == 'nt':
@@ -269,11 +270,12 @@ class OctaveKernel(Kernel):
             plot_format = 'png'
 
         post_call = """
-        for f = __ipy_figures
+        for f = __oct2py_figures
           outfile = sprintf('%s/__ipy_oct_fig_%%03d.png', f);
-          try
-            print(f, outfile, '-d%s', '-tight');
-          end
+              try
+                print(f, outfile, '-d%s', '-tight');
+                close(f);
+              end
         end
         """ % (plot_dir, plot_format)
 
@@ -296,7 +298,11 @@ class OctaveKernel(Kernel):
             info = self.help_cache[token]
 
         else:
-            info = self. _get_octave_info(token, detail_level)
+            try:
+                info = self. _get_octave_info(token, detail_level)
+            except Exception as e:
+                self.log.error(e)
+                return
             if info['type_name'] == 'built-in function':
                 self.help_cache[token] = info
                 if token in self.docstring_cache:
@@ -369,22 +375,26 @@ class OctaveKernel(Kernel):
             obj = getattr(oc, obj)
             return self.inspector.info(obj, detail_level=detail_level)
 
-        exist = oc.run('exist "%s"' % obj)
+        try:
+            exist = oc.run('exist "%s"' % obj, timeout=1)
+        except Oct2PyError:
+            return info
+
         if exist == 0:
             return info
 
         try:
-            help_str = oc.run('help %s' % obj)
+            help_str = oc.run('help %s' % obj, timeout=1)
         except Oct2PyError:
             help_str = None
 
         try:
-            type_str = oc.type(obj)[0].strip()
+            type_str = oc.type(obj, timeout=0.5)[0].strip()
         except Oct2PyError:
             type_str = ''
 
         try:
-            cls_str = oc.run("class(%s)" % obj)
+            cls_str = oc.run("class(%s)" % obj, timeout=0.5)
         except Oct2PyError:
             cls_str = ''
 
@@ -395,18 +405,22 @@ class OctaveKernel(Kernel):
             type_first_line = ''
 
         try:
-            var = oc.get(obj)
+            var = oc.get(obj, timeout=1)
         except Oct2PyError:
             var = None
 
-        if var:
-            help_str = '%s is a variable' % obj
+        string_form = obj
+
+        if not var is None:
+            help_str = '%s is a variable of type %s.' % (obj, cls_str)
+            type_str = cls_str
+            string_form = str(var)
 
         info['found'] = True
         info['docstring'] = help_str or type_first_line
-        info['type_name'] = cls_str if not var is None else 'built-in function'
+        info['type_name'] = type_str
         info['source'] = help_str
-        info['string_form'] = obj if var is None else str(var)
+        info['string_form'] = string_form
 
         if type_first_line.rstrip().endswith('.m'):
             info['file'] = type_first_line.split()[-1]
