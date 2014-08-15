@@ -50,7 +50,7 @@ class OctaveKernel(Kernel):
             self.octavewrapper = octave
             octave.restart()
             # make sure the kernel is ready at startup
-            octave._eval('1')
+            octave.eval('1')
         finally:
             signal.signal(signal.SIGINT, sig)
 
@@ -109,8 +109,8 @@ class OctaveKernel(Kernel):
 
         try:
             if self.inline:
-                code = '__inline=1;' + code
-            output = self._eval(code)
+                code = '__inline=1;close all;' + code
+            output = self.eval(code)
             if self.inline:
                 plot_dir, plot_format = self._post_call()
 
@@ -148,7 +148,7 @@ class OctaveKernel(Kernel):
         start = cursor_pos - len(token)
         cmd = 'completion_matches("%s")' % token
         try:
-            output = self.octavewrapper._eval(str(cmd), timeout=3)
+            output = self.octavewrapper.eval(str(cmd), timeout=3)
         except Oct2PyError as e:
             self.log.error(e)
             return default
@@ -237,11 +237,11 @@ class OctaveKernel(Kernel):
 
         return {'status': 'ok', 'restart': restart}
 
-    def _eval(self, code):
+    def eval(self, code):
         output = ''
 
         try:
-            output = self.octavewrapper._eval(str(code))
+            output = self.octavewrapper.eval(str(code))
 
         except KeyboardInterrupt:
             self.octavewrapper._session.proc.send_signal(signal.SIGINT)
@@ -280,7 +280,7 @@ class OctaveKernel(Kernel):
         end
         """ % (plot_dir, plot_format)
 
-        self._eval(post_call)
+        self.eval(post_call)
         return plot_dir, plot_format
 
     def _get_help(self, code):
@@ -377,7 +377,7 @@ class OctaveKernel(Kernel):
             return self.inspector.info(obj, detail_level=detail_level)
 
         try:
-            exist = oc.run('exist "%s"' % obj, timeout=1)
+            exist = oc.eval('exist "%s"' % obj, timeout=1)
         except Oct2PyError:
             return info
 
@@ -385,7 +385,7 @@ class OctaveKernel(Kernel):
             return info
 
         try:
-            help_str = oc.run('help %s' % obj, timeout=1)
+            help_str = oc.eval('help %s' % obj, timeout=1)
         except Oct2PyError:
             help_str = None
 
@@ -395,7 +395,7 @@ class OctaveKernel(Kernel):
             type_str = ''
 
         try:
-            cls_str = oc.run("class(%s)" % obj, timeout=0.5)
+            cls_str = oc.eval("class(%s)" % obj, timeout=0.5)
         except Oct2PyError:
             cls_str = ''
 
@@ -406,7 +406,7 @@ class OctaveKernel(Kernel):
             type_first_line = ''
 
         try:
-            var = oc.get(obj, timeout=1)
+            var = oc.pull(obj, timeout=1)
         except Oct2PyError:
             var = None
 
