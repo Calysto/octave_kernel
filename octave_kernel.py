@@ -10,6 +10,7 @@ import re
 import logging
 import tempfile
 import sys
+import base64
 from glob import glob
 from shutil import rmtree
 from xml.dom import minidom
@@ -343,7 +344,7 @@ class OctaveKernel(Kernel):
             if plot_format == 'svg':
                 image = _fix_gnuplot_svg_size(image, size=(width, height))
             else:
-                image = image.encode('base64')
+                image = base64.b64encode(image).decode('ascii')
             data = {plot_mime_type: image}
             metadata = {plot_mime_type: {'width': width, 'height': height}}
 
