@@ -58,7 +58,7 @@ class OctaveKernel(Kernel):
         self.inspector = Inspector()
         self.inspector.set_active_scheme("Linux")
 
-        self.log.setLevel(logging.INFO)
+        self.log.setLevel(logging.CRITICAL)
 
         try:
             self.hist_file = os.path.join(locate_profile(),
@@ -357,7 +357,7 @@ class OctaveKernel(Kernel):
     def _get_octave_info(self, obj, detail_level):
         info = dict(argspec=None, base_class=None, call_def=None,
                     call_docstring=None, class_docstring=None,
-                    definition=None, docstring=None, file=None,
+                    definition=None, docstring='', file=None,
                     found=False, init_definition=None,
                     init_docstring=None, isalias=0, isclass=None,
                     ismagic=0, length=None, name='', namespace=None,
