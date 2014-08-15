@@ -1,5 +1,5 @@
-from distutils.core import setup
-from distutils.command.install import install
+from setuptools import setup
+from setuptools.command.install import install
 import json
 import os
 import sys
@@ -56,7 +56,7 @@ setup(name='octave_kernel',
       url='https://github.com/blink1073/octave_kernel',
       py_modules=['octave_kernel'],
       cmdclass={'install': install_with_kernelspec},
-      requires=['oct2py (>= 2.0)', 'IPython (>= 3.0)'],
+      install_requires=['oct2py >= 2.0', 'IPython >= 3.0'],
       classifiers=[
           'Framework :: IPython',
           'License :: OSI Approved :: BSD License',
