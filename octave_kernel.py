@@ -9,7 +9,6 @@ from subprocess import check_output
 import re
 import logging
 import tempfile
-import sys
 import base64
 from glob import glob
 from shutil import rmtree
@@ -109,6 +108,8 @@ class OctaveKernel(Kernel):
             return abort_msg
 
         try:
+            if self.inline:
+                code = '__inline=1;' + code
             output = self._eval(code)
             if self.inline:
                 plot_dir, plot_format = self._post_call()
@@ -147,7 +148,7 @@ class OctaveKernel(Kernel):
         start = cursor_pos - len(token)
         cmd = 'completion_matches("%s")' % token
         try:
-            output = self.octavewrapper._eval(str(cmd), timeout=2)
+            output = self.octavewrapper._eval(str(cmd), timeout=3)
         except Oct2PyError as e:
             self.log.error(e)
             return default
