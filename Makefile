@@ -1,5 +1,5 @@
 # Note: This is meant for Octave Kernel developer use only
-.PHONY: all clean test
+.PHONY: all clean release test
 
 export KILL_OCTAVE="from oct2py import kill_octave; kill_octave()"
 
@@ -12,6 +12,14 @@ clean:
 	rm -rf dist
 	find . -name "*.pyc" -o -name "*.py,cover"| xargs rm -f
 	python -c $(KILL_OCTAVE)
+
+
+release:
+	make clean
+	pip install wheel
+	python setup.py register
+	python setup.py bdist_wheel upload
+	python setup.py sdist --formats=gztar,zip upload
 
 test:
 	make clean

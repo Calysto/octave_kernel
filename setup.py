@@ -4,11 +4,6 @@ import json
 import os
 import sys
 
-if sys.argv[-1] == 'publish':
-    os.system('python setup.py register')
-    os.system('python setup.py sdist --formats=gztar,zip upload')
-    sys.exit()
-
 
 kernel_json = {"argv": [sys.executable, "-m", "octave_kernel", "-f",
                         "{connection_file}"],
