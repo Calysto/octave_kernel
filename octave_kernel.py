@@ -229,7 +229,7 @@ class OctaveKernel(Kernel):
             self.octavewrapper.restart()
 
         else:
-            self.octavewrapper.close()
+            self.octavewrapper.exit()
 
         if self.hist_file:
             with open(self.hist_file, 'wb') as fid:
