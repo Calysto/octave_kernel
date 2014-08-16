@@ -148,7 +148,7 @@ class OctaveKernel(Kernel):
         start = cursor_pos - len(token)
         cmd = 'completion_matches("%s")' % token
         try:
-            output = self.octavewrapper.eval(str(cmd), timeout=3)
+            output = self.octavewrapper.eval(str(cmd), timeout=5)
         except Oct2PyError as e:
             self.log.error(e)
             return default
@@ -233,7 +233,8 @@ class OctaveKernel(Kernel):
 
         if self.hist_file:
             with open(self.hist_file, 'wb') as fid:
-                fid.write('\n'.join(self.hist_cache[-self.max_hist_cache:]))
+                data = '\n'.join(self.hist_cache[-self.max_hist_cache:])
+                fid.write(data.encode('utf-8'))
 
         return {'status': 'ok', 'restart': restart}
 
