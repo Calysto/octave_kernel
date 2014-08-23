@@ -20,6 +20,8 @@ release:
 	python setup.py register
 	python setup.py bdist_wheel upload
 	python setup.py sdist --formats=gztar,zip upload
+	git tag v`python -c "import octave_kernel;print(octave_kernel.__version__)"`
+	git push origin master --all
 
 test:
 	make clean
