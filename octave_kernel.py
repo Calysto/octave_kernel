@@ -6,6 +6,7 @@ from oct2py import Oct2PyError, octave
 import os
 import signal
 from subprocess import check_output
+from optparse import OptionParser
 import re
 import logging
 import tempfile
@@ -70,7 +71,14 @@ class OctaveKernel(Kernel):
         self.hist_cache = []
         self.docstring_cache = {}
         self.help_cache = {}
+
         self.inline = False
+        self.plot_format = 'png' if not os.name == 'nt' else 'svg'
+        self.plot_size = '640,480'
+        p = self.inline_parser = OptionParser()
+        p.add_option('-f', '--format', action='store', help='Plot format (png, svg or jpg).')
+        p.add_option('-s', '--size', action='store',
+                                    help='Pixel size of plots, "width,height". Default is "-s 400,250".')
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
@@ -96,9 +104,18 @@ class OctaveKernel(Kernel):
             self.octavewrapper.restart()
             return abort_msg
 
-        elif code == '%inline':
-            self.inline = not self.inline
-            output = "Inline is set to %s" % self.inline
+        elif code.startswith('%inline'):
+            if len(code.split()) == 1:
+                self.inline = not self.inline
+            else:
+                self.inline = True
+
+            args, name = self.inline_parser.parse_args(code.split())
+            self.plot_format = args.format or self.plot_format
+            self.plot_size = args.size or self.plot_size
+
+            state = "OFF" if not self.inline else "ON"
+            output = "Inline plotting is %s" % state
             stream_content = {'name': 'stdout', 'data': output}
             self.send_response(self.iopub_socket, 'stream', stream_content)
             return abort_msg
@@ -109,10 +126,12 @@ class OctaveKernel(Kernel):
 
         try:
             if self.inline:
-                code = '__inline=1;close all;' + code
-            output = self.eval(code)
-            if self.inline:
-                plot_dir, plot_format = self._post_call()
+                plot_width, plot_height = [int(s) for s in self.plot_size.split(',')]
+                self.plot_dir =  tempfile.mkdtemp()
+                output = self.eval(code, plot_dir=self.plot_dir, plot_format=self.plot_format,
+                                                  plot_width=plot_width, plot_height=plot_height)
+            else:
+                output = self.eval(code)
 
         except Oct2PyError as e:
             return self._handle_error(str(e))
@@ -121,7 +140,7 @@ class OctaveKernel(Kernel):
             stream_content = {'name': 'stdout', 'data': output}
             self.send_response(self.iopub_socket, 'stream', stream_content)
             if self.inline:
-                self._handle_figures(plot_dir, plot_format)
+                self._handle_figures()
 
         if output == 'Octave Session Interrupted':
             return abort_msg
@@ -238,11 +257,11 @@ class OctaveKernel(Kernel):
 
         return {'status': 'ok', 'restart': restart}
 
-    def eval(self, code):
+    def eval(self, code, *args, **kwargs):
         output = ''
 
         try:
-            output = self.octavewrapper.eval(str(code))
+            output = self.octavewrapper.eval(str(code), *args, **kwargs)
 
         except KeyboardInterrupt:
             self.octavewrapper._session.proc.send_signal(signal.SIGINT)
@@ -261,28 +280,6 @@ class OctaveKernel(Kernel):
         output = str(output)
 
         return output
-
-    def _post_call(self):
-        '''Generate plots in a temporary directory.'''
-        plot_dir = tempfile.mkdtemp().replace('\\', '/')
-
-        if os.name == 'nt':
-            plot_format = 'svg'
-        else:
-            plot_format = 'png'
-
-        post_call = """
-        for f = __oct2py_figures
-          outfile = sprintf('%s/__ipy_oct_fig_%%03d.png', f);
-              try
-                print(f, outfile, '-d%s', '-tight');
-                close(f);
-              end
-        end
-        """ % (plot_dir, plot_format)
-
-        self.eval(post_call)
-        return plot_dir, plot_format
 
     def _get_help(self, code):
         if code.startswith('??') or code.endswith('??'):
@@ -331,9 +328,12 @@ class OctaveKernel(Kernel):
         return {'status': 'error', 'execution_count': self.execution_count,
                 'ename': '', 'evalue': err, 'traceback': []}
 
-    def _handle_figures(self, plot_dir, plot_format):
+    def _handle_figures(self):
 
-        width, height = 640, 480
+        plot_dir = self.plot_dir
+        plot_format = self.plot_format
+
+        width, height = [int(s) for s in self.plot_size.split(',')]
 
         _mimetypes = {'png': 'image/png',
                       'svg': 'image/svg+xml',

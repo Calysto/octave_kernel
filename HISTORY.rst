@@ -6,9 +6,8 @@ Release History
 0.4 (2014-08-10)
 ++++++++++++++++
 - Add Python 3 support.
-- Add %inline plotting toggle.
+- Add %inline plotting toggle with --format and --size options.
 - Add compatibility for oct2py >= 2.0.
-
 
 0.3 (2014-08-03)
 +++++++++++++++++
