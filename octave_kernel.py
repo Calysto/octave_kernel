@@ -15,6 +15,7 @@ from glob import glob
 from shutil import rmtree
 from xml.dom import minidom
 
+
 __version__ = '0.5'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
@@ -79,7 +80,7 @@ class OctaveKernel(Kernel):
         p.add_option(
             '-f', '--format', action='store', help='Plot format (png, svg or jpg).')
         p.add_option('-s', '--size', action='store',
-                     help='Pixel size of plots, "width,height". Default is "-s 400,250".')
+                     help='Pixel size of plots, "width,height". Default is "-s 640,480".')
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
