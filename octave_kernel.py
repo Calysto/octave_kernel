@@ -76,9 +76,10 @@ class OctaveKernel(Kernel):
         self.plot_format = 'png' if not os.name == 'nt' else 'svg'
         self.plot_size = '640,480'
         p = self.inline_parser = OptionParser()
-        p.add_option('-f', '--format', action='store', help='Plot format (png, svg or jpg).')
+        p.add_option(
+            '-f', '--format', action='store', help='Plot format (png, svg or jpg).')
         p.add_option('-s', '--size', action='store',
-                                    help='Pixel size of plots, "width,height". Default is "-s 400,250".')
+                     help='Pixel size of plots, "width,height". Default is "-s 400,250".')
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
@@ -100,39 +101,28 @@ class OctaveKernel(Kernel):
             self.do_shutdown(False)
             return abort_msg
 
-        elif code == 'restart' or code.startswith('restart('):
+        elif code in ['restart', '%restart'] or code.startswith('restart('):
             self.octavewrapper.restart()
             return abort_msg
 
         elif code.startswith('%inline'):
-            if len(code.split()) == 1:
-                self.inline = not self.inline
-            else:
-                self.inline = True
-
-            args, name = self.inline_parser.parse_args(code.split())
-            self.plot_format = args.format or self.plot_format
-            self.plot_size = args.size or self.plot_size
-
-            state = "OFF" if not self.inline else "ON"
-            output = "Inline plotting is %s" % state
-            stream_content = {'name': 'stdout', 'data': output}
-            self.send_response(self.iopub_socket, 'stream', stream_content)
+            self._handle_inline(code)
             return abort_msg
 
         elif code.endswith('?') or code.startswith('?'):
             self._get_help(code)
             return abort_msg
 
-        try:
-            if self.inline:
-                plot_width, plot_height = [int(s) for s in self.plot_size.split(',')]
-                self.plot_dir =  tempfile.mkdtemp()
-                output = self.eval(code, plot_dir=self.plot_dir, plot_format=self.plot_format,
-                                                  plot_width=plot_width, plot_height=plot_height)
-            else:
-                output = self.eval(code)
+        plot_width, plot_height = [int(s) for s in self.plot_size.split(',')]
+        if self.inline:
+            self.plot_dir = tempfile.mkdtemp()
+        else:
+            self.plot_dir = None
 
+        try:
+            output = self.eval(code, plot_dir=self.plot_dir,
+                               plot_format=self.plot_format,
+                               plot_width=plot_width, plot_height=plot_height)
         except Oct2PyError as e:
             return self._handle_error(str(e))
 
@@ -328,6 +318,21 @@ class OctaveKernel(Kernel):
         return {'status': 'error', 'execution_count': self.execution_count,
                 'ename': '', 'evalue': err, 'traceback': []}
 
+    def _handle_inline(self, code):
+        if len(code.split()) == 1:
+            self.inline = not self.inline
+        else:
+            self.inline = True
+
+        args, name = self.inline_parser.parse_args(code.split())
+        self.plot_format = args.format or self.plot_format
+        self.plot_size = args.size or self.plot_size
+
+        state = "OFF" if not self.inline else "ON"
+        output = "Inline plotting is %s" % state
+        stream_content = {'name': 'stdout', 'data': output}
+        self.send_response(self.iopub_socket, 'stream', stream_content)
+
     def _handle_figures(self):
 
         plot_dir = self.plot_dir
@@ -499,30 +504,30 @@ def _complete_path(path=None):
 
 
 def _fix_gnuplot_svg_size(image, size=None):
-        """
-        GnuPlot SVGs do not have height/width attributes.  Set
-        these to be the same as the viewBox, so that the browser
-        scales the image correctly.
+    """
+    GnuPlot SVGs do not have height/width attributes.  Set
+    these to be the same as the viewBox, so that the browser
+    scales the image correctly.
 
-        Parameters
-        ----------
-        image : str
-            SVG data.
-        size : tuple of int
-            Image width, height.
+    Parameters
+    ----------
+    image : str
+        SVG data.
+    size : tuple of int
+        Image width, height.
 
-        """
-        (svg,) = minidom.parseString(image).getElementsByTagName('svg')
-        viewbox = svg.getAttribute('viewBox').split(' ')
+    """
+    (svg,) = minidom.parseString(image).getElementsByTagName('svg')
+    viewbox = svg.getAttribute('viewBox').split(' ')
 
-        if size is not None:
-            width, height = size
-        else:
-            width, height = viewbox[2:]
+    if size is not None:
+        width, height = size
+    else:
+        width, height = viewbox[2:]
 
-        svg.setAttribute('width', '%dpx' % width)
-        svg.setAttribute('height', '%dpx' % height)
-        return svg.toxml()
+    svg.setAttribute('width', '%dpx' % width)
+    svg.setAttribute('height', '%dpx' % height)
+    return svg.toxml()
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp

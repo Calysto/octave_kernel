@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-0.5 (2014-08-xx)
+0.5 (2014-08-23)
 ++++++++++++++++
 - Add %inline --format and --size options.
 
