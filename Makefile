@@ -2,6 +2,7 @@
 .PHONY: all clean release test
 
 export KILL_OCTAVE="from oct2py import kill_octave; kill_octave()"
+export VERSION=`python -c "import octave_kernel;print(octave_kernel.__version__)"`
 
 all:
 	make clean
@@ -20,8 +21,9 @@ release:
 	python setup.py register
 	python setup.py bdist_wheel upload
 	python setup.py sdist --formats=gztar,zip upload
-	git tag v`python -c "import octave_kernel;print(octave_kernel.__version__)"`
+	git tag v$(VERSION)
 	git push origin --all
+	git push origin --tags
 
 test:
 	make clean
