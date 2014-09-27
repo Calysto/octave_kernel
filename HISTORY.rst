@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+0.6 (2014-09-24)
+++++++++++++++++
+- Update for compatibility with oct2py 2.4
+
+
 0.5 (2014-08-23)
 ++++++++++++++++
 - Add %inline --format and --size options.

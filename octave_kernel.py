@@ -16,7 +16,7 @@ from shutil import rmtree
 from xml.dom import minidom
 
 
-__version__ = '0.5'
+__version__ = '0.6'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
@@ -52,7 +52,7 @@ class OctaveKernel(Kernel):
             self.octavewrapper = octave
             octave.restart()
             # make sure the kernel is ready at startup
-            octave.eval('1')
+            octave.eval('1;')
         finally:
             signal.signal(signal.SIGINT, sig)
 
@@ -121,19 +121,19 @@ class OctaveKernel(Kernel):
             self.plot_dir = None
 
         try:
-            output = self.eval(code, plot_dir=self.plot_dir,
+            resp = self.eval(code, plot_dir=self.plot_dir,
                                plot_format=self.plot_format,
                                plot_width=plot_width, plot_height=plot_height)
         except Oct2PyError as e:
             return self._handle_error(str(e))
 
         if not silent:
-            stream_content = {'name': 'stdout', 'data': output}
+            stream_content = {'name': 'stdout', 'data': resp}
             self.send_response(self.iopub_socket, 'stream', stream_content)
             if self.inline:
                 self._handle_figures()
 
-        if output == 'Octave Session Interrupted':
+        if resp == 'Octave Session Interrupted':
             return abort_msg
 
         return {'status': 'ok', 'execution_count': self.execution_count,
@@ -250,9 +250,11 @@ class OctaveKernel(Kernel):
 
     def eval(self, code, *args, **kwargs):
         output = ''
+        kwargs.setdefault('verbose', False)
+        kwargs['return_both'] =True
 
         try:
-            output = self.octavewrapper.eval(str(code), *args, **kwargs)
+            output, _ = self.octavewrapper.eval(str(code), *args, **kwargs)
 
         except KeyboardInterrupt:
             self.octavewrapper._session.proc.send_signal(signal.SIGINT)
