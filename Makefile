@@ -1,8 +1,10 @@
 # Note: This is meant for Octave Kernel developer use only
 .PHONY: all clean release test
 
+export NAME=octave_kernel
+export VERSION=`python -c "import $(NAME); print($(NAME).__version__)"`
 export KILL_OCTAVE="from oct2py import kill_octave; kill_octave()"
-export VERSION=`python -c "import octave_kernel;print(octave_kernel.__version__)"`
+
 
 all:
 	make clean
