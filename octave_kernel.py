@@ -16,7 +16,7 @@ from shutil import rmtree
 from xml.dom import minidom
 
 
-__version__ = '0.6'
+__version__ = '0.7'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
