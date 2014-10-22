@@ -16,7 +16,7 @@ from shutil import rmtree
 from xml.dom import minidom
 
 
-__version__ = '0.7'
+__version__ = '0.7.1'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
@@ -58,8 +58,6 @@ class OctaveKernel(Kernel):
 
         self.inspector = Inspector()
         self.inspector.set_active_scheme("Linux")
-
-        self.log.setLevel(logging.INFO)
 
         try:
             self.hist_file = os.path.join(locate_profile(),
@@ -194,7 +192,7 @@ class OctaveKernel(Kernel):
 
             else:
                 try:
-                    info = self. _get_octave_info(token, detail_level)
+                    info = self._get_octave_info(token, detail_level)
                 except Exception as e:
                     self.log.error(e)
                     return default
@@ -204,7 +202,8 @@ class OctaveKernel(Kernel):
 
             if docstring:
                 data = {'text/plain': docstring}
-                return {'status': 'ok', 'data': data, 'metadata': dict()}
+                return {'status': 'ok', 'data': data, 'metadata': dict(),
+                        'found': True}
 
         return default
 
@@ -274,7 +273,7 @@ class OctaveKernel(Kernel):
 
         return output
 
-    def _get_help(self, code):
+    def _get_help(self, code, send_response=True):
         if code.startswith('??') or code.endswith('??'):
             detail_level = 1
         else:
@@ -386,7 +385,7 @@ class OctaveKernel(Kernel):
             return self.inspector.info(obj, detail_level=detail_level)
 
         try:
-            exist = oc.eval('exist "%s"' % obj, timeout=1)
+            exist = oc.eval('exist "%s";' % obj, timeout=1)
         except Oct2PyError:
             return info
 
@@ -394,7 +393,7 @@ class OctaveKernel(Kernel):
             return info
 
         try:
-            help_str = oc.eval('help %s' % obj, timeout=1)
+            help_str = oc.help(obj, timeout=1)
         except Oct2PyError:
             help_str = None
 
@@ -404,7 +403,7 @@ class OctaveKernel(Kernel):
             type_str = ''
 
         try:
-            cls_str = oc.eval("class(%s)" % obj, timeout=0.5)
+            cls_str = oc.eval("class(%s);" % obj, timeout=0.5)
         except Oct2PyError:
             cls_str = ''
 

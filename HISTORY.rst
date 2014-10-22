@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+0.7.1 (2014-10-22)
+++++++++++++++++
+- Fix bug in help and calltips
+
+
 0.7 (2014-10-19)
 ++++++++++++++++
 - Update for compatibility with IPython 3.0 message spec changes.
