@@ -37,8 +37,15 @@ if svem_flag in sys.argv:
     # Die, setuptools, die.
     sys.argv.remove(svem_flag)
 
+with open('octave_kernel.py', 'rb') as fid:
+    for line in fid:
+        line = line.decode('utf-8')
+        if line.startswith('__version__'):
+            version = line.strip().split()[-1][1:-1]
+            break
+
 setup(name='octave_kernel',
-      version='0.1.0',
+      version=version,
       description='An Octave kernel for Jupyter/IPython',
       long_description=open('README.rst', 'r').read(),
       url="https://github.com/calysto/octave_kernel/tree/master/matlab_kernel",
