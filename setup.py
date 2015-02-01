@@ -7,11 +7,11 @@ import sys
 
 kernel_json = {
     "argv": [sys.executable,
-	     "-m", "matlab_kernel",
+	     "-m", "octave_kernel",
 	     "-f", "{connection_file}"],
-    "display_name": "Matlab",
-    "language": "matlab",
-    "name": "matlab_kernel",
+    "display_name": "Octave",
+    "language": "octave",
+    "name": "octave_kernel",
 }
 
 class install_with_kernelspec(install):
@@ -26,10 +26,10 @@ class install_with_kernelspec(install):
                 json.dump(kernel_json, f, sort_keys=True)
             log.info('Installing kernel spec')
             try:
-                install_kernel_spec(td, 'matlab_kernel', user=self.user,
+                install_kernel_spec(td, 'octave_kernel', user=self.user,
                                     replace=True)
             except:
-                install_kernel_spec(td, 'matlab_kernel', user=not self.user,
+                install_kernel_spec(td, 'octave_kernel', user=not self.user,
                                     replace=True)
 
 svem_flag = '--single-version-externally-managed'
@@ -37,17 +37,17 @@ if svem_flag in sys.argv:
     # Die, setuptools, die.
     sys.argv.remove(svem_flag)
 
-setup(name='matlab_kernel',
+setup(name='octave_kernel',
       version='0.1.0',
-      description='A Matlab kernel for Jupyter/IPython',
-      long_description= open('README.rst', 'r').read(),
-      url="https://github.com/calysto/matlab_kernel/tree/master/matlab_kernel",
+      description='An Octave kernel for Jupyter/IPython',
+      long_description=open('README.rst', 'r').read(),
+      url="https://github.com/calysto/octave_kernel/tree/master/matlab_kernel",
       author='Steven Silvester',
       author_email='steven.silvester@ieee.org',
-      py_modules=['matlab_kernel'],
-      requires=["metakernel (>=0.8)", "pymatbridge", "IPython (>=3.0)"],
+      py_modules=['octave_kernel'],
+      requires=["metakernel (>=0.8)", "IPython (>=3.0)"],
       cmdclass={'install': install_with_kernelspec},
-      classifiers = [
+      classifiers=[
           'Framework :: IPython',
           'License :: OSI Approved :: BSD License',
           'Programming Language :: Python :: 3',

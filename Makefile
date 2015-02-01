@@ -1,8 +1,8 @@
 # Note: This is meant for Metaernel developer use only
-.PHONY: all clean test test_warn cover release gh-pages
+.PHONY: all clean demo test test_warn cover release gh-pages
 
 export TEST_ARGS=--exe -v --with-doctest
-export NAME=matlab_kernel
+export NAME=octave_kernel
 export VERSION=`python -c "import $(NAME); print($(NAME).__version__)"`
 export GHP_MSG="Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`"
 
@@ -18,6 +18,10 @@ clean:
 	rm -rf build
 	rm -rf dist
 	/usr/bin/find . -name "*.pyc" -o -name "*.py,cover"| xargs rm -f
+
+demo: clean
+	python setup.py install
+	ipython qtconsole --kernel octave_kernel
 
 test: clean
 	python setup.py install
