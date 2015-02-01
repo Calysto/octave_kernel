@@ -10,7 +10,7 @@ from shutil import rmtree
 
 PLOT_DIR = tempfile.mkdtemp()
 
-__version__ = '0.1'
+__version__ = '0.8'
 
 
 # make plotting inline only - using png
@@ -88,6 +88,7 @@ class OctaveKernel(ProcessMetaKernel):
         for fname in os.listdir(plot_dir):
             im = Image(filename=os.path.join(plot_dir, fname))
             self.Display(im)
+        rmtree(plot_dir)
 
         return resp
 
