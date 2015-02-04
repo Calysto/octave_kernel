@@ -1,3 +1,5 @@
 .ipynb_checkpoints/
 MANIFEST
 dist/
+build/
+octave-workspace
