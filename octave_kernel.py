@@ -8,12 +8,7 @@ import tempfile
 from shutil import rmtree
 
 
-PLOT_DIR = tempfile.mkdtemp()
-
-__version__ = '0.8'
-
-
-# make plotting inline only - using png
+__version__ = '0.9'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -31,19 +26,6 @@ class OctaveKernel(ProcessMetaKernel):
 
     _setup = """
     more off;
-    set(0, 'defaultfigurevisible', 'off');
-    graphics_toolkit('gnuplot');
-
-    function make_figs(figdir)
-        figHandles = get(0, 'children');
-        for fig=1:length(figHandles)
-            h = figHandles(fig);
-            filename = fullfile(figdir, ['OctaveFig', sprintf('%%03d', fig)]);
-            saveas(h, [filename, '.png']);
-            disp(filename);
-            close(fig);
-        end;
-    endfunction;
     """
 
     _first = True
@@ -67,9 +49,9 @@ class OctaveKernel(ProcessMetaKernel):
             prompt_cmd = u('disp(char(3))')
             change_prompt = None
         else:
-            orig_prompt = 'octave.*>'
+            orig_prompt = u('octave.*>')
             prompt_cmd = None
-            change_prompt = "PS1('{0}'); PS2('{1}')"
+            change_prompt = u("PS1('{0}'); PS2('{1}')")
 
         self._first = True
         return REPLWrapper('octave', orig_prompt, change_prompt,
@@ -77,18 +59,23 @@ class OctaveKernel(ProcessMetaKernel):
 
     def do_execute_direct(self, code):
         if self._first:
-            super(OctaveKernel, self).do_execute_direct(self._setup)
             self._first = False
+            self.handle_plot_settings()
+            super(OctaveKernel, self).do_execute_direct(self._setup)
 
         resp = super(OctaveKernel, self).do_execute_direct(code)
 
-        plot_dir = tempfile.mkdtemp()
-        make_figs = 'make_figs("%s")' % plot_dir
-        super(OctaveKernel, self).do_execute_direct(make_figs)
-        for fname in os.listdir(plot_dir):
-            im = Image(filename=os.path.join(plot_dir, fname))
-            self.Display(im)
-        rmtree(plot_dir)
+        if self.plot_settings.get('backend', None) == 'inline':
+            plot_dir = tempfile.mkdtemp()
+            make_figs = 'make_figs("%s")' % plot_dir
+            super(OctaveKernel, self).do_execute_direct(make_figs)
+            for fname in os.listdir(plot_dir):
+                try:
+                    im = Image(filename=os.path.join(plot_dir, fname))
+                    self.Display(im)
+                except Exception as e:
+                    self.Error(e)
+            rmtree(plot_dir)
 
         return resp
 
@@ -99,7 +86,7 @@ class OctaveKernel(ProcessMetaKernel):
                 return None
             else:
                 return ""
-        resp = self.wrapper.run_command('more off; help %s' % obj)
+        resp = self.do_execute_direct('help %s' % obj)
         return resp
 
     def get_completions(self, info):
@@ -107,8 +94,60 @@ class OctaveKernel(ProcessMetaKernel):
         Get completions from kernel based on info dict.
         """
         cmd = 'completion_matches("%s")' % info['obj']
-        resp = self.wrapper.run_command(cmd)
+        resp = self.do_execute_direct(cmd)
         return resp.splitlines()
+
+    def handle_plot_settings(self):
+        """Handle the current plot settings"""
+        settings = self.plot_settings
+        if settings.get('format', None) is None:
+            settings.clear()
+        settings.setdefault('backend', 'inline')
+        settings.setdefault('format', 'png')
+        settings.setdefault('size', '560,420')
+
+        cmds = []
+
+        if settings['backend'] == 'inline':
+            cmds.append("set(0, 'defaultfigurevisible', 'off');")
+            cmds.append("graphics_toolkit('gnuplot');")
+        else:
+            cmds.append("set(0, 'defaultfigurevisible', 'on');")
+            cmds.append("graphics_toolkit('%s');" % settings['backend'])
+
+        try:
+            width, height = settings['size'].split(',')
+            width, height = int(width), int(height)
+        except Exception as e:
+            self.Error(e)
+            width, height = 560, 420
+
+        cmds.append("""
+        function make_figs(figdir)
+            figHandles = get(0, 'children');
+            for fig=1:length(figHandles)
+                f = figHandles(fig);
+                p = get(f, 'position');
+                  w = %(width)s;
+                  h = %(height)s;
+                  if (p(3) > %(width)s);
+                        h = p(4) * w / p(3);
+                  end;
+                  if (p(4) > %(height)s);
+                        w = p(3) * h / p(4);
+                  end;
+                  size_fmt = sprintf('-S%%d,%%d', w, h);
+                  outfile = fullfile(figdir, ['OctaveFig', sprintf('%%03d', fig)]);
+                  print(f, outfile, '-d%(format)s', '-tight', size_fmt);
+                close(fig);
+            end;
+        endfunction;
+        """ % dict(width=width, height=height, format=settings['format']))
+
+        cmds.append("set(0, 'DefaultFigurePosition', [300, 200, %s, %s]);" %
+                    (width, height))
+
+        self.do_execute_direct('\n'.join(cmds))
 
 
 if __name__ == '__main__':
