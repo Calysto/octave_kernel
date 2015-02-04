@@ -115,12 +115,15 @@ class OctaveKernel(ProcessMetaKernel):
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             cmds.append("graphics_toolkit('%s');" % settings['backend'])
 
-        try:
-            width, height = settings['size'].split(',')
-            width, height = int(width), int(height)
-        except Exception as e:
-            self.Error(e)
-            width, height = 560, 420
+        if isinstance(settings['size'], tuple):
+            width, height = settings['size']
+        else:
+            try:
+                width, height = settings['size'].split(',')
+                width, height = int(width), int(height)
+            except Exception as e:
+                self.Error(e)
+                width, height = 560, 420
 
         cmds.append("""
         function make_figs(figdir)
