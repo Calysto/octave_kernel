@@ -1,4 +1,3 @@
-from distutils.command.install import install
 from distutils.core import setup
 from distutils import log
 import os
@@ -7,30 +6,33 @@ import sys
 
 kernel_json = {
     "argv": [sys.executable,
-	     "-m", "octave_kernel",
-	     "-f", "{connection_file}"],
+             "-m", "octave_kernel",
+             "-f", "{connection_file}"],
     "display_name": "Octave",
     "language": "octave",
     "name": "octave_kernel",
 }
 
-class install_with_kernelspec(install):
-    def run(self):
-        install.run(self)
-        from IPython.kernel.kernelspec import install_kernel_spec
-        from IPython.utils.tempdir import TemporaryDirectory
-        from metakernel.utils.kernel import install_kernel_resources
-        with TemporaryDirectory() as td:
-            os.chmod(td, 0o755) # Starts off as 700, not user readable
-            with open(os.path.join(td, 'kernel.json'), 'w') as f:
-                json.dump(kernel_json, f, sort_keys=True)
-            log.info('Installing kernel spec')
-            try:
-                install_kernel_spec(td, 'octave_kernel', user=self.user,
-                                    replace=True)
-            except:
-                install_kernel_spec(td, 'octave_kernel', user=not self.user,
-                                    replace=True)
+
+def install_spec():
+    user = '--user' in sys.argv
+    from IPython.kernel.kernelspec import install_kernel_spec
+    from IPython.utils.tempdir import TemporaryDirectory
+    with TemporaryDirectory() as td:
+        os.chmod(td, 0o755)  # Starts off as 700, not user readable
+        with open(os.path.join(td, 'kernel.json'), 'w') as f:
+            json.dump(kernel_json, f, sort_keys=True)
+        log.info('Installing kernel spec')
+        try:
+            install_kernel_spec(td, "octave_kernel", user=user,
+                                replace=True)
+        except:
+            install_kernel_spec(td, "octave_kernel", user=not user,
+                                replace=True)
+
+if 'install' in sys.argv or 'develop' in sys.argv:
+    install_spec()
+
 
 svem_flag = '--single-version-externally-managed'
 if svem_flag in sys.argv:
@@ -54,7 +56,6 @@ setup(name='octave_kernel',
       license='MIT',
       py_modules=['octave_kernel'],
       requires=["metakernel (>=0.8)", "IPython (>=3.0)"],
-      cmdclass={'install': install_with_kernelspec},
       classifiers=[
           'Framework :: IPython',
           'License :: OSI Approved :: BSD License',
@@ -62,4 +63,4 @@ setup(name='octave_kernel',
           'Programming Language :: Python :: 2',
           'Topic :: System :: Shells',
       ]
-)
+      )
