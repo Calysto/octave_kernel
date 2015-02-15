@@ -1,14 +1,14 @@
 from __future__ import print_function
 
 from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
-from IPython.display import Image
+from IPython.display import Image, SVG
 from subprocess import check_output
 import os
 import tempfile
 from shutil import rmtree
 
 
-__version__ = '0.9.1'
+__version__ = '0.10.0'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -70,8 +70,12 @@ class OctaveKernel(ProcessMetaKernel):
             make_figs = 'make_figs("%s")' % plot_dir
             super(OctaveKernel, self).do_execute_direct(make_figs)
             for fname in os.listdir(plot_dir):
+                filename = os.path.join(plot_dir, fname)
                 try:
-                    im = Image(filename=os.path.join(plot_dir, fname))
+                    if fname.lower().endswith('.svg'):
+                        im = SVG(filename)
+                    else:
+                        im = Image(filename)
                     self.Display(im)
                 except Exception as e:
                     self.Error(e)
