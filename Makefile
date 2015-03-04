@@ -21,7 +21,7 @@ clean:
 
 demo: clean
 	python setup.py install
-	ipython qtconsole --kernel octave_kernel
+	ipython console --kernel octave_kernel
 
 test: clean
 	python setup.py install
