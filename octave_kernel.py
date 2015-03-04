@@ -26,6 +26,8 @@ class OctaveKernel(ProcessMetaKernel):
 
     _setup = """
     more off;
+    set(0, 'defaultfigurepaperunits', 'inches');
+    set(0, 'defaultfigureunits', 'inches');
     """
 
     _first = True
@@ -54,6 +56,7 @@ class OctaveKernel(ProcessMetaKernel):
             change_prompt = u("PS1('{0}'); PS2('{1}')")
 
         self._first = True
+
         return REPLWrapper('octave', orig_prompt, change_prompt,
                            prompt_emit_cmd=prompt_cmd)
 
@@ -67,8 +70,7 @@ class OctaveKernel(ProcessMetaKernel):
 
         if self.plot_settings.get('backend', None) == 'inline':
             plot_dir = tempfile.mkdtemp()
-            make_figs = 'make_figs("%s")' % plot_dir
-            super(OctaveKernel, self).do_execute_direct(make_figs)
+            self._make_figs(plot_dir)
             for fname in os.listdir(plot_dir):
                 filename = os.path.join(plot_dir, fname)
                 try:
@@ -129,33 +131,22 @@ class OctaveKernel(ProcessMetaKernel):
                 self.Error(e)
                 width, height = 560, 420
 
-        cmds.append("""
-        function make_figs(figdir)
-            figHandles = get(0, 'children');
-            for fig=1:length(figHandles)
-                f = figHandles(fig);
-                p = get(f, 'position');
-                  w = %(width)s;
-                  h = %(height)s;
-                  if (p(3) > %(width)s);
-                        h = p(4) * w / p(3);
-                  end;
-                  if (p(4) > %(height)s);
-                        w = p(3) * h / p(4);
-                  end;
-                  size_fmt = sprintf('-S%%d,%%d', w, h);
-                  outfile = fullfile(figdir, ['OctaveFig', sprintf('%%03d', fig)]);
-                  print(f, outfile, '-d%(format)s', '-tight', size_fmt);
-                close(fig);
-            end;
-        endfunction;
-        """ % dict(width=width, height=height, format=settings['format']))
-
-        cmds.append("set(0, 'DefaultFigurePosition', [300, 200, %s, %s]);" %
-                    (width, height))
+        size = "set(0, 'defaultfigurepaperposition', [0 0 %s %s]);"
+        cmds.append(size % (width / 150., height / 150.))
 
         self.do_execute_direct('\n'.join(cmds))
 
+    def _make_figs(self, plot_dir):
+            cmd = """
+            figHandles = get(0, 'children');
+            for fig=1:length(figHandles);
+                h = figHandles(fig);
+                filename = fullfile('%s', ['OctaveFig', sprintf('%%03d', fig)]);
+                saveas(h, [filename, '.png']);
+                close(h);
+            end;
+            """ % plot_dir
+            super(OctaveKernel, self).do_execute_direct(cmd.replace('\n', ''))
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
