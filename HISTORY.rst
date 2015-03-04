@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+0.10 (2015-03-03)
+++++++++++++++++
+- Fix Windows support
+
+
 0.8 (2015-02-01)
 ++++++++++++++++
 - Rewritten to use MetaKernel - provides a full suite of magics
