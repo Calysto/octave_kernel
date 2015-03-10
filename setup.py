@@ -55,7 +55,7 @@ setup(name='octave_kernel',
       author_email='steven.silvester@ieee.org',
       license='MIT',
       py_modules=['octave_kernel'],
-      requires=["metakernel (>=0.9)", "IPython (>=3.0)"],
+      install_requires=["metakernel >= 0.9", "IPython >= 3.0"],
       classifiers=[
           'Framework :: IPython',
           'License :: OSI Approved :: BSD License',
