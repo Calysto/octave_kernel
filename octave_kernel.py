@@ -121,15 +121,15 @@ class OctaveKernel(ProcessMetaKernel):
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             cmds.append("graphics_toolkit('%s');" % settings['backend'])
 
+        width, height = 560, 420
         if isinstance(settings['size'], tuple):
             width, height = settings['size']
-        else:
+        elif settings['size']:
             try:
                 width, height = settings['size'].split(',')
                 width, height = int(width), int(height)
             except Exception as e:
-                self.Error(e)
-                width, height = 560, 420
+                self.Error('Error setting plot settings: %s' % e)
 
         size = "set(0, 'defaultfigurepaperposition', [0 0 %s %s]);"
         cmds.append(size % (width / 150., height / 150.))
