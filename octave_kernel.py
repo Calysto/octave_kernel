@@ -4,6 +4,7 @@ from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
 from IPython.display import Image, SVG
 from subprocess import check_output
 import os
+import sys
 import tempfile
 from shutil import rmtree
 
@@ -63,6 +64,8 @@ class OctaveKernel(ProcessMetaKernel):
     def do_execute_direct(self, code):
         if self._first:
             self._first = False
+            if sys.platform == 'darwin':
+                self.plot_settings['format'] = 'svg'
             self.handle_plot_settings()
             super(OctaveKernel, self).do_execute_direct(self._setup)
 
@@ -81,7 +84,7 @@ class OctaveKernel(ProcessMetaKernel):
                     self.Display(im)
                 except Exception as e:
                     self.Error(e)
-            rmtree(plot_dir)
+            #rmtree(plot_dir)
 
         return resp
 
@@ -114,6 +117,8 @@ class OctaveKernel(ProcessMetaKernel):
 
         cmds = []
 
+        self._plot_fmt = settings['format']
+
         if settings['backend'] == 'inline':
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
             cmds.append("graphics_toolkit('gnuplot');")
@@ -142,10 +147,10 @@ class OctaveKernel(ProcessMetaKernel):
             for fig=1:length(figHandles);
                 h = figHandles(fig);
                 filename = fullfile('%s', ['OctaveFig', sprintf('%%03d', fig)]);
-                saveas(h, [filename, '.png']);
+                saveas(h, [filename, '.%s']);
                 close(h);
             end;
-            """ % plot_dir
+            """ % (plot_dir, self._plot_fmt)
             super(OctaveKernel, self).do_execute_direct(cmd.replace('\n', ''))
 
 if __name__ == '__main__':
