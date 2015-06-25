@@ -6,10 +6,9 @@ import subprocess
 import os
 import sys
 import tempfile
-from shutil import rmtree
 
 
-__version__ = '0.10.0'
+__version__ = '0.11.0'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -92,7 +91,6 @@ class OctaveKernel(ProcessMetaKernel):
                     self.Display(im)
                 except Exception as e:
                     self.Error(e)
-            #rmtree(plot_dir)
 
         return resp
 
