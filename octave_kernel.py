@@ -2,13 +2,13 @@ from __future__ import print_function
 
 from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
 from IPython.display import Image, SVG
-from subprocess import check_output
+import subprocess
 import os
 import sys
 import tempfile
 
 
-__version__ = '0.10.0'
+__version__ = '0.11.0'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -16,7 +16,7 @@ class OctaveKernel(ProcessMetaKernel):
     implementation_version = __version__,
     language = 'octave'
     language_version = '0.1',
-    banner = "Matlab Kernel"
+    banner = "Octave Kernel"
     language_info = {
         'mimetype': 'text/x-octave',
         'name': 'octave_kernel',
@@ -37,7 +37,7 @@ class OctaveKernel(ProcessMetaKernel):
     @property
     def banner(self):
         if self._banner is None:
-            banner = check_output(['octave', '--version'])
+            banner = subprocess.check_output(['octave', '--version'])
             self._banner = banner.decode('utf-8')
         return self._banner
 
@@ -65,6 +65,14 @@ class OctaveKernel(ProcessMetaKernel):
                 self.plot_settings['format'] = 'svg'
             self.handle_plot_settings()
             super(OctaveKernel, self).do_execute_direct(self._setup)
+            if os.name != 'nt':
+                msg = ('may not be able to display plots properly '
+                       'without gnuplot, please install it '
+                       '(gnuplot-x11 on Linux)')
+                try:
+                    subprocess.check_call(['gnuplot', '--version'])
+                except subprocess.CalledProcessError:
+                    self.Error(msg)
 
         resp = super(OctaveKernel, self).do_execute_direct(code)
 

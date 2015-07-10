@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+0.11 (2015-06-24)
++++++++++++++++++
+- Altert the user if gnuplot is not available
+
+
 0.10 (2015-03-03)
 ++++++++++++++++
 - Fix Windows support
