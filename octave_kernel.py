@@ -6,7 +6,6 @@ from subprocess import check_output
 import os
 import sys
 import tempfile
-from shutil import rmtree
 
 
 __version__ = '0.10.0'
@@ -43,9 +42,7 @@ class OctaveKernel(ProcessMetaKernel):
         return self._banner
 
     def makeWrapper(self):
-        """Start a bash shell and return a :class:`REPLWrapper` object.
-        Note that this is equivalent :function:`metakernel.pyexpect.bash`,
-        but is used here as an example of how to be cross-platform.
+        """Start an Octave process and return a :class:`REPLWrapper` object.
         """
         if os.name == 'nt':
             orig_prompt = u(chr(3))
@@ -84,7 +81,6 @@ class OctaveKernel(ProcessMetaKernel):
                     self.Display(im)
                 except Exception as e:
                     self.Error(e)
-            #rmtree(plot_dir)
 
         return resp
 
