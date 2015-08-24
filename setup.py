@@ -42,7 +42,7 @@ setup(name='octave_kernel',
       license='MIT',
       py_modules=['octave_kernel'],
       cmdclass={'install': install_with_kernelspec},
-      install_requires=["metakernel >= 0.10.1", "IPython >= 3.0"],
+      install_requires=["metakernel >= 0.10.2", "IPython >= 3.0"],
       classifiers=[
           'Framework :: IPython',
           'License :: OSI Approved :: BSD License',
