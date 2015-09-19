@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 
-__version__ = '0.12.5'
+__version__ = '0.12.6'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -55,7 +55,8 @@ class OctaveKernel(ProcessMetaKernel):
 
         self._first = True
 
-        return REPLWrapper('octave', orig_prompt, change_prompt,
+        executable = os.environ.get('OCTAVE_EXECUTABLE', 'octave')
+        return REPLWrapper(executable, orig_prompt, change_prompt,
                            prompt_emit_cmd=prompt_cmd)
 
     def do_execute_direct(self, code):
