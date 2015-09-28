@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 
-__version__ = '0.12.6'
+__version__ = '0.12.7'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -56,6 +56,13 @@ class OctaveKernel(ProcessMetaKernel):
         self._first = True
 
         executable = os.environ.get('OCTAVE_EXECUTABLE', 'octave')
+        try:
+            info = subprocess.check_output([executable, '--version'])
+            if 'version 4' in info.decode('utf-8').lower():
+                executable += ' --no-gui -W'
+        except OSError:  # pragma: no cover
+            pass
+
         return REPLWrapper(executable, orig_prompt, change_prompt,
                            prompt_emit_cmd=prompt_cmd)
 
