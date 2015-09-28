@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 
-__version__ = '0.12.7'
+__version__ = '0.12.8'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -59,7 +59,7 @@ class OctaveKernel(ProcessMetaKernel):
         try:
             info = subprocess.check_output([executable, '--version'])
             if 'version 4' in info.decode('utf-8').lower():
-                executable += ' --no-gui -W'
+                executable += ' --no-gui'
         except OSError:  # pragma: no cover
             pass
 
