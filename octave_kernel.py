@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 
-__version__ = '0.12.8'
+__version__ = '0.12.9'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -124,7 +124,7 @@ class OctaveKernel(ProcessMetaKernel):
         if settings.get('format', None) is None:
             settings.clear()
         settings.setdefault('backend', 'inline')
-        settings.setdefault('format', 'png')
+        settings.setdefault('format', 'svg')
         settings.setdefault('size', '560,420')
 
         cmds = []
