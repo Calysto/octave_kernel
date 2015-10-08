@@ -2,11 +2,9 @@ A Jupyter/IPython kernel for Octave
 
 This requires IPython 3, and Octave installed with gnuplot support.
 
-To test it, install via ``pip`` or ``setup.py``, then::
+Install as ``pip install octave_kernel``.
 
-    ipython qtconsole --kernel=octave_kernel
-
-Or select the Octave Kernel in the IPython Notebook.
+Then, you can select the "Octave" Kernel in the IPython Notebook.
 
 This is based on `MetaKernel <http://pypi.python.org/pypi/metakernel>`_,
 which means it features a standard set of magics.
