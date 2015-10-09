@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 
-__version__ = '0.12.10'
+__version__ = '0.12.11'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -21,6 +21,7 @@ class OctaveKernel(ProcessMetaKernel):
         'mimetype': 'text/x-octave',
         'name': 'octave_kernel',
         'file_extension': '.m',
+        "codemirror_mode": "Octave",
         'help_links': MetaKernel.help_links,
     }
 
@@ -98,7 +99,7 @@ class OctaveKernel(ProcessMetaKernel):
                 except Exception as e:
                     self.Error(e)
 
-        return resp
+        return resp or None
 
     def get_kernel_help_on(self, info, level=0, none_on_fail=False):
         obj = info.get('help_obj', '')
