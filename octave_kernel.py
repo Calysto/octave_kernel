@@ -38,7 +38,8 @@ class OctaveKernel(ProcessMetaKernel):
     @property
     def banner(self):
         if self._banner is None:
-            banner = subprocess.check_output(['octave', '--version'])
+            executable = os.environ.get('OCTAVE_EXECUTABLE', 'octave')
+            banner = subprocess.check_output([executable, '--version'])
             self._banner = banner.decode('utf-8')
         return self._banner
 
