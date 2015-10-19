@@ -3,12 +3,13 @@ from __future__ import print_function
 from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
 from IPython.display import Image, SVG
 import subprocess
+from xml.dom import minidom
 import os
 import sys
 import tempfile
 
 
-__version__ = '0.12.12'
+__version__ = '0.13'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -89,11 +90,18 @@ class OctaveKernel(ProcessMetaKernel):
         if self.plot_settings.get('backend', None) == 'inline':
             plot_dir = tempfile.mkdtemp()
             self._make_figs(plot_dir)
+            width, height = 0, 0
             for fname in os.listdir(plot_dir):
                 filename = os.path.join(plot_dir, fname)
                 try:
                     if fname.lower().endswith('.svg'):
                         im = SVG(filename)
+                        if ',' in self.plot_settings['size']:
+                            size = self.plot_settings['size']
+                            width, height = size.split(',')
+                            width, height = int(width), int(height)
+                            im.data = self._fix_gnuplot_svg_size(im.data,
+                                size=(width, height))
                     else:
                         im = Image(filename)
                     self.Display(im)
@@ -166,6 +174,32 @@ class OctaveKernel(ProcessMetaKernel):
             end;
             """ % (plot_dir, self._plot_fmt)
             super(OctaveKernel, self).do_execute_direct(cmd.replace('\n', ''))
+
+    def _fix_gnuplot_svg_size(self, image, size=None):
+        """
+        GnuPlot SVGs do not have height/width attributes.  Set
+        these to be the same as the viewBox, so that the browser
+        scales the image correctly.
+
+        Parameters
+        ----------
+        image : str
+            SVG data.
+        size : tuple of int
+            Image width, height.
+
+        """
+        (svg,) = minidom.parseString(image).getElementsByTagName('svg')
+        viewbox = svg.getAttribute('viewBox').split(' ')
+
+        if size is not None and size[0] is not None:
+            width, height = size
+        else:
+            width, height = viewbox[2:]
+
+        svg.setAttribute('width', '%dpx' % int(width))
+        svg.setAttribute('height', '%dpx' % int(height))
+        return svg.toxml()
 
 if __name__ == '__main__':
     try:

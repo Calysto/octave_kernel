@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+0.13 (2015-10-19)
++++++++++++++++++
+- Add resizing support for SVG
+
+
 0.11 (2015-06-24)
 +++++++++++++++++
 - Altert the user if gnuplot is not available
