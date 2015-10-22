@@ -1,17 +1,16 @@
-A Jupyter/IPython kernel for Octave
+A Jupyter kernel for Octave
 
-This requires IPython 3, and Octave installed with gnuplot support.
+This requires `Jupyter Notebook <http://jupyter.readthedocs.org/en/latest/install.html>`_, and Octave installed with gnuplot support.
 
 Install as ``pip install octave_kernel``.
 
-Then, you can select the "Octave" Kernel in the IPython Notebook.
+Then, you can select the "Octave" Kernel in the Jupyter Notebook.
 
 This is based on `MetaKernel <http://pypi.python.org/pypi/metakernel>`_,
 which means it features a standard set of magics.
 
 A sample notebook is available online_.
 
-You can specify the path to `octave` by setting the OCTAVE_EXECUTABLE 
-environment variable.
+You can specify the path to your matlab executable by creating an `OCTAVE_EXECUTABLE` environmental variable.
 
 .. _online: http://nbviewer.ipython.org/github/Calysto/octave_kernel/blob/master/octave_kernel.ipynb

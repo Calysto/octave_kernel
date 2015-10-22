@@ -9,7 +9,7 @@ import sys
 import tempfile
 
 
-__version__ = '0.13'
+__version__ = '0.13.1'
 
 
 class OctaveKernel(ProcessMetaKernel):
