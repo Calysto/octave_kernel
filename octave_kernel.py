@@ -165,12 +165,12 @@ class OctaveKernel(ProcessMetaKernel):
 
     def _make_figs(self, plot_dir):
             cmd = """
-            figHandles = get(0, 'children');
-            for fig=1:length(figHandles);
-                h = figHandles(fig);
-                filename = fullfile('%s', ['OctaveFig', sprintf('%%03d', fig)]);
-                saveas(h, [filename, '.%s']);
-                close(h);
+            _figHandles = get(0, 'children');
+            for _fig=1:length(_figHandles);
+                _handle = _figHandles(_fig);
+                _filename = fullfile('%s', ['OctaveFig', sprintf('%%03d', _fig)]);
+                saveas(_handle, [_filename, '.%s']);
+                close(_handle);
             end;
             """ % (plot_dir, self._plot_fmt)
             super(OctaveKernel, self).do_execute_direct(cmd.replace('\n', ''))
