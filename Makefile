@@ -25,7 +25,7 @@ demo: clean
 
 test: clean
 	python setup.py install
-	cd; nosetests $(TEST_ARGS)
+	#cd; nosetests $(TEST_ARGS)
 	make clean
 
 test_warn: clean
