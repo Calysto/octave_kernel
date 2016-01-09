@@ -10,7 +10,7 @@ import sys
 import tempfile
 
 
-__version__ = '0.14.0'
+__version__ = '0.14.1'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -55,11 +55,14 @@ class OctaveKernel(ProcessMetaKernel):
                 msg = ('Octave Executable not found, please add to path or set'
                        '"OCTAVE_EXECUTABLE" environment variable')
                 raise OSError(msg)
+        else:
+            self._executable = executable
+            return executable
 
     @property
     def banner(self):
         if self._banner is None:
-            banner = subprocess.check_output([self._executable, '--version'])
+            banner = subprocess.check_output([self.executable, '--version'])
             self._banner = banner.decode('utf-8')
         return self._banner
 
@@ -77,7 +80,7 @@ class OctaveKernel(ProcessMetaKernel):
 
         self._first = True
 
-        executable = self._executable
+        executable = self.executable
         if 'version 4' in self.banner:
             executable += ' --no-gui'
 
