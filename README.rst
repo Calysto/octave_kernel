@@ -11,6 +11,6 @@ which means it features a standard set of magics.
 
 A sample notebook is available online_.
 
-You can specify the path to your matlab executable by creating an `OCTAVE_EXECUTABLE` environmental variable.
+You can specify the path to your Octave executable by creating an `OCTAVE_EXECUTABLE` environmental variable.
 
 .. _online: http://nbviewer.ipython.org/github/Calysto/octave_kernel/blob/master/octave_kernel.ipynb

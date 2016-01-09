@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+0.14 (2016-01-09)
++++++++++++++++++
+- Improved handling of Octave executable.
+
+
 0.13 (2015-10-19)
 +++++++++++++++++
 - Add resizing support for SVG

@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
+from metakernel.pexpect import which
 from IPython.display import Image, SVG
 import subprocess
 from xml.dom import minidom
@@ -9,7 +10,7 @@ import sys
 import tempfile
 
 
-__version__ = '0.13.2'
+__version__ = '0.14.0'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -36,11 +37,29 @@ class OctaveKernel(ProcessMetaKernel):
 
     _banner = None
 
+    _executable = None
+
+    @property
+    def executable(self):
+        if self._executable:
+            return self._executable
+        executable = os.environ.get('OCTAVE_EXECUTABLE', None)
+        if not executable or not which(executable):
+            if which('octave-cli'):
+                self._executable = 'octave-cli'
+                return self._executable
+            elif which('octave'):
+                self._executable = 'octave'
+                return self._executable
+            else:
+                msg = ('Octave Executable not found, please add to path or set'
+                       '"OCTAVE_EXECUTABLE" environment variable')
+                raise OSError(msg)
+
     @property
     def banner(self):
         if self._banner is None:
-            executable = os.environ.get('OCTAVE_EXECUTABLE', 'octave')
-            banner = subprocess.check_output([executable, '--version'])
+            banner = subprocess.check_output([self._executable, '--version'])
             self._banner = banner.decode('utf-8')
         return self._banner
 
@@ -58,13 +77,9 @@ class OctaveKernel(ProcessMetaKernel):
 
         self._first = True
 
-        executable = os.environ.get('OCTAVE_EXECUTABLE', 'octave')
-        try:
-            info = subprocess.check_output([executable, '--version'])
-            if 'version 4' in info.decode('utf-8').lower():
-                executable += ' --no-gui'
-        except OSError:  # pragma: no cover
-            pass
+        executable = self._executable
+        if 'version 4' in self.banner:
+            executable += ' --no-gui'
 
         return REPLWrapper(executable, orig_prompt, change_prompt,
                            prompt_emit_cmd=prompt_cmd)
