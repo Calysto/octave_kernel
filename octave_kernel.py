@@ -10,7 +10,7 @@ import sys
 import tempfile
 
 
-__version__ = '0.14.1'
+__version__ = '0.14.2'
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -92,6 +92,7 @@ class OctaveKernel(ProcessMetaKernel):
             self._first = False
             if sys.platform == 'darwin':
                 self.plot_settings['format'] = 'svg'
+                self.Print('svg')
             self.handle_plot_settings()
             super(OctaveKernel, self).do_execute_direct(self._setup)
             if os.name != 'nt':
