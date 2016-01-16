@@ -10,7 +10,7 @@ import sys
 import tempfile
 
 
-__version__ = '0.14.3'
+from . import __version__
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -218,10 +218,3 @@ class OctaveKernel(ProcessMetaKernel):
         svg.setAttribute('width', '%dpx' % int(width))
         svg.setAttribute('height', '%dpx' % int(height))
         return svg.toxml()
-
-if __name__ == '__main__':
-    try:
-        from ipykernel.kernelapp import IPKernelApp
-    except ImportError:
-        from IPython.kernel.zmq.kernelapp import IPKernelApp
-    IPKernelApp.launch_instance(kernel_class=OctaveKernel)
