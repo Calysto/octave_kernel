@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+0.15.1 (2016-01-16)
++++++++++++++++++++
+- Switch to 2-step installation.
+
+
 0.14 (2016-01-09)
 +++++++++++++++++
 - Improved handling of Octave executable.
