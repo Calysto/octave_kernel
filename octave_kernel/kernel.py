@@ -84,8 +84,10 @@ class OctaveKernel(ProcessMetaKernel):
         if 'version 4' in self.banner:
             executable += ' --no-gui'
 
-        return REPLWrapper(executable, orig_prompt, change_prompt,
-                           prompt_emit_cmd=prompt_cmd)
+        wrapper = REPLWrapper(executable, orig_prompt, change_prompt,
+                prompt_emit_cmd=prompt_cmd)
+        wrapper.child.linesep = '\n'
+        return wrapper
 
     def do_execute_direct(self, code):
         if self._first:
@@ -102,9 +104,7 @@ class OctaveKernel(ProcessMetaKernel):
                     subprocess.check_call(['gnuplot', '--version'])
                 except subprocess.CalledProcessError:
                     self.Error(msg)
-
-        resp = super(OctaveKernel, self).do_execute_direct(code)
-
+        super(OctaveKernel, self).do_execute_direct(code, self.Print)
         if self.plot_settings.get('backend', None) == 'inline':
             plot_dir = tempfile.mkdtemp()
             self._make_figs(plot_dir)
@@ -125,8 +125,6 @@ class OctaveKernel(ProcessMetaKernel):
                     self.Display(im)
                 except Exception as e:
                     self.Error(e)
-
-        return resp or None
 
     def get_kernel_help_on(self, info, level=0, none_on_fail=False):
         obj = info.get('help_obj', '')
