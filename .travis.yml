@@ -1,6 +1,5 @@
 language: python
 python:
-  - "2.7"
   - "3.5"
 install:
   - sudo apt-add-repository -y ppa:picaso/octave;
@@ -10,4 +9,4 @@ install:
   - flit install
   - python -m octave_kernel.install
 script:
- - python test_octave_kernel.py
+  - python test_octave_kernel.py
