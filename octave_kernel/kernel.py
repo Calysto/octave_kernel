@@ -17,13 +17,14 @@ class OctaveKernel(ProcessMetaKernel):
     implementation = 'Octave Kernel'
     implementation_version = __version__,
     language = 'octave'
-    language_version = '0.1',
-    banner = "Octave Kernel"
+    language_version = __version__,
+    banner = "Octave Kernel",
     language_info = {
         'mimetype': 'text/x-octave',
-        'name': 'octave_kernel',
+        'name': 'octave',
         'file_extension': '.m',
         "codemirror_mode": "Octave",
+        "version": __version__,
         'help_links': MetaKernel.help_links,
     }
 
@@ -104,6 +105,7 @@ class OctaveKernel(ProcessMetaKernel):
                     subprocess.check_call(['gnuplot', '--version'])
                 except subprocess.CalledProcessError:
                     self.Error(msg)
+
         super(OctaveKernel, self).do_execute_direct(code, self.Print)
         if self.plot_settings.get('backend', None) == 'inline':
             plot_dir = tempfile.mkdtemp()
@@ -133,16 +135,16 @@ class OctaveKernel(ProcessMetaKernel):
                 return None
             else:
                 return ""
-        resp = self.do_execute_direct('help %s' % obj)
-        return resp
+        resp = super(OctaveKernel, self).do_execute_direct('help %s' % obj)
+        return str(resp)
 
     def get_completions(self, info):
         """
         Get completions from kernel based on info dict.
         """
         cmd = 'completion_matches("%s")' % info['obj']
-        resp = self.do_execute_direct(cmd)
-        return resp.splitlines()
+        resp = super(OctaveKernel, self).do_execute_direct(cmd)
+        return str(resp).splitlines()
 
     def handle_plot_settings(self):
         """Handle the current plot settings"""
