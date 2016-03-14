@@ -14,6 +14,7 @@ kernel_json = {
              "-m", "octave_kernel",
              "-f", "{connection_file}"],
     "display_name": "Octave",
+    "mimetype": "text/x-octave",
     "language": "octave",
     "name": "octave",
 }
