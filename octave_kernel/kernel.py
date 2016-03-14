@@ -23,7 +23,6 @@ class OctaveKernel(ProcessMetaKernel):
         'mimetype': 'text/x-octave',
         'name': 'octave',
         'file_extension': '.m',
-        "codemirror_mode": "Octave",
         "version": __version__,
         'help_links': MetaKernel.help_links,
     }
