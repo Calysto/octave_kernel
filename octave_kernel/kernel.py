@@ -92,8 +92,6 @@ class OctaveKernel(ProcessMetaKernel):
     def do_execute_direct(self, code):
         if self._first:
             self._first = False
-            if sys.platform == 'darwin':
-                self.plot_settings['format'] = 'svg'
             self.handle_plot_settings()
             super(OctaveKernel, self).do_execute_direct(self._setup)
             if os.name != 'nt':
@@ -151,6 +149,10 @@ class OctaveKernel(ProcessMetaKernel):
         if settings.get('format', None) is None:
             settings.clear()
         settings.setdefault('backend', 'inline')
+        if sys.platform == 'darwin':
+            settings.setdefault('format', 'svg')
+        else:
+            settings.setdefault('format', 'png')
         settings.setdefault('format', 'png')
         settings.setdefault('size', '560,420')
 
@@ -161,6 +163,8 @@ class OctaveKernel(ProcessMetaKernel):
         if settings['backend'] == 'inline':
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
             cmds.append("graphics_toolkit('gnuplot');")
+            if sys.platform == 'darwin':
+                cmds.append('setenv("GNUTERM","X11");')
         else:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             cmds.append("graphics_toolkit('%s');" % settings['backend'])
