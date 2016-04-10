@@ -113,16 +113,19 @@ class OctaveKernel(ProcessMetaKernel):
                 try:
                     if fname.lower().endswith('.svg'):
                         im = SVG(filename)
-                        if ',' in self.plot_settings['size']:
-                            size = self.plot_settings['size']
-                            width, height = size.split(',')
-                            width, height = int(width), int(height)
-                            im.data = self._fix_gnuplot_svg_size(im.data,
-                                size=(width, height))
+                        size = self.plot_settings['size']
+                        if not (isinstance(size, tuple)):
+                            size = 560, 420
+                        width, height = size
+                        width, height = int(width), int(height)
+                        im.data = self._fix_gnuplot_svg_size(im.data,
+                            size=(width, height))
                     else:
                         im = Image(filename)
                     self.Display(im)
                 except Exception as e:
+                    import traceback
+                    traceback.print_exc(file=sys.__stderr__)
                     self.Error(e)
 
     def get_kernel_help_on(self, info, level=0, none_on_fail=False):
@@ -176,6 +179,7 @@ class OctaveKernel(ProcessMetaKernel):
             try:
                 width, height = settings['size'].split(',')
                 width, height = int(width), int(height)
+                settings['size'] = width, height
             except Exception as e:
                 self.Error('Error setting plot settings: %s' % e)
 
@@ -210,7 +214,10 @@ class OctaveKernel(ProcessMetaKernel):
             Image width, height.
 
         """
-        (svg,) = minidom.parseString(image).getElementsByTagName('svg')
+        # Minidom does not support parseUnicode, so it must be decoded
+        # to accept unicode characters
+        parsed = minidom.parseString(image.encode('utf-8'))
+        (svg,) = parsed.getElementsByTagName('svg')
         viewbox = svg.getAttribute('viewBox').split(' ')
 
         if size is not None and size[0] is not None:
