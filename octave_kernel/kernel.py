@@ -158,6 +158,7 @@ class OctaveKernel(ProcessMetaKernel):
             settings.setdefault('format', 'png')
         settings.setdefault('format', 'png')
         settings.setdefault('size', '560,420')
+        settings.setdefault('resolution', 150.)
 
         cmds = []
 
@@ -183,8 +184,9 @@ class OctaveKernel(ProcessMetaKernel):
             except Exception as e:
                 self.Error('Error setting plot settings: %s' % e)
 
+        res = settings['resolution']
         size = "set(0, 'defaultfigurepaperposition', [0 0 %s %s]);"
-        cmds.append(size % (width / 150., height / 150.))
+        cmds.append(size % (width / res, height / res))
 
         self.do_execute_direct('\n'.join(cmds))
 
