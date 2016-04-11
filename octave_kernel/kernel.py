@@ -29,8 +29,6 @@ class OctaveKernel(ProcessMetaKernel):
 
     _setup = """
     more off;
-    set(0, 'defaultfigurepaperunits', 'inches');
-    set(0, 'defaultfigureunits', 'inches');
     """
 
     _first = True
@@ -184,23 +182,24 @@ class OctaveKernel(ProcessMetaKernel):
             except Exception as e:
                 self.Error('Error setting plot settings: %s' % e)
 
-        res = settings['resolution']
-        size = "set(0, 'defaultfigurepaperposition', [0 0 %s %s]);"
-        cmds.append(size % (width / res, height / res))
+        size = "set(0, 'defaultfigureposition', [0 0 %s %s]);"
+        cmds.append(size % (width, height))
 
         self.do_execute_direct('\n'.join(cmds))
 
     def _make_figs(self, plot_dir):
-            cmd = """
-            _figHandles = get(0, 'children');
-            for _fig=1:length(_figHandles);
-                _handle = _figHandles(_fig);
-                _filename = fullfile('%s', ['OctaveFig', sprintf('%%03d', _fig)]);
-                saveas(_handle, [_filename, '.%s']);
-                close(_handle);
-            end;
-            """ % (plot_dir, self._plot_fmt)
-            super(OctaveKernel, self).do_execute_direct(cmd.replace('\n', ''))
+        fmt = self.plot_settings['format']
+        res = self.plot_settings['resolution']
+        cmd = """
+        _figHandles = get(0, 'children');
+        for _fig=1:length(_figHandles);
+            _handle = _figHandles(_fig);
+            _filename = fullfile('%(plot_dir)s', ['OctaveFig', sprintf('%%03d', _fig)]);
+            print(_handle, [_filename, '.%(fmt)s'], '-r%(res)s');
+            close(_handle);
+        end;
+        """ % locals()
+        super(OctaveKernel, self).do_execute_direct(cmd.replace('\n', ''))
 
     def _fix_gnuplot_svg_size(self, image, size=None):
         """
