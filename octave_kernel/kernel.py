@@ -192,10 +192,18 @@ class OctaveKernel(ProcessMetaKernel):
         res = self.plot_settings['resolution']
         cmd = """
         _figHandles = get(0, 'children');
-        for _fig=1:length(_figHandles);
+        for _fig=1:length(_figHandles),
             _handle = _figHandles(_fig);
-            _filename = fullfile('%(plot_dir)s', ['OctaveFig', sprintf('%%03d', _fig)]);
-            print(_handle, [_filename, '.%(fmt)s'], '-r%(res)s');
+            _filename = fullfile('%(plot_dir)s', ['OctaveFig', sprintf('%%03d.%(fmt)s', _fig)]);
+            try,
+               _image = double(get(get(get(_handle,'children'),'children'),'cdata'));
+               _clim = get(get(_handle,'children'),'clim');
+               _image = _image - _clim(1);
+               _image = _image ./ (_clim(2) - _clim(1));
+               imwrite(uint8(_image*255), _filename);
+            catch,
+               print(_handle, _filename, '-r%(res)s');
+            end,
             close(_handle);
         end;
         """ % locals()
