@@ -1,3 +1,3 @@
 """An Octave kernel for Jupyter"""
 
-__version__ = '0.16.0'
+__version__ = '0.16.1'
