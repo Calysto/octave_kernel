@@ -6,6 +6,7 @@ from IPython.display import Image, SVG
 import subprocess
 from xml.dom import minidom
 import os
+import shutil
 import sys
 import tempfile
 
@@ -125,6 +126,7 @@ class OctaveKernel(ProcessMetaKernel):
                     import traceback
                     traceback.print_exc(file=sys.__stderr__)
                     self.Error(e)
+            shutil.rmtree(plot_dir, True)
 
     def get_kernel_help_on(self, info, level=0, none_on_fail=False):
         obj = info.get('help_obj', '')
