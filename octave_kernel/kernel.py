@@ -106,19 +106,11 @@ class OctaveKernel(ProcessMetaKernel):
         if self.plot_settings.get('backend', None) == 'inline':
             plot_dir = tempfile.mkdtemp()
             self._make_figs(plot_dir)
-            width, height = 0, 0
             for fname in os.listdir(plot_dir):
                 filename = os.path.join(plot_dir, fname)
                 try:
                     if fname.lower().endswith('.svg'):
-                        im = SVG(filename)
-                        size = self.plot_settings['size']
-                        if not (isinstance(size, tuple)):
-                            size = 560, 420
-                        width, height = size
-                        width, height = int(width), int(height)
-                        im.data = self._fix_gnuplot_svg_size(im.data,
-                            size=(width, height))
+                        im = self._handle_svg(filename)
                     else:
                         im = Image(filename)
                     self.Display(im)
@@ -211,29 +203,40 @@ class OctaveKernel(ProcessMetaKernel):
         """ % locals()
         super(OctaveKernel, self).do_execute_direct(cmd.replace('\n', ''))
 
-    def _fix_gnuplot_svg_size(self, image, size=None):
+    def _handle_svg(self, filename):
         """
-        GnuPlot SVGs do not have height/width attributes.  Set
-        these to be the same as the viewBox, so that the browser
-        scales the image correctly.
-
-        Parameters
-        ----------
-        image : str
-            SVG data.
-        size : tuple of int
-            Image width, height.
-
+        Handle special considerations for SVG images.
         """
+        # Gnuplot can create invalid characters in SVG files.
+        with open(filename, 'r', errors='replace') as fid:
+            data = fid.read()
+        im = SVG(data=data)
+        try:
+            im.data = self._fix_svg_size(im.data)
+        except Exception:
+            pass
+        return im
+
+    def _fix_svg_size(self, data):
+        # GnuPlot SVGs do not have height/width attributes.  Set
+        # these to be the same as the viewBox, so that the browser
+        # scales the image correctly.
+
+        # Get the desired size.
+        size = self.plot_settings['size']
+        if not (isinstance(size, tuple)):
+            size = 560, 420
+        width, height = size
+
         # Minidom does not support parseUnicode, so it must be decoded
         # to accept unicode characters
-        parsed = minidom.parseString(image.encode('utf-8'))
+        parsed = minidom.parseString(data.encode('utf-8'))
         (svg,) = parsed.getElementsByTagName('svg')
-        viewbox = svg.getAttribute('viewBox').split(' ')
 
         if size is not None and size[0] is not None:
             width, height = size
         else:
+            viewbox = svg.getAttribute('viewBox').split(' ')
             width, height = viewbox[2:]
 
         svg.setAttribute('width', '%dpx' % int(width))
