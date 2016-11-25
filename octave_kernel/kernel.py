@@ -159,8 +159,6 @@ class OctaveKernel(ProcessMetaKernel):
         if settings['backend'] == 'inline':
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
             cmds.append("graphics_toolkit('gnuplot');")
-            if sys.platform == 'darwin':
-                cmds.append('setenv("GNUTERM","X11");')
         else:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             cmds.append("graphics_toolkit('%s');" % settings['backend'])
