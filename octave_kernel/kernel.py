@@ -5,6 +5,7 @@ from metakernel.pexpect import which
 from IPython.display import Image, SVG
 import subprocess
 from xml.dom import minidom
+import codecs
 import os
 import shutil
 import sys
@@ -206,7 +207,7 @@ class OctaveKernel(ProcessMetaKernel):
         Handle special considerations for SVG images.
         """
         # Gnuplot can create invalid characters in SVG files.
-        with open(filename, 'r', errors='replace') as fid:
+        with codecs.open(filename, 'r', encoding='utf-8', errors='replace') as fid:
             data = fid.read()
         im = SVG(data=data)
         try:
