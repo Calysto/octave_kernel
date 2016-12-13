@@ -4,3 +4,4 @@ dist/
 build/
 octave-workspace
 *.egg-info/
+*.pyc

@@ -188,14 +188,18 @@ class OctaveKernel(ProcessMetaKernel):
         for _fig=1:length(_figHandles),
             _handle = _figHandles(_fig);
             _filename = fullfile('%(plot_dir)s', ['OctaveFig', sprintf('%%03d.%(fmt)s', _fig)]);
-            try,
-               _image = double(get(get(get(_handle,'children'),'children'),'cdata'));
-               _clim = get(get(_handle,'children'),'clim');
-               _image = _image - _clim(1);
-               _image = _image ./ (_clim(2) - _clim(1));
-               imwrite(uint8(_image*255), _filename);
-            catch,
-               print(_handle, _filename, '-r%(res)s');
+            if strcmp(get(get(get(gcf, 'children'), 'children'), 'type'), 'image') == 1,
+                try,
+                   _image = double(get(get(get(_handle,'children'),'children'),'cdata'));
+                   _clim = get(get(_handle,'children'),'clim');
+                   _image = _image - _clim(1);
+                   _image = _image ./ (_clim(2) - _clim(1));
+                   imwrite(uint8(_image*255), _filename);
+                catch,
+                   print(_handle, _filename, '-r%(res)s');
+                end,
+            else,
+                print(_handle, _filename, '-r%(res)s');
             end,
             close(_handle);
         end;
