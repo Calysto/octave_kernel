@@ -148,10 +148,9 @@ class OctaveKernel(ProcessMetaKernel):
         else:
             settings.setdefault('format', 'png')
 
-        settings.setdefault('width', 560)
-        settings.setdefault('height', 420)
-
-        settings.setdefault('resolution', 150)
+        settings.setdefault('width', -1)
+        settings.setdefault('height', -1)
+        settings.setdefault('resolution', 0)
 
         cmds = []
 
@@ -164,19 +163,30 @@ class OctaveKernel(ProcessMetaKernel):
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             cmds.append("graphics_toolkit('%s');" % settings['backend'])
 
-        size = "set(0, 'defaultfigureposition', [0 0 %s %s]);"
-        cmds.append(size % (settings['width'], settings['height']))
-
         self.do_execute_direct('\n'.join(cmds))
 
     def _make_figs(self, plot_dir):
         fmt = self.plot_settings['format']
         res = self.plot_settings['resolution']
+        wid = self.plot_settings['width']
+        hgt = self.plot_settings['height']
         cmd = """
         _figHandles = get(0, 'children');
         for _fig=1:length(_figHandles),
             _handle = _figHandles(_fig);
             _filename = fullfile('%(plot_dir)s', ['OctaveFig', sprintf('%%03d.%(fmt)s', _fig)]);
+            _position = get(_handle, 'position');
+            _wid = %(wid)s;
+            _hgt = %(hgt)s;
+            if (_wid < 0 && _hgt < 0),
+              _wid = _position(3);
+              _hgt = _position(4);
+            elseif (_wid < 0),
+              _wid = _position(3) * _hgt / _position(4);
+            elseif (_hgt < 0),
+              _hgt = _position(4) * _wid / _position(3);
+            end,
+            _size_fmt = sprintf('-S%%d,%%d', _wid, _hgt);
             if strcmp(get(get(get(gcf, 'children'), 'children'), 'type'), 'image') == 1,
                 try,
                    _image = double(get(get(get(_handle,'children'),'children'),'cdata'));
@@ -185,10 +195,10 @@ class OctaveKernel(ProcessMetaKernel):
                    _image = _image ./ (_clim(2) - _clim(1));
                    imwrite(uint8(_image*255), _filename);
                 catch,
-                   print(_handle, _filename, '-r%(res)s');
+                   print(_handle, _filename, '-r%(res)s', _size_fmt);
                 end,
             else,
-                print(_handle, _filename, '-r%(res)s');
+                print(_handle, _filename, '-r%(res)s', _size_fmt);
             end,
             close(_handle);
         end;
@@ -214,22 +224,13 @@ class OctaveKernel(ProcessMetaKernel):
         # these to be the same as the viewBox, so that the browser
         # scales the image correctly.
 
-        # Get the desired size.
-        size = self.plot_settings['size']
-        if not (isinstance(size, tuple)):
-            size = 560, 420
-        width, height = size
-
         # Minidom does not support parseUnicode, so it must be decoded
         # to accept unicode characters
         parsed = minidom.parseString(data.encode('utf-8'))
         (svg,) = parsed.getElementsByTagName('svg')
 
-        if size is not None and size[0] is not None:
-            width, height = size
-        else:
-            viewbox = svg.getAttribute('viewBox').split(' ')
-            width, height = viewbox[2:]
+        viewbox = svg.getAttribute('viewBox').split(' ')
+        width, height = viewbox[2:]
 
         svg.setAttribute('width', '%dpx' % int(width))
         svg.setAttribute('height', '%dpx' % int(height))
