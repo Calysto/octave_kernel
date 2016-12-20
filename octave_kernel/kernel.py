@@ -86,6 +86,7 @@ class OctaveKernel(ProcessMetaKernel):
         executable += ' -i'
 
         wrapper = REPLWrapper(executable, orig_prompt, change_prompt,
+                stdin_prompt_regex='debug>',
                 prompt_emit_cmd=prompt_cmd)
         wrapper.child.linesep = '\n'
         return wrapper
