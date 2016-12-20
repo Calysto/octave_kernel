@@ -83,6 +83,7 @@ class OctaveKernel(ProcessMetaKernel):
         executable = self.executable
         if 'version 4' in self.banner:
             executable += ' --no-gui'
+        executable += ' -i'
 
         wrapper = REPLWrapper(executable, orig_prompt, change_prompt,
                 prompt_emit_cmd=prompt_cmd)
@@ -142,16 +143,15 @@ class OctaveKernel(ProcessMetaKernel):
     def handle_plot_settings(self):
         """Handle the current plot settings"""
         settings = self.plot_settings
-        if settings.get('format', None) is None:
-            settings.clear()
-        settings.setdefault('backend', 'inline')
         if sys.platform == 'darwin':
             settings.setdefault('format', 'svg')
         else:
             settings.setdefault('format', 'png')
-        settings.setdefault('format', 'png')
-        settings.setdefault('size', '560,420')
-        settings.setdefault('resolution', 150.)
+
+        settings.setdefault('width', 560)
+        settings.setdefault('height', 420)
+
+        settings.setdefault('resolution', 150)
 
         cmds = []
 
@@ -164,19 +164,8 @@ class OctaveKernel(ProcessMetaKernel):
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             cmds.append("graphics_toolkit('%s');" % settings['backend'])
 
-        width, height = 560, 420
-        if isinstance(settings['size'], tuple):
-            width, height = settings['size']
-        elif settings['size']:
-            try:
-                width, height = settings['size'].split(',')
-                width, height = int(width), int(height)
-                settings['size'] = width, height
-            except Exception as e:
-                self.Error('Error setting plot settings: %s' % e)
-
         size = "set(0, 'defaultfigureposition', [0 0 %s %s]);"
-        cmds.append(size % (width, height))
+        cmds.append(size % (settings['width'], settings['height']))
 
         self.do_execute_direct('\n'.join(cmds))
 
