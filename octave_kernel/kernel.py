@@ -154,7 +154,7 @@ class OctaveEngine(object):
         make_figs = '_make_figures("%s", "%s", %d, %d, %d)'
         self.eval(make_figs % (plot_dir, fmt, wid, hgt, res))
         images = []
-        for fname in os.listdir(plot_dir):
+        for fname in reversed(os.listdir(plot_dir)):
             filename = os.path.join(plot_dir, fname)
             try:
                 if fname.lower().endswith('.svg'):
