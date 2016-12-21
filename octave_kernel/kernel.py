@@ -1,16 +1,17 @@
 from __future__ import print_function
 
+import codecs
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from xml.dom import minidom
+
 from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
 from metakernel.pexpect import which
 from IPython.display import Image, SVG
-import subprocess
-from xml.dom import minidom
-import codecs
-import os
-import shutil
-import sys
-import tempfile
-
 
 from . import __version__
 
@@ -29,99 +30,39 @@ class OctaveKernel(ProcessMetaKernel):
         'help_links': MetaKernel.help_links,
     }
 
-    _setup = """
-    more off;
-    """
-
-    _first = True
-
     _banner = None
-
-    _executable = None
-
-    @property
-    def executable(self):
-        if self._executable:
-            return self._executable
-        executable = os.environ.get('OCTAVE_EXECUTABLE', None)
-        if not executable or not which(executable):
-            if which('octave-cli'):
-                self._executable = 'octave-cli'
-                return self._executable
-            elif which('octave'):
-                self._executable = 'octave'
-                return self._executable
-            else:
-                msg = ('Octave Executable not found, please add to path or set'
-                       '"OCTAVE_EXECUTABLE" environment variable')
-                raise OSError(msg)
-        else:
-            self._executable = executable
-            return executable
+    _octave_engine = None
 
     @property
     def banner(self):
         if self._banner is None:
-            banner = subprocess.check_output([self.executable, '--version'])
-            self._banner = banner.decode('utf-8')
+            self._banner = self.octave_engine.eval('info', silent=True)
         return self._banner
+
+    @property
+    def octave_engine(self):
+        if self._octave_engine:
+            return self._octave_engine
+        self._octave_engine = OctaveEngine(plot_settings=self.plot_settings,
+                                           error_handler=self.Error,
+                                           stdin_handler=self.raw_input,
+                                           stream_handler=self.Print)
+        return self._octave_engine
 
     def makeWrapper(self):
         """Start an Octave process and return a :class:`REPLWrapper` object.
         """
-        if os.name == 'nt':
-            orig_prompt = u(chr(3))
-            prompt_cmd = u('disp(char(3))')
-            change_prompt = None
-        else:
-            orig_prompt = u('octave.*>')
-            prompt_cmd = None
-            change_prompt = u("PS1('{0}'); PS2('{1}')")
+        return self.octave_engine.repl
 
-        self._first = True
-
-        executable = self.executable
-        if 'version 4' in self.banner:
-            executable += ' --no-gui'
-        executable += ' -i'
-
-        wrapper = REPLWrapper(executable, orig_prompt, change_prompt,
-                stdin_prompt_regex='debug>',
-                prompt_emit_cmd=prompt_cmd)
-        wrapper.child.linesep = '\n'
-        return wrapper
-
-    def do_execute_direct(self, code):
-        if self._first:
-            self._first = False
-            self.handle_plot_settings()
-            super(OctaveKernel, self).do_execute_direct(self._setup)
-            if os.name != 'nt':
-                msg = ('may not be able to display plots properly '
-                       'without gnuplot, please install it '
-                       '(gnuplot-x11 on Linux)')
-                try:
-                    subprocess.check_call(['gnuplot', '--version'])
-                except subprocess.CalledProcessError:
-                    self.Error(msg)
-
-        super(OctaveKernel, self).do_execute_direct(code, self.Print)
-        if self.plot_settings.get('backend', None) == 'inline':
-            plot_dir = tempfile.mkdtemp()
-            self._make_figs(plot_dir)
-            for fname in os.listdir(plot_dir):
-                filename = os.path.join(plot_dir, fname)
-                try:
-                    if fname.lower().endswith('.svg'):
-                        im = self._handle_svg(filename)
-                    else:
-                        im = Image(filename)
-                    self.Display(im)
-                except Exception as e:
-                    import traceback
-                    traceback.print_exc(file=sys.__stderr__)
-                    self.Error(e)
-            shutil.rmtree(plot_dir, True)
+    def do_execute_direct(self, code, silent=False):
+        if code.strip() in ['quit', 'quit()', 'exit', 'exit()']:
+            self.do_shutdown(True)
+            return
+        val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
+        if not silent:
+            for image in self.octave_engine.handle_figs():
+                self.Display(image)
+        return val
 
     def get_kernel_help_on(self, info, level=0, none_on_fail=False):
         obj = info.get('help_obj', '')
@@ -130,88 +71,128 @@ class OctaveKernel(ProcessMetaKernel):
                 return None
             else:
                 return ""
-        resp = super(OctaveKernel, self).do_execute_direct('help %s' % obj)
-        return str(resp)
+        return self.octave_engine.eval('help %s' % obj, silent=True)
 
     def get_completions(self, info):
         """
         Get completions from kernel based on info dict.
         """
         cmd = 'completion_matches("%s")' % info['obj']
-        resp = super(OctaveKernel, self).do_execute_direct(cmd)
-        return str(resp).splitlines()
+        val = self.octave_engine.eval(cmd, silent=True)
+        return val and val.splitlines() or []
 
     def handle_plot_settings(self):
         """Handle the current plot settings"""
-        settings = self.plot_settings
+        self.octave_engine.plot_settings = self.plot_settings
+
+
+class OctaveEngine(object):
+
+    def __init__(self, error_handler=None, stream_handler=None,
+                 stdin_handler=None, plot_settings=None):
+        self.executable = self._get_executable()
+        self.repl = self._create_repl()
+        self.error_handler = error_handler
+        self.stream_handler = stream_handler
+        self.stdin_handler = stdin_handler
+        self._startup(plot_settings)
+
+    @property
+    def plot_settings(self):
+        return self._plot_settings
+
+    @plot_settings.setter
+    def plot_settings(self, settings):
+        self._plot_settings = settings or dict(backend='inline')
         if sys.platform == 'darwin':
             settings.setdefault('format', 'svg')
         else:
             settings.setdefault('format', 'png')
 
+        settings.setdefault('backend', 'inline')
         settings.setdefault('width', -1)
         settings.setdefault('height', -1)
         settings.setdefault('resolution', 0)
 
         cmds = []
-
-        self._plot_fmt = settings['format']
-
         if settings['backend'] == 'inline':
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
             cmds.append("graphics_toolkit('gnuplot');")
         else:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             cmds.append("graphics_toolkit('%s');" % settings['backend'])
+        self.eval('\n'.join(cmds))
 
-        self.do_execute_direct('\n'.join(cmds))
+    def eval(self, code, timeout=None, silent=False):
+        """Evaluate code using the engine.
+        """
+        stream_handler = None if silent else self.stream_handler
+        try:
+            return self.repl.run_command(code.rstrip(),
+                                         timeout=timeout,
+                                         stream_handler=stream_handler,
+                                         stdin_handler=self.stdin_handler)
+        except Exception as e:
+            if self.error_handler:
+                self.error_handler(e)
+            else:
+                raise e
 
-    def _make_figs(self, plot_dir):
-        fmt = self.plot_settings['format']
-        res = self.plot_settings['resolution']
-        wid = self.plot_settings['width']
-        hgt = self.plot_settings['height']
-        cmd = """
-        _figHandles = get(0, 'children');
-        for _fig=1:length(_figHandles),
-            _handle = _figHandles(_fig);
-            _filename = fullfile('%(plot_dir)s', ['OctaveFig', sprintf('%%03d.%(fmt)s', _fig)]);
-            _position = get(_handle, 'position');
-            _wid = %(wid)s;
-            _hgt = %(hgt)s;
-            if (_wid < 0 && _hgt < 0),
-              _wid = _position(3);
-              _hgt = _position(4);
-            elseif (_wid < 0),
-              _wid = _position(3) * _hgt / _position(4);
-            elseif (_hgt < 0),
-              _hgt = _position(4) * _wid / _position(3);
-            end,
-            _size_fmt = sprintf('-S%%d,%%d', _wid, _hgt);
-            if strcmp(get(get(get(gcf, 'children'), 'children'), 'type'), 'image') == 1,
-                try,
-                   _image = double(get(get(get(_handle,'children'),'children'),'cdata'));
-                   _clim = get(get(_handle,'children'),'clim');
-                   _image = _image - _clim(1);
-                   _image = _image ./ (_clim(2) - _clim(1));
-                   imwrite(uint8(_image*255), _filename);
-                catch,
-                   print(_handle, _filename, '-r%(res)s', _size_fmt);
-                end,
-            else,
-                print(_handle, _filename, '-r%(res)s', _size_fmt);
-            end,
-            close(_handle);
-        end;
-        """ % locals()
-        super(OctaveKernel, self).do_execute_direct(cmd.replace('\n', ''))
+    def handle_figs(self, plot_dir=None):
+        """Get a list of IPython Image objects for the created figures.
+        """
+        settings = self._plot_settings
+        if settings['backend'] != 'inline':
+            self.eval('drawnow("expose");')
+            return []
+        fmt = settings['format']
+        res = settings['resolution']
+        wid = settings['width']
+        hgt = settings['height']
+        plot_dir = plot_dir or tempfile.mkdtemp()
+        make_figs = '_make_figures("%s", "%s", %d, %d, %d)'
+        self.eval(make_figs % (plot_dir, fmt, wid, hgt, res))
+        images = []
+        for fname in os.listdir(plot_dir):
+            filename = os.path.join(plot_dir, fname)
+            try:
+                if fname.lower().endswith('.svg'):
+                    im = self._handle_svg(filename)
+                else:
+                    im = Image(filename)
+                images.append(im)
+            except Exception as e:
+                if self.error_handler:
+                    self.error_handler(e)
+                else:
+                    raise e
+        shutil.rmtree(plot_dir, True)
+        return images
+
+    def _startup(self, plot_settings):
+        cwd = os.getcwd().replace(os.path.sep, '/')
+        here = os.path.realpath(os.path.dirname(__file__))
+        here = here.replace(os.path.sep, '/')
+        # Changing directories will source the local ".octaverc" file.
+        cmd = 'more off; source ~/.octaverc; cd("%s"); addpath(genpath("%s"));'
+        self.eval(cmd % (cwd, here))
+        available = self.eval('available_graphics_toolkits', silent=True)
+        if 'gnuplot' not in available:
+            msg = ('May not be able to display plots properly '
+                   'without gnuplot, please install it')
+            if self.error_handler:
+                self.error_handler(msg)
+            else:
+                raise ValueError(msg)
+        self.plot_settings = plot_settings
 
     def _handle_svg(self, filename):
         """
         Handle special considerations for SVG images.
         """
         # Gnuplot can create invalid characters in SVG files.
-        with codecs.open(filename, 'r', encoding='utf-8', errors='replace') as fid:
+        with codecs.open(filename, 'r', encoding='utf-8',
+                         errors='replace') as fid:
             data = fid.read()
         im = SVG(data=data)
         try:
@@ -221,10 +202,10 @@ class OctaveKernel(ProcessMetaKernel):
         return im
 
     def _fix_svg_size(self, data):
-        # GnuPlot SVGs do not have height/width attributes.  Set
-        # these to be the same as the viewBox, so that the browser
-        # scales the image correctly.
-
+        """GnuPlot SVGs do not have height/width attributes.  Set
+        these to be the same as the viewBox, so that the browser
+        scales the image correctly.
+        """
         # Minidom does not support parseUnicode, so it must be decoded
         # to accept unicode characters
         parsed = minidom.parseString(data.encode('utf-8'))
@@ -236,3 +217,43 @@ class OctaveKernel(ProcessMetaKernel):
         svg.setAttribute('width', '%dpx' % int(width))
         svg.setAttribute('height', '%dpx' % int(height))
         return svg.toxml()
+
+    def _create_repl(self):
+        cmd = self.executable
+        if 'octave-cli' not in cmd:
+            version_cmd = [self.executable, '--version']
+            version = subprocess.check_output(version_cmd).decode('utf-8')
+            if 'version 4' in version:
+                cmd += ' --no-gui'
+        # Interactive mode prevents crashing on Windows on syntax errors.
+        # Delay sourcing the "~/.octaverc" file in case it displays a pager.
+        cmd += ' --interactive --quiet --no-init-file'
+        if os.name == 'nt':
+            orig_prompt = u(chr(3))
+            prompt_emit_cmd = u('disp(char(3))')
+            change_prompt = None
+        else:
+            orig_prompt = u('octave.*>')
+            prompt_emit_cmd = None
+            change_prompt = u("PS1('{0}'); PS2('{1}')")
+
+        repl = REPLWrapper(cmd, orig_prompt, change_prompt,
+                           stdin_prompt_regex=re.compile(r'\A[\w]+>>? '),
+                           prompt_emit_cmd=prompt_emit_cmd)
+        repl.linesep = '\n'
+        return repl
+
+    def _get_executable(self):
+        """Find the best octave executable.
+        """
+        executable = os.environ.get('OCTAVE_EXECUTABLE', None)
+        if not executable or not which(executable):
+            if which('octave-cli'):
+                executable = 'octave-cli'
+            elif which('octave'):
+                executable = 'octave'
+            else:
+                msg = ('Octave Executable not found, please add to path or set'
+                       '"OCTAVE_EXECUTABLE" environment variable')
+                raise OSError(msg)
+        return executable
