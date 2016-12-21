@@ -150,6 +150,7 @@ class OctaveEngine(object):
         wid = settings['width']
         hgt = settings['height']
         plot_dir = plot_dir or tempfile.mkdtemp()
+        plot_dir = plot_dir.replace(os.path.sep, '/')
         make_figs = '_make_figures("%s", "%s", %d, %d, %d)'
         self.eval(make_figs % (plot_dir, fmt, wid, hgt, res))
         images = []
@@ -170,12 +171,11 @@ class OctaveEngine(object):
         return images
 
     def _startup(self, plot_settings):
-        cwd = os.getcwd().replace(os.path.sep, '/')
-        here = os.path.realpath(os.path.dirname(__file__))
-        here = here.replace(os.path.sep, '/')
         # Changing directories will source the local ".octaverc" file.
-        cmd = 'more off; source ~/.octaverc; cd("%s"); addpath(genpath("%s"));'
-        self.eval(cmd % (cwd, here))
+        cwd = os.getcwd().replace(os.path.sep, '/')
+        self.eval('more off; source ~/.octaverc; cd("%s");' % cwd)
+        here = os.path.realpath(os.path.dirname(__file__))
+        self.eval('addpath("%s")' % here.replace(os.path.sep, '/'))
         available = self.eval('available_graphics_toolkits', silent=True)
         if 'gnuplot' not in available:
             msg = ('May not be able to display plots properly '
@@ -228,18 +228,11 @@ class OctaveEngine(object):
         # Interactive mode prevents crashing on Windows on syntax errors.
         # Delay sourcing the "~/.octaverc" file in case it displays a pager.
         cmd += ' --interactive --quiet --no-init-file'
-        if os.name == 'nt':
-            orig_prompt = u(chr(3))
-            prompt_emit_cmd = u('disp(char(3))')
-            change_prompt = None
-        else:
-            orig_prompt = u('octave.*>')
-            prompt_emit_cmd = None
-            change_prompt = u("PS1('{0}'); PS2('{1}')")
+        orig_prompt = u('octave.*>')
+        change_prompt = u("PS1('{0}'); PS2('{1}')")
 
         repl = REPLWrapper(cmd, orig_prompt, change_prompt,
-                           stdin_prompt_regex=re.compile(r'\A[\w]+>>? '),
-                           prompt_emit_cmd=prompt_emit_cmd)
+                           stdin_prompt_regex=re.compile(r'\A[\w]+>>? '))
         repl.linesep = '\n'
         return repl
 
