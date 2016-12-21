@@ -9,4 +9,4 @@ install:
   - flit install
   - python -m octave_kernel.install
 script:
-  - python test_octave_kernel.py
+  - make test
