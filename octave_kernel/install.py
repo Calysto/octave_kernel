@@ -2,10 +2,7 @@ import json
 import os
 import sys
 
-try:
-    from jupyter_client.kernelspec import install_kernel_spec
-except ImportError:
-    from IPython.kernel.kernelspec import install_kernel_spec
+from jupyter_client.kernelspec import install_kernel_spec
 from IPython.utils.tempdir import TemporaryDirectory
 
 

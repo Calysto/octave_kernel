@@ -7,8 +7,8 @@ MAINTAINER = 'Steven Silvester'
 MAINTAINER_EMAIL = 'steven.silvester@ieee.org'
 URL = 'http://github.com/calsto/octave_kernel'
 LICENSE = 'MIT'
-REQUIRES = ["metakernel (>=0.16.0)"]
-INSTALL_REQUIRES = ["metakernel >=0.16"]
+REQUIRES = ["metakernel (>=0.16.0)", "jupyter_client"]
+INSTALL_REQUIRES = ["metakernel >=0.16", "jupyter_client"]
 PACKAGES = []
 PACKAGE_DATA = {DISTNAME: ['*.m']}
 CLASSIFIERS = """\
