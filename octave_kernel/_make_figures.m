@@ -1,4 +1,4 @@
-function _make_figures(plot_dir, fmt, wid, hgt, res)
+function _make_figures(plot_dir, fmt, name, wid, hgt, res)
     %%%% Create figures in the given plot directory.
     %%%%
     % Disable a "print" warning that does not affect png and svg output.
@@ -6,7 +6,7 @@ function _make_figures(plot_dir, fmt, wid, hgt, res)
 
     handles = get(0, 'children');
     for ind = 1:length(handles)
-        filename = sprintf('OctaveFig%03d', ind);
+        filename = sprintf('%s%03d', name, ind);
         filepath = fullfile(plot_dir, [filename, '.', fmt]);
 
         h = handles(ind);

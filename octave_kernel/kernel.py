@@ -103,7 +103,8 @@ class OctaveEngine(object):
 
     @plot_settings.setter
     def plot_settings(self, settings):
-        self._plot_settings = settings or dict(backend='inline')
+        settings = settings or dict(backend='inline')
+        self._plot_settings = settings
         if sys.platform == 'darwin':
             settings.setdefault('format', 'svg')
         else:
@@ -113,6 +114,7 @@ class OctaveEngine(object):
         settings.setdefault('width', -1)
         settings.setdefault('height', -1)
         settings.setdefault('resolution', 0)
+        settings.setdefault('name', 'Figure')
 
         cmds = []
         if settings['backend'] == 'inline':
@@ -149,10 +151,11 @@ class OctaveEngine(object):
         res = settings['resolution']
         wid = settings['width']
         hgt = settings['height']
+        name = settings['name']
         plot_dir = plot_dir or tempfile.mkdtemp()
         plot_dir = plot_dir.replace(os.path.sep, '/')
-        make_figs = '_make_figures("%s", "%s", %d, %d, %d)'
-        self.eval(make_figs % (plot_dir, fmt, wid, hgt, res))
+        make_figs = '_make_figures("%s", "%s", "%s", %d, %d, %d)'
+        self.eval(make_figs % (plot_dir, fmt, name, wid, hgt, res))
         images = []
         for fname in reversed(os.listdir(plot_dir)):
             filename = os.path.join(plot_dir, fname)
