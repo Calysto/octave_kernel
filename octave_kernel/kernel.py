@@ -171,7 +171,6 @@ class OctaveEngine(object):
         return images
 
     def _startup(self, plot_settings):
-        # Changing directories will source the local ".octaverc" file.
         cwd = os.getcwd().replace(os.path.sep, '/')
         self.eval('more off; source ~/.octaverc; cd("%s");' % cwd)
         here = os.path.realpath(os.path.dirname(__file__))
