@@ -155,7 +155,14 @@ class OctaveEngine(object):
         plot_dir = plot_dir or tempfile.mkdtemp()
         plot_dir = plot_dir.replace(os.path.sep, '/')
         make_figs = '_make_figures("%s", "%s", "%s", %d, %d, %d)'
-        self.eval(make_figs % (plot_dir, fmt, name, wid, hgt, res))
+        make_figs = make_figs % (plot_dir, fmt, name, wid, hgt, res)
+        resp = self.eval(make_figs, silent=True)
+        if resp and 'error:' in resp:
+            if self.error_handler:
+                self.error_handler(resp)
+            else:
+                raise Exception(resp)
+
         images = []
         for fname in reversed(os.listdir(plot_dir)):
             filename = os.path.join(plot_dir, fname)
