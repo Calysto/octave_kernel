@@ -60,7 +60,7 @@ class OctaveKernel(ProcessMetaKernel):
             return
         val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
         if not silent:
-            for image in self.octave_engine.handle_figs():
+            for image in self.octave_engine.extract_figures():
                 self.Display(image)
         return val
 
@@ -140,7 +140,7 @@ class OctaveEngine(object):
             else:
                 raise e
 
-    def handle_figs(self, plot_dir=None):
+    def extract_figures(self, plot_dir=None):
         """Get a list of IPython Image objects for the created figures.
         """
         settings = self._plot_settings
