@@ -1,8 +1,9 @@
 function _make_figures(plot_dir, fmt, name, wid, hgt, res)
     %%%% Create figures in the given plot directory.
     %%%%
+
     % Disable a "print" warning that does not affect png and svg output.
-    warning('off', 'print:missing_fig2dev');
+    warning('off');
 
     handles = get(0, 'children');
     for ind = 1:length(handles)
@@ -46,4 +47,6 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res)
         end
         close(h);
     end
+
+    warning('on');
 end
