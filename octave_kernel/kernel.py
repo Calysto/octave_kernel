@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import codecs
+import glob
 import os
 import re
 import shutil
@@ -60,8 +61,10 @@ class OctaveKernel(ProcessMetaKernel):
             return
         val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
         if not silent:
-            for image in self.octave_engine.extract_figures():
+            plot_dir = self.octave_engine.make_figures()
+            for image in self.octave_engine.extract_figures(plot_dir):
                 self.Display(image)
+            shutil.rmtree(plot_dir, True)
         return val
 
     def get_kernel_help_on(self, info, level=0, none_on_fail=False):
@@ -140,13 +143,24 @@ class OctaveEngine(object):
             else:
                 raise e
 
-    def extract_figures(self, plot_dir=None):
-        """Get a list of IPython Image objects for the created figures.
+    def make_figures(self, plot_dir=None):
+        """Create figures for the current figures.
+
+        Parameters
+        ----------
+        plot_dir: str, optional
+            The directory in which to create the plots.
+
+        Returns
+        -------
+        out: str
+            The plot directory containing the files.
         """
         settings = self._plot_settings
         if settings['backend'] != 'inline':
             self.eval('drawnow("expose");')
-            return []
+            if not plot_dir:
+                return
         fmt = settings['format']
         res = settings['resolution']
         wid = settings['width']
@@ -162,9 +176,19 @@ class OctaveEngine(object):
                 self.error_handler(resp)
             else:
                 raise Exception(resp)
+        return plot_dir
 
+    def extract_figures(self, plot_dir):
+        """Get a list of IPython Image objects for the created figures.
+
+        Parameters
+        ----------
+        plot_dir: str
+            The directory in which to create the plots.
+        """
         images = []
-        for fname in reversed(os.listdir(plot_dir)):
+        path = os.path.join(plot_dir, '%s*' % self.plot_settings['name'])
+        for fname in reversed(glob.glob(path)):
             filename = os.path.join(plot_dir, fname)
             try:
                 if fname.lower().endswith('.svg'):
@@ -177,7 +201,6 @@ class OctaveEngine(object):
                     self.error_handler(e)
                 else:
                     raise e
-        shutil.rmtree(plot_dir, True)
         return images
 
     def _startup(self, plot_settings):
