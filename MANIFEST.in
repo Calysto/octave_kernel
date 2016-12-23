@@ -4,7 +4,7 @@ include Makefile
 recursive-include docs *.rst
 recursive-include docs *.png
 recursive-include docs *.py
-recursive-include oct2py *.m
+recursive-include octave_kernel *.m
 recursive-include example *.m
 recursive-include example *.py
 recursive-include example *.ipynb
