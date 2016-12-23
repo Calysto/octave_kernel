@@ -108,6 +108,14 @@ class OctaveEngine(object):
     def plot_settings(self, settings):
         settings = settings or dict(backend='inline')
         self._plot_settings = settings
+
+        # Remove "None" keys so we can use setdefault below.
+        keys = ['format', 'backend', 'width', 'height', 'resolution',
+                'backend']
+        for key in keys:
+            if key in settings and settings.get(key, None) is None:
+                del settings[key]
+
         if sys.platform == 'darwin':
             settings.setdefault('format', 'svg')
         else:
