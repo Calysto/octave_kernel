@@ -19,29 +19,34 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res)
         % If no height is given, scale based on figure aspect.
         elseif (hgt < 0)
           hgt = pos(4) * wid / pos(3);
-        end
+        end;
 
         size_opt = sprintf('-S%d,%d', wid, hgt);
         res_opt = sprintf('-r%d', res);
 
         % Try to use imwrite if the figure only contains an image.
-        grandchild = get(get(h, 'children'), 'children');
-        if strcmp(get(grandchild, 'type'), 'image') == 1
+        use_imwrite = false
+        try
+          grandchild = get(get(h, 'children'), 'children');
+          use_imwrite = strcmp(get(grandchild, 'type'), 'image') == 1
+        end;
+
+        if (use_imwrite)
             try
-               image = double(get(grandchild, 'cdata'));
-               clim = get(get(h, 'children'), 'clim');
-               image = image - clim(1);
-               image = image ./ (clim(2) - clim(1));
-               % Force a png file.
-               impath = fullfile(plot_dir, [filename, '.png']);
-               imwrite(uint8(image*255), impath);
+                 image = double(get(grandchild, 'cdata'));
+                 clim = get(get(h, 'children'), 'clim');
+                 image = image - clim(1);
+                 image = image ./ (clim(2) - clim(1));
+                 % Force a png file.
+                 impath = fullfile(plot_dir, [filename, '.png']);
+                 imwrite(uint8(image*255), impath);
             catch
                % Fall back on a standard figure save.
                print(h, filepath, res_opt, size_opt);
-            end
+            end;
         else
             print(h, filepath, res_opt, size_opt);
-        end
+        end;
         close(h);
-    end
-end
+    end;
+end;
