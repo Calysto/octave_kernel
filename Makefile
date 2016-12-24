@@ -12,9 +12,11 @@ clean:
 	rm -rf dist
 
 test: clean
-	pip install jupyter_kernel_test
+	pip install jupyter_kernel_test nbconvert
 	python setup.py build
+	python -m octave_kernel.install
 	python test_octave_kernel.py
+	jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null;
 	make clean
 
 release: clean
