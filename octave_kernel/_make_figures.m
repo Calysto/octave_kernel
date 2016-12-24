@@ -6,6 +6,7 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res)
     for ind = 1:length(handles)
         filename = sprintf('%s%03d', name, ind);
         filepath = fullfile(plot_dir, [filename, '.', fmt]);
+        pngpath = fullfile(plot_dir, [filename, '.png']);
 
         h = handles(ind);
         pos = get(h, 'position');
@@ -38,15 +39,32 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res)
                  image = image - clim(1);
                  image = image ./ (clim(2) - clim(1));
                  % Force a png file.
-                 impath = fullfile(plot_dir, [filename, '.png']);
-                 imwrite(uint8(image*255), impath);
+                 imwrite(uint8(image*255), pngpath);
             catch
                % Fall back on a standard figure save.
-               print(h, filepath, res_opt, size_opt);
+               safe_print(h, filepath, pngpath, res_opt, size_opt);
             end;
         else
-            print(h, filepath, res_opt, size_opt);
+            safe_print(h, filepath, pngpath, res_opt, size_opt);
         end;
         close(h);
     end;
 end;
+
+
+function safe_print(h, filepath, altpath, res_opt, size_opt) 
+  try 
+    inner_print(h, filepath, res_opt, size_opt)
+  catch
+    inner_print(h, altpath, res_opt, size_opt)
+  end
+end
+
+
+function inner_print(h, filepath, res_opt, size_opt)
+  try
+    print(h, filepath, res_opt, size_opt)
+  catch
+    print(h, filepath)
+  end
+end

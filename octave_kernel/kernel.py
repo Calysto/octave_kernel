@@ -111,7 +111,7 @@ class OctaveEngine(object):
 
         # Remove "None" keys so we can use setdefault below.
         keys = ['format', 'backend', 'width', 'height', 'resolution',
-                'backend']
+                'backend', 'name']
         for key in keys:
             if key in settings and settings.get(key, None) is None:
                 del settings[key]
