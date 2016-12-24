@@ -253,6 +253,7 @@ class OctaveEngine(object):
 
         viewbox = svg.getAttribute('viewBox').split(' ')
         width, height = viewbox[2:]
+        width, height = int(width), int(height)
 
         # Handle overrides in case they were not encoded.
         settings = self.plot_settings
@@ -265,8 +266,8 @@ class OctaveEngine(object):
                 width = width * settings['height'] / height
             height = settings['height']
 
-        svg.setAttribute('width', '%dpx' % int(width))
-        svg.setAttribute('height', '%dpx' % int(height))
+        svg.setAttribute('width', '%dpx' % width)
+        svg.setAttribute('height', '%dpx' % height)
         return svg.toxml()
 
     def _create_repl(self):
