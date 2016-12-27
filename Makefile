@@ -29,3 +29,5 @@ release: clean
 	git push origin --all
 	git push origin --tags
 	twine upload dist/*
+	printf '\nUpgrade octave_kernel-feedstock with release and sha256 sum:'
+	shasum -a 256 dist/*.tar.gz
