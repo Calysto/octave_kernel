@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import getopt
 
 from jupyter_client.kernelspec import install_kernel_spec
 from IPython.utils.tempdir import TemporaryDirectory
@@ -17,7 +18,7 @@ kernel_json = {
 }
 
 
-def install_my_kernel_spec(user=True):
+def install_my_kernel_spec(user=True, prefix=None):
     user = '--user' in sys.argv or not _is_root()
     with TemporaryDirectory() as td:
         os.chmod(td, 0o755)  # Starts off as 700, not user readable
@@ -26,10 +27,10 @@ def install_my_kernel_spec(user=True):
         kernel_name = kernel_json['name']
         try:
             install_kernel_spec(td, kernel_name, user=user,
-                                replace=True)
+                                replace=True, prefix=prefix)
         except:
             install_kernel_spec(td, kernel_name, user=not user,
-                                replace=True)
+                                replace=True, prefix=prefix)
 
 
 def _is_root():
@@ -40,8 +41,18 @@ def _is_root():
 
 
 def main(argv=[]):
-    user = '--user' in argv or not _is_root()
-    install_my_kernel_spec(user=user)
+    prefix = None
+    user = not _is_root()
+
+    opts, _ = getopt.getopt(argv[1:], '', ['user', 'prefix='])
+    for k, v in opts:
+        if k == '--user':
+            user = True
+        elif k == '--prefix':
+            prefix = v
+            user = False
+
+    install_my_kernel_spec(user=user, prefix=prefix)
 
 
 if __name__ == '__main__':
