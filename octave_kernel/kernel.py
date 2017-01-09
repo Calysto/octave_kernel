@@ -301,4 +301,5 @@ class OctaveEngine(object):
                 msg = ('Octave Executable not found, please add to path or set'
                        '"OCTAVE_EXECUTABLE" environment variable')
                 raise OSError(msg)
+        executable = executable.replace(os.path.sep, '/')
         return executable
