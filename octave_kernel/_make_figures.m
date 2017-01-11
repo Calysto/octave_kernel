@@ -11,7 +11,7 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res)
         h = handles(ind);
         pos = get(h, 'position');
         % If no width or height is given, use the figure size.
-        if (wid < 0 && hgt < 0)
+        if (wid < 0 && hgt < 0 && res == 0)
           wid = pos(3);
           hgt = pos(4);
         % If no width is given, scale based on figure aspect.
@@ -22,14 +22,17 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res)
           hgt = pos(4) * wid / pos(3);
         end;
 
-        size_opt = sprintf('-S%d,%d', wid, hgt);
-        res_opt = sprintf('-r%d', res);
+        if (wid > 0)
+          size_opt = sprintf('-S%d,%d', wid, hgt);
+        else 
+          size_opt = sprintf('-r%d', res)
+        end
 
         % Try to use imwrite if the figure only contains an image.
-        use_imwrite = false
+        use_imwrite = false;
         try
           grandchild = get(get(h, 'children'), 'children');
-          use_imwrite = strcmp(get(grandchild, 'type'), 'image') == 1
+          use_imwrite = strcmp(get(grandchild, 'type'), 'image') == 1;
         end;
 
         if (use_imwrite)
@@ -42,28 +45,28 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res)
                  imwrite(uint8(image*255), pngpath);
             catch
                % Fall back on a standard figure save.
-               safe_print(h, filepath, pngpath, res_opt, size_opt);
+               safe_print(h, filepath, pngpath, size_opt);
             end;
         else
-            safe_print(h, filepath, pngpath, res_opt, size_opt);
+            safe_print(h, filepath, pngpath, size_opt);
         end;
         close(h);
     end;
 end;
 
 
-function safe_print(h, filepath, altpath, res_opt, size_opt) 
+function safe_print(h, filepath, altpath, size_opt) 
   try 
-    inner_print(h, filepath, res_opt, size_opt)
+    inner_print(h, filepath, size_opt)
   catch
-    inner_print(h, altpath, res_opt, size_opt)
+    inner_print(h, altpath, size_opt)
   end
 end
 
 
-function inner_print(h, filepath, res_opt, size_opt)
+function inner_print(h, filepath, size_opt)
   try
-    print(h, filepath, res_opt, size_opt)
+    print(h, filepath, size_opt)
   catch
     print(h, filepath)
   end
