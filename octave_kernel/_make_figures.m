@@ -91,8 +91,8 @@ function save_image(im, pngpath)
   cdata = cdata ./ (clim(2) - clim(1));
 
   if (ndims(cdata) == 2)
-    [I, ~] = gray2ind(cdata);
     cmap = colormap(get(im, 'parent'));
+    [I, ~] = gray2ind(cdata, length(cmap));
     imwrite(I, cmap, pngpath);
   else
     imwrite(cdata, pngpath);
