@@ -17,6 +17,10 @@ from IPython.display import Image, SVG
 from . import __version__
 
 
+STDIN_PROMPT = '__stdin_prompt>'
+STDIN_PROMPT_REGEX = re.compile(r'\A.+?%s' % STDIN_PROMPT)
+
+
 class OctaveKernel(ProcessMetaKernel):
     implementation = 'Octave Kernel'
     implementation_version = __version__,
@@ -75,6 +79,17 @@ class OctaveKernel(ProcessMetaKernel):
             else:
                 return ""
         return self.octave_engine.eval('help %s' % obj, silent=True)
+
+    def Print(self, *args, **kwargs):
+        # Ignore standalone input hook displays.
+        if (args[0].strip() == STDIN_PROMPT):
+            return
+        super(OctaveKernel, self).Print(*args, **kwargs)
+
+    def raw_input(self, text):
+        # Remove the stdin prompt to restore the original prompt.
+        text = text.replace(STDIN_PROMPT, '')
+        return super(OctaveKernel, self).raw_input(text)
 
     def get_completions(self, info):
         """
@@ -216,6 +231,7 @@ class OctaveEngine(object):
         self.eval('more off; source ~/.octaverc; cd("%s");' % cwd)
         here = os.path.realpath(os.path.dirname(__file__))
         self.eval('addpath("%s")' % here.replace(os.path.sep, '/'))
+        self.eval('add_input_event_hook(@_input_hook);')
         available = self.eval('available_graphics_toolkits', silent=True)
         if 'gnuplot' not in available:
             msg = ('May not be able to display plots properly '
@@ -284,7 +300,7 @@ class OctaveEngine(object):
         change_prompt = u("PS1('{0}'); PS2('{1}')")
 
         repl = REPLWrapper(cmd, orig_prompt, change_prompt,
-                           stdin_prompt_regex=re.compile(r'\A[\w]+>>? '))
+                           stdin_prompt_regex=STDIN_PROMPT_REGEX)
         repl.linesep = '\n'
         return repl
 
