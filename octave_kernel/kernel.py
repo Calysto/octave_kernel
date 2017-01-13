@@ -87,7 +87,7 @@ class OctaveKernel(ProcessMetaKernel):
         super(OctaveKernel, self).Print(*args, **kwargs)
 
     def raw_input(self, text):
-        # Remove the stdin prompt from the original prompt.
+        # Remove the stdin prompt to restore the original prompt.
         text = text.replace(STDIN_PROMPT, '')
         return super(OctaveKernel, self).raw_input(text)
 
