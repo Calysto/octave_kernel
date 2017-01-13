@@ -21,5 +21,5 @@
 ## @end deftypefn
 
 function kbhit(n)
-    disp('**WARNING Ignoring unsupported function `kbhit`');
+    disp('**WARNING Kernel ignoring unsupported function `kbhit`');
 endfunction;
