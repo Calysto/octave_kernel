@@ -21,5 +21,5 @@
 ## @end deftypefn
 
 function kbhit(n)
-    disp('**WARNING Ignoring unspported function `kbhit`');
+    disp('**WARNING Ignoring unsupported function `kbhit`');
 endfunction;
