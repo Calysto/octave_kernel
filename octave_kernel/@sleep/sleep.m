@@ -9,8 +9,11 @@
 function sleep(varargin)
     seconds = varargin{1};
     if (seconds > 5)
-        msg = sprintf('** Sleeping for %0.1f seconds.  Interrupt the kernel to abort sleep.', seconds);
-            disp(msg);
+        msg = '** Sleeping for %0.1f seconds.';
+        if (!ispc()) 
+            msg = strcat(msg, '  Interrupt the kernel to abort sleep.');
+        end
+        disp(sprintf(msg, seconds));
     end
     builtin('sleep', seconds);
 endfunction
