@@ -6,9 +6,9 @@ LONG_DESCRIPTION = open('README.rst', 'rb').read().decode('utf-8')
 MAINTAINER = 'Steven Silvester'
 MAINTAINER_EMAIL = 'steven.silvester@ieee.org'
 URL = 'http://github.com/calsto/octave_kernel'
-LICENSE = 'MIT'
-REQUIRES = ["metakernel (>=0.17.4)", "jupyter_client (>=4.3.0)", "ipykernel"]
-INSTALL_REQUIRES = ["metakernel >=0.17.4", "jupyter_client >=4.3.0", "ipykernel"]
+LICENSE = 'BSD'
+REQUIRES = ["metakernel (>=0.18.0)", "jupyter_client (>=4.3.0)", "ipykernel"]
+INSTALL_REQUIRES = ["metakernel >=0.18.0", "jupyter_client >=4.3.0", "ipykernel"]
 PACKAGES = [DISTNAME]
 PACKAGE_DATA = {DISTNAME: ['*.m']}
 CLASSIFIERS = """\

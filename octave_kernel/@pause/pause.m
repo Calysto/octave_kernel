@@ -19,13 +19,14 @@
 ## @end deftypefn
 
 function pause(n)
-    if (nargin == 0)
-        disp('** Pausing execution indefinitely.  Interrupt the kernel to continue'
-            );
-        builtin('pause');
-    elseif (n > 5)
-        msg = sprintf('** Pausing execution for %0.1f seconds.  Interrupt the kernel to abort pause.', n);
-        disp(msg);
+    if (nargin == 0 && ispc())
+        disp('** Indefinite pause unsupported on Windows, ignoring');
+    elseif (nargin == 0)
+        input('Paused, enter any value to continue');
+    elseif (n > 5 && !ispc())
+        msg = '** Pausing execution for %0.1f seconds.';
+        msg = strcat(msg, '  Interrupt the kernel to abort pause.');
+        disp(sprintf(msg, n));
         builtin('pause', n);
     else
         builtin('pause', n)
