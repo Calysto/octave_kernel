@@ -13,7 +13,7 @@
 
 function ans = yes_or_no(varargin)
   if (nargin == 0)
-    varargin = '';
+    varargin = {''};
   end
   if (nargin > 1)
     builtin('yes_or_no', varargin{:});
@@ -31,6 +31,7 @@ function ans = yes_or_no(varargin)
         break;
 
       end;
+      prompt = 'Please answer yes or no.';
     end;
   end;
 
