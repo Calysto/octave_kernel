@@ -19,9 +19,7 @@
 ## @end deftypefn
 
 function pause(n)
-    if (nargin == 0 && ispc())
-        disp('** Indefinite pause unsupported on Windows, ignoring');
-    elseif (nargin == 0)
+    if (nargin == 0)
         input('Paused, enter any value to continue');
     elseif (n > 5 && !ispc())
         msg = '** Pausing execution for %0.1f seconds.';
