@@ -79,21 +79,31 @@ function im = check_imwrite(h)
     return;
   end;
 
+  % Check for image too small to display
+  cdata = get(artist, 'cdata');
+  if (size(cdata)(1) < 100 || size(cdata)(2) < 100)
+    return;
+  end;
+
   im = artist;
 end;
 
 
 function save_image(im, pngpath) 
-
   cdata = double(get(im, 'cdata'));
-  clim = get(im, 'clim');
-  cdata = cdata - clim(1);
-  cdata = cdata ./ (clim(2) - clim(1));
 
   if (ndims(cdata) == 2)
+    mapping = get(im, 'cdatamapping');
+    if (strcmp(mapping, 'scaled') == 1)
+      clim = get(im, 'clim');
+      cdata = cdata - clim(1);
+      cdata = cdata ./ (clim(2) - clim(1));
+    end;
+
     cmap = colormap(get(im, 'parent'));
     [I, ~] = gray2ind(cdata, length(cmap));
     imwrite(I, cmap, pngpath);
+
   else
     imwrite(cdata, pngpath);
   end;
