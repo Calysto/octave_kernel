@@ -194,6 +194,7 @@ class OctaveEngine(object):
         make_figs = '_make_figures("%s", "%s", "%s", %d, %d, %d)'
         make_figs = make_figs % (plot_dir, fmt, name, wid, hgt, res)
         resp = self.eval(make_figs, silent=True)
+        print(resp)
         if resp and 'error:' in resp:
             if self.error_handler:
                 self.error_handler(resp)

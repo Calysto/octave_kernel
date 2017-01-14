@@ -25,24 +25,17 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res)
         if (wid > 0)
           size_opt = sprintf('-S%d,%d', wid, hgt);
         else 
-          size_opt = sprintf('-r%d', res)
+          size_opt = sprintf('-r%d', res);
         end
 
-        % Try to use imwrite if the figure only contains an image.
-        use_imwrite = false;
-        try
-          grandchild = get(get(h, 'children'), 'children');
-          use_imwrite = strcmp(get(grandchild, 'type'), 'image') == 1;
-        end;
+        % Try to use imwrite if the figure only contains an image
+        % with no title or labels.
+        im = check_imwrite(h);
 
-        if (use_imwrite)
+        if (im)
             try
-                 image = double(get(grandchild, 'cdata'));
-                 clim = get(get(h, 'children'), 'clim');
-                 image = image - clim(1);
-                 image = image ./ (clim(2) - clim(1));
-                 % Force a png file.
-                 imwrite(uint8(image*255), pngpath);
+               % Try to save the image.
+               save_image(im, pngpath);
             catch
                % Fall back on a standard figure save.
                safe_print(h, filepath, pngpath, size_opt);
@@ -55,19 +48,82 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res)
 end;
 
 
+function im = check_imwrite(h)
+  im = '';
+
+  if (length(get(h, 'children')) != 1)
+    return;
+  end;
+
+  ax = get(h, 'children');
+
+  if (length(get(ax, 'children')) != 1)
+    return;
+  end;
+
+  artist = get(ax, 'children');
+
+  if (strcmp(get(artist, 'type'), 'image') != 1)
+    return;
+  end;
+
+  if (get(get(ax, 'title'), 'string'))
+    return;
+  end;
+
+  if (get(get(ax, 'xlabel'), 'string'))
+    return;
+  end;
+
+  if (get(get(ax, 'ylabel'), 'string'))
+    return;
+  end;
+
+  % Check for image too small to display
+  cdata = get(artist, 'cdata');
+  if (size(cdata)(1) < 100 || size(cdata)(2) < 100)
+    return;
+  end;
+
+  im = artist;
+end;
+
+
+function save_image(im, pngpath) 
+  cdata = double(get(im, 'cdata'));
+
+  if (ndims(cdata) == 2)
+    mapping = get(im, 'cdatamapping');
+    if (strcmp(mapping, 'scaled') == 1)
+      clim = get(im, 'clim');
+      cdata = cdata - clim(1);
+      cdata = cdata ./ (clim(2) - clim(1));
+    end;
+
+    cmap = colormap(get(im, 'parent'));
+    [I, ~] = gray2ind(cdata, length(cmap));
+    imwrite(I, cmap, pngpath);
+
+  else
+    imwrite(cdata, pngpath);
+  end;
+
+end;
+
+
 function safe_print(h, filepath, altpath, size_opt) 
   try 
-    inner_print(h, filepath, size_opt)
+    inner_print(h, filepath, size_opt);
   catch
-    inner_print(h, altpath, size_opt)
+    inner_print(h, altpath, size_opt);
   end
 end
 
 
 function inner_print(h, filepath, size_opt)
   try
-    print(h, filepath, size_opt)
+    print(h, filepath, size_opt);
   catch
-    print(h, filepath)
+    print(h, filepath);
   end
 end
