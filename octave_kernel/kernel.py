@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import uuid
 from xml.dom import minidom
 
 from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
@@ -51,7 +52,8 @@ class OctaveKernel(ProcessMetaKernel):
         self._octave_engine = OctaveEngine(plot_settings=self.plot_settings,
                                            error_handler=self.Error,
                                            stdin_handler=self.raw_input,
-                                           stream_handler=self.Print)
+                                           stream_handler=self.Print,
+                                           logger=self.log)
         return self._octave_engine
 
     def makeWrapper(self):
@@ -63,6 +65,8 @@ class OctaveKernel(ProcessMetaKernel):
         if code.strip() in ['quit', 'quit()', 'exit', 'exit()']:
             self.do_shutdown(True)
             return
+        if self.octave_engine.needs_sync:
+            self.octave_engine.resync()
         val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
         if not silent:
             plot_dir = self.octave_engine.make_figures()
@@ -107,12 +111,15 @@ class OctaveKernel(ProcessMetaKernel):
 class OctaveEngine(object):
 
     def __init__(self, error_handler=None, stream_handler=None,
-                 stdin_handler=None, plot_settings=None):
+                 stdin_handler=None, plot_settings=None,
+                 logger=None):
         self.executable = self._get_executable()
         self.repl = self._create_repl()
         self.error_handler = error_handler
         self.stream_handler = stream_handler
         self.stdin_handler = stdin_handler
+        self.logger = logger
+        self.needs_sync = False
         self._startup(plot_settings)
 
     @property
@@ -155,11 +162,19 @@ class OctaveEngine(object):
         """Evaluate code using the engine.
         """
         stream_handler = None if silent else self.stream_handler
+        if self.logger:
+            self.logger.debug('Octave eval:')
+            self.logger.debug(code)
         try:
-            return self.repl.run_command(code.rstrip(),
+            resp = self.repl.run_command(code.rstrip(),
                                          timeout=timeout,
                                          stream_handler=stream_handler,
                                          stdin_handler=self.stdin_handler)
+            if self.logger and resp:
+                self.logger.debug(resp)
+            return resp
+        except KeyboardInterrupt:
+            return self._interrupt(True)
         except Exception as e:
             if self.error_handler:
                 self.error_handler(e)
@@ -303,7 +318,50 @@ class OctaveEngine(object):
         repl = REPLWrapper(cmd, orig_prompt, change_prompt,
                            stdin_prompt_regex=STDIN_PROMPT_REGEX)
         repl.linesep = '\n'
+        repl.interrupt = self._interrupt
         return repl
+
+    def _interrupt(self, silent=False):
+        if (os.name == 'nt'):
+            if self.logger:
+                msg = 'Cannot interrupt Octave kernel on Windows'
+                self.logger.warning(msg)
+            return self._interrupt_expect(silent)
+        return REPLWrapper.interrupt(self.engine)
+
+    def _interrupt_expect(self, silent):
+        repl = self.repl
+        child = repl.child
+        expects = [repl.prompt_regex, child.linesep]
+        expected = uuid.uuid4().hex
+        repl.sendline('disp("%s");' % expected)
+        if repl.prompt_emit_cmd:
+            repl.sendline(repl.prompt_emit_cmd)
+        lines = []
+        while True:
+            # Prevent a keyboard interrupt from breaking this up.
+            while True:
+                try:
+                    pos = child.expect(expects)
+                    break
+                except KeyboardInterrupt:
+                    pass
+            if pos == 1:  # End of line received
+                if silent:
+                    lines.append(child.bfore)
+                else:
+                    self.stream_handler(child.before)
+            else:
+                line = child.before
+                if line.strip() == expected:
+                    break
+                if len(line) != 0:
+                    # prompt received, but partial line precedes it
+                    if silent:
+                        lines.append(line)
+                    else:
+                        self.stream_handler(line)
+        return '\n'.join(lines)
 
     def _get_executable(self):
         """Find the best octave executable.
