@@ -209,7 +209,6 @@ class OctaveEngine(object):
         make_figs = '_make_figures("%s", "%s", "%s", %d, %d, %d)'
         make_figs = make_figs % (plot_dir, fmt, name, wid, hgt, res)
         resp = self.eval(make_figs, silent=True)
-        print(resp)
         if resp and 'error:' in resp:
             if self.error_handler:
                 self.error_handler(resp)
@@ -327,7 +326,7 @@ class OctaveEngine(object):
                 msg = 'Cannot interrupt Octave kernel on Windows'
                 self.logger.warning(msg)
             return self._interrupt_expect(silent)
-        return REPLWrapper.interrupt(self.engine)
+        return REPLWrapper.interrupt(self.repl)
 
     def _interrupt_expect(self, silent):
         repl = self.repl
@@ -347,10 +346,11 @@ class OctaveEngine(object):
                 except KeyboardInterrupt:
                     pass
             if pos == 1:  # End of line received
+                line = child.before
                 if silent:
-                    lines.append(child.bfore)
+                    lines.append(line)
                 else:
-                    self.stream_handler(child.before)
+                    self.stream_handler(line)
             else:
                 line = child.before
                 if line.strip() == expected:
