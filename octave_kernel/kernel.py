@@ -19,7 +19,7 @@ from . import __version__
 
 
 STDIN_PROMPT = '__stdin_prompt>'
-STDIN_PROMPT_REGEX = re.compile(r'\A.+?%s' % STDIN_PROMPT)
+STDIN_PROMPT_REGEX = re.compile(r'\A.+?%s|debug> ' % STDIN_PROMPT)
 
 
 class OctaveKernel(ProcessMetaKernel):
@@ -88,6 +88,9 @@ class OctaveKernel(ProcessMetaKernel):
         # Ignore standalone input hook displays.
         if (args[0].strip() == STDIN_PROMPT):
             return
+        if (args[0].startswith(STDIN_PROMPT)):
+            args = list(args)
+            args[0] = args[0].replace(STDIN_PROMPT, '')
         super(OctaveKernel, self).Print(*args, **kwargs)
 
     def raw_input(self, text):
@@ -170,6 +173,7 @@ class OctaveEngine(object):
                                          timeout=timeout,
                                          stream_handler=stream_handler,
                                          stdin_handler=self.stdin_handler)
+            resp = resp.replace(STDIN_PROMPT, '')
             if self.logger and resp:
                 self.logger.debug(resp)
             return resp
@@ -243,10 +247,9 @@ class OctaveEngine(object):
 
     def _startup(self, plot_settings):
         cwd = os.getcwd().replace(os.path.sep, '/')
-        self.eval('more off; source ~/.octaverc; cd("%s");' % cwd)
+        self.eval('more off; source ~/.octaverc; cd("%s");' % cwd, silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
         self.eval('addpath("%s")' % here.replace(os.path.sep, '/'))
-        self.eval('add_input_event_hook(@_input_hook);')
         available = self.eval('available_graphics_toolkits', silent=True)
         if 'gnuplot' not in available:
             msg = ('May not be able to display plots properly '
