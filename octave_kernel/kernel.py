@@ -65,8 +65,6 @@ class OctaveKernel(ProcessMetaKernel):
         if code.strip() in ['quit', 'quit()', 'exit', 'exit()']:
             self.do_shutdown(True)
             return
-        if self.octave_engine.needs_sync:
-            self.octave_engine.resync()
         val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
         if not silent:
             plot_dir = self.octave_engine.make_figures()
@@ -116,13 +114,12 @@ class OctaveEngine(object):
     def __init__(self, error_handler=None, stream_handler=None,
                  stdin_handler=None, plot_settings=None,
                  logger=None):
+        self.logger = logger
         self.executable = self._get_executable()
         self.repl = self._create_repl()
         self.error_handler = error_handler
         self.stream_handler = stream_handler
         self.stdin_handler = stdin_handler
-        self.logger = logger
-        self.needs_sync = False
         self._startup(plot_settings)
 
     @property
@@ -319,7 +316,8 @@ class OctaveEngine(object):
 
         repl = REPLWrapper(cmd, orig_prompt, change_prompt,
                            stdin_prompt_regex=STDIN_PROMPT_REGEX)
-        repl.linesep = '\n'
+        if os.name == 'nt':
+            repl.child.crlf = '\n'
         repl.interrupt = self._interrupt
         return repl
 
