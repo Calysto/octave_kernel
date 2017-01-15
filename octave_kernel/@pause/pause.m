@@ -21,9 +21,11 @@
 function pause(n)
     if (nargin == 0)
         input('Paused, enter any value to continue');
-    elseif (n > 5 && !ispc())
+    elseif (n > 5)
         msg = '** Pausing execution for %0.1f seconds.';
-        msg = strcat(msg, '  Interrupt the kernel to abort pause.');
+        if (!ispc())
+            msg = strcat(msg, '  Interrupt the kernel to abort pause.');
+        end
         disp(sprintf(msg, n));
         builtin('pause', n);
     else

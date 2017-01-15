@@ -12,9 +12,11 @@
 
 function usleep(varargin)
     usec = varargin{1};
-    if (usec > 5e6 && !ispc())
+    if (usec > 5e6)
         msg = '** Sleeping for %0.1f seconds.';
-        msg = strcat(msg, '  Interrupt the kernel to abort sleep.');
+        if (!ispc())
+            msg = strcat(msg, '  Interrupt the kernel to abort sleep.');
+        end
         disp(sprintf(msg, usec / 1e6));
     end
     builtin('usleep', usec);
