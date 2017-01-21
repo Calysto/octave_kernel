@@ -77,12 +77,11 @@ class OctaveKernel(ProcessMetaKernel):
     def makeWrapper(self):
         """Start an Octave process and return a :class:`REPLWrapper` object.
         """
-        if self.wrapper:
-            self._octave_engine = None
         return self.octave_engine.repl
 
     def do_execute_direct(self, code, silent=False):
         if code.strip() in ['quit', 'quit()', 'exit', 'exit()']:
+            self._octave_engine = None
             self.do_shutdown(True)
             return
         val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
