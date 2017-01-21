@@ -352,7 +352,7 @@ class OctaveEngine(object):
     def _interrupt(self, silent=False):
         if (os.name == 'nt'):
             if self.logger:
-                msg = 'Cannot interrupt Octave kernel on Windows'
+                msg = 'Cannot interrupt Octave on Windows'
                 self.logger.warning(msg)
             return self._interrupt_expect(silent)
         return REPLWrapper.interrupt(self.repl)
