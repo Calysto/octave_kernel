@@ -20,30 +20,48 @@ from . import __version__
 
 STDIN_PROMPT = '__stdin_prompt>'
 STDIN_PROMPT_REGEX = re.compile(r'\A.+?%s|debug> ' % STDIN_PROMPT)
+HELP_LINKS = [
+    {
+        'text': "GNU Octave",
+        'url': "https://www.gnu.org/software/octave/support.html",
+    },
+    {
+        'text': "Octave Kernel",
+        'url': "https://github.com/Calysto/octave_kernel",
+    },
+
+] + MetaKernel.help_links
 
 
 class OctaveKernel(ProcessMetaKernel):
     implementation = 'Octave Kernel'
     implementation_version = __version__,
     language = 'octave'
-    language_version = __version__,
-    banner = "Octave Kernel",
-    language_info = {
-        'mimetype': 'text/x-octave',
-        'name': 'octave',
-        'file_extension': '.m',
-        "version": __version__,
-        'help_links': MetaKernel.help_links,
-    }
+    help_links = HELP_LINKS
 
-    _banner = None
     _octave_engine = None
+    _language_version = None
+
+    @property
+    def language_version(self):
+        if self._language_version:
+            return self._language_version
+        ver = self.octave_engine.eval('version', silent=True)
+        ver = self._language_version = ver.split()[-1]
+        return ver
+
+    @property
+    def language_info(self):
+        return {'mimetype': 'text/x-octave',
+                'name': 'octave',
+                'file_extension': '.m',
+                'version': self.language_version,
+                'help_links': HELP_LINKS}
 
     @property
     def banner(self):
-        if self._banner is None:
-            self._banner = self.octave_engine.eval('info', silent=True)
-        return self._banner
+        msg = 'Octave Kernel v%s running GNU Octave v%s'
+        return msg % (__version__, self.language_version)
 
     @property
     def octave_engine(self):
@@ -59,6 +77,8 @@ class OctaveKernel(ProcessMetaKernel):
     def makeWrapper(self):
         """Start an Octave process and return a :class:`REPLWrapper` object.
         """
+        if self.wrapper:
+            self._octave_engine = None
         return self.octave_engine.repl
 
     def do_execute_direct(self, code, silent=False):
