@@ -68,9 +68,8 @@ class OctaveKernel(ProcessMetaKernel):
         val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
         if not silent:
             plot_dir = self.octave_engine.make_figures()
-            for image in self.octave_engine.extract_figures(plot_dir):
+            for image in self.octave_engine.extract_figures(plot_dir, True):
                 self.Display(image)
-            shutil.rmtree(plot_dir, True)
         return val
 
     def get_kernel_help_on(self, info, level=0, none_on_fail=False):
@@ -207,8 +206,13 @@ class OctaveEngine(object):
         name = settings['name']
         plot_dir = plot_dir or tempfile.mkdtemp()
         plot_dir = plot_dir.replace(os.path.sep, '/')
-        make_figs = '_make_figures("%s", "%s", "%s", %d, %d, %d)'
-        make_figs = make_figs % (plot_dir, fmt, name, wid, hgt, res)
+
+        # Do not overwrite any existing plot files.
+        spec = os.path.join(plot_dir, '%s*' % name)
+        start = len(glob.glob(spec))
+
+        make_figs = '_make_figures("%s", "%s", "%s", %d, %d, %d, %d)'
+        make_figs = make_figs % (plot_dir, fmt, name, wid, hgt, res, start)
         resp = self.eval(make_figs, silent=True)
         if resp and 'error:' in resp:
             if self.error_handler:
@@ -217,17 +221,19 @@ class OctaveEngine(object):
                 raise Exception(resp)
         return plot_dir
 
-    def extract_figures(self, plot_dir):
+    def extract_figures(self, plot_dir, remove=False):
         """Get a list of IPython Image objects for the created figures.
 
         Parameters
         ----------
         plot_dir: str
             The directory in which to create the plots.
+        remove: bool, optional.
+            Whether to remove the plot directory after saving.
         """
         images = []
-        path = os.path.join(plot_dir, '%s*' % self.plot_settings['name'])
-        for fname in reversed(glob.glob(path)):
+        spec = os.path.join(plot_dir, '%s*' % self.plot_settings['name'])
+        for fname in reversed(glob.glob(spec)):
             filename = os.path.join(plot_dir, fname)
             try:
                 if fname.lower().endswith('.svg'):
@@ -240,6 +246,8 @@ class OctaveEngine(object):
                     self.error_handler(e)
                 else:
                     raise e
+        if remove:
+            shutil.rmtree(plot_dir, True)
         return images
 
     def _startup(self, plot_settings):

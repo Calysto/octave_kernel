@@ -1,10 +1,10 @@
-function _make_figures(plot_dir, fmt, name, wid, hgt, res)
+function _make_figures(plot_dir, fmt, name, wid, hgt, res, start_ind)
     %%%% Create figures in the given plot directory.
     %%%%
 
     handles = get(0, 'children');
     for ind = 1:length(handles)
-        filename = sprintf('%s%03d', name, ind);
+        filename = sprintf('%s%03d', name, ind + start_ind);
         filepath = fullfile(plot_dir, [filename, '.', fmt]);
         pngpath = fullfile(plot_dir, [filename, '.png']);
 
