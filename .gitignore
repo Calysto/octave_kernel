@@ -1,4 +1,5 @@
 .ipynb_checkpoints/
+.DS_Store/
 MANIFEST
 dist/
 build/
