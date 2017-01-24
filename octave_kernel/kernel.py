@@ -102,12 +102,14 @@ class OctaveKernel(ProcessMetaKernel):
 
     def Print(self, *args, **kwargs):
         # Ignore standalone input hook displays.
-        if (args[0].strip() == STDIN_PROMPT):
-            return
-        if (args[0].startswith(STDIN_PROMPT)):
-            args = list(args)
-            args[0] = args[0].replace(STDIN_PROMPT, '')
-        super(OctaveKernel, self).Print(*args, **kwargs)
+        out = []
+        for arg in args:
+            if arg.strip() == STDIN_PROMPT:
+                return
+            if arg.strip().startswith(STDIN_PROMPT):
+                arg = arg.replace(STDIN_PROMPT, '')
+            out.append(arg)
+        super(OctaveKernel, self).Print(*out, **kwargs)
 
     def raw_input(self, text):
         # Remove the stdin prompt to restore the original prompt.
