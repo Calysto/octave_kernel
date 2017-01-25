@@ -1,5 +1,7 @@
 """Setup script for octave_kernel package.
 """
+import glob
+
 DISTNAME = 'octave_kernel'
 DESCRIPTION = 'A Jupyter kernel for Octave.'
 LONG_DESCRIPTION = open('README.rst', 'rb').read().decode('utf-8')
@@ -10,7 +12,7 @@ LICENSE = 'BSD'
 REQUIRES = ["metakernel (>=0.18.0)", "jupyter_client (>=4.3.0)", "ipykernel"]
 INSTALL_REQUIRES = ["metakernel >=0.18.0", "jupyter_client >=4.3.0", "ipykernel"]
 PACKAGES = [DISTNAME]
-PACKAGE_DATA = {DISTNAME: ['*.m']}
+PACKAGE_DATA = {DISTNAME: ['*.m'] + glob.glob('%s/**/*.m' % DISTNAME) }
 CLASSIFIERS = """\
 Intended Audience :: Science/Research
 License :: OSI Approved :: BSD License
@@ -44,6 +46,7 @@ setup(
     maintainer_email=MAINTAINER_EMAIL,
     packages=PACKAGES,
     package_data=PACKAGE_DATA,
+    include_package_data=True,
     url=URL,
     download_url=URL,
     license=LICENSE,

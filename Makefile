@@ -22,7 +22,6 @@ test: clean
 release: clean
 	pip install wheel
 	python setup.py register
-	rm -rf dist
 	python setup.py bdist_wheel --universal
 	python setup.py sdist
 	git tag v$(VERSION)
