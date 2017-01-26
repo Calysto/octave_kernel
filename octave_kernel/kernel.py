@@ -348,6 +348,8 @@ class OctaveEngine(object):
         if os.name == 'nt':
             repl.child.crlf = '\n'
         repl.interrupt = self._interrupt
+        # Remove the default 50ms delay before sending lines.
+        repl.child.delaybeforesend = None
         return repl
 
     def _interrupt(self, silent=False):
