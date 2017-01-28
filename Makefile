@@ -19,7 +19,7 @@ test: clean
 	jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null;
 	make clean
 
-release: clean
+release: test clean
 	pip install wheel
 	python setup.py register
 	python setup.py bdist_wheel --universal
