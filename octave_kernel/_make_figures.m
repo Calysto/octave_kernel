@@ -115,7 +115,12 @@ function safe_print(h, filepath, altpath, size_opt)
   try 
     inner_print(h, filepath, size_opt);
   catch
-    inner_print(h, altpath, size_opt);
+    try
+      inner_print(h, altpath, size_opt);
+    catch ME
+      close(h);
+      error(ME.message);
+    end
   end
 end
 

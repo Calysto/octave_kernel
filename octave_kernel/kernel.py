@@ -86,9 +86,14 @@ class OctaveKernel(ProcessMetaKernel):
             return
         val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
         if not silent:
-            plot_dir = self.octave_engine.make_figures()
-            for image in self.octave_engine.extract_figures(plot_dir, True):
-                self.Display(image)
+            try:
+                plot_dir = self.octave_engine.make_figures()
+            except Exception as e:
+                self.Error(e)
+                return val
+            if plot_dir:
+                for image in self.octave_engine.extract_figures(plot_dir, True):
+                    self.Display(image)
         return val
 
     def get_kernel_help_on(self, info, level=0, none_on_fail=False):
@@ -172,7 +177,7 @@ class OctaveEngine(object):
         cmds = []
         if settings['backend'] == 'inline':
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
-            cmds.append("graphics_toolkit('gnuplot');")
+            cmds.append("graphics_toolki('gnuplot')")
         else:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             cmds.append("graphics_toolkit('%s');" % settings['backend'])
@@ -235,7 +240,9 @@ class OctaveEngine(object):
         make_figs = '_make_figures("%s", "%s", "%s", %d, %d, %d, %d)'
         make_figs = make_figs % (plot_dir, fmt, name, wid, hgt, res, start)
         resp = self.eval(make_figs, silent=True)
+        msg = 'Inline plot failed, consider trying another graphics toolkit\n'
         if resp and 'error:' in resp:
+            resp = msg + resp
             if self.error_handler:
                 self.error_handler(resp)
             else:
@@ -276,14 +283,6 @@ class OctaveEngine(object):
         self.eval('more off; source ~/.octaverc; cd("%s");' % cwd, silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
         self.eval('addpath("%s")' % here.replace(os.path.sep, '/'))
-        available = self.eval('available_graphics_toolkits', silent=True)
-        if 'gnuplot' not in available:
-            msg = ('May not be able to display plots properly '
-                   'without gnuplot, please install it')
-            if self.error_handler:
-                self.error_handler(msg)
-            else:
-                raise ValueError(msg)
         self.plot_settings = plot_settings
 
     def _handle_svg(self, filename):
