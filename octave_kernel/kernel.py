@@ -177,7 +177,7 @@ class OctaveEngine(object):
         cmds = []
         if settings['backend'] == 'inline':
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
-            cmds.append("graphics_toolki('gnuplot')")
+            cmds.append("graphics_toolkit('gnuplot')")
         else:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             cmds.append("graphics_toolkit('%s');" % settings['backend'])
