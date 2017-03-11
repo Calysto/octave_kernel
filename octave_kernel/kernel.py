@@ -279,7 +279,7 @@ class OctaveEngine(object):
 
     def _startup(self, plot_settings):
         cwd = os.getcwd().replace(os.path.sep, '/')
-        self.eval("graphics_toolkit('gnuplot')" % cwd, silent=True)
+        self.eval("graphics_toolkit('gnuplot')", silent=True)
         self.eval('more off; source ~/.octaverc; cd("%s");' % cwd, silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
         self.eval('addpath("%s")' % here.replace(os.path.sep, '/'))
