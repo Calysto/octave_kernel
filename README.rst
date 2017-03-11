@@ -1,5 +1,5 @@
-A Jupyter kernel for Octave
-===========================
+An Octave kernel for Jupyter
+============================
 Prerequisites: Install  `Jupyter Notebook <http://jupyter.readthedocs.org/en/latest/install.html>`_, and Octave_.  It is recommended that you also
 install ``gnuplot`` support in Octave for inline plotting.
 
