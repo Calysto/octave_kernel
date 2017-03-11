@@ -338,7 +338,11 @@ class OctaveEngine(object):
                 cmd += ' --no-gui'
         # Interactive mode prevents crashing on Windows on syntax errors.
         # Delay sourcing the "~/.octaverc" file in case it displays a pager.
-        cmd += ' --interactive --quiet --no-init-file'
+        cmd += ' --interactive --quiet --no-init-file '
+
+        # Add cli options provided by the user.
+        cmd += os.environ.get('OCTAVE_CLI_OPTIONS', '')
+
         orig_prompt = u('octave.*>')
         change_prompt = u("PS1('{0}'); PS2('{1}')")
 
