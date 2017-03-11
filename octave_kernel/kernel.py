@@ -177,7 +177,6 @@ class OctaveEngine(object):
         cmds = []
         if settings['backend'] == 'inline':
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
-            cmds.append("graphics_toolkit('gnuplot')")
         else:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             cmds.append("graphics_toolkit('%s');" % settings['backend'])
@@ -280,6 +279,7 @@ class OctaveEngine(object):
 
     def _startup(self, plot_settings):
         cwd = os.getcwd().replace(os.path.sep, '/')
+        self.eval("graphics_toolkit('gnuplot')" % cwd, silent=True)
         self.eval('more off; source ~/.octaverc; cd("%s");' % cwd, silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
         self.eval('addpath("%s")' % here.replace(os.path.sep, '/'))
