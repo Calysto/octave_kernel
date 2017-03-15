@@ -281,7 +281,6 @@ class OctaveEngine(object):
         cwd = os.getcwd().replace(os.path.sep, '/')
         resp = self.eval('available_graphics_toolkits', silent=True)
         if 'gnuplot' in resp:
-            self.logger.warn('gnuplot')
             self.eval("graphics_toolkit('gnuplot')", silent=True)
         self.eval('more off; source ~/.octaverc; cd("%s");' % cwd, silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
