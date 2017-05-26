@@ -3,6 +3,7 @@ dist: trusty
 python:
   - "2.7"
   - "3.5"
+  - "3.6"
 install:
   - sudo apt-add-repository -y ppa:octave/stable;
   - sudo apt-get update -qq;
