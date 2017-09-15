@@ -10,6 +10,6 @@ install:
   - sudo apt-get install -qq octave liboctave-dev gnuplot-x11;
   - pip install -U pip
   - pip install .
-  - python -m octave_kernel install
+  - python -m octave_kernel install --user
 script:
   - make test

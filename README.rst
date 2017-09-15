@@ -8,6 +8,8 @@ To install::
     pip install octave_kernel
     python -m octave_kernel install
 
+Add ``--user`` to the above commands to put in your private environment.
+
 To use it, run one of:
 
 .. code:: shell
