@@ -6,7 +6,7 @@ install ``gnuplot`` support in Octave for inline plotting.
 To install::
 
     pip install octave_kernel
-    python -m octave_kernel.install
+    python -m octave_kernel install
 
 To use it, run one of:
 
