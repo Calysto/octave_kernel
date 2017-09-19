@@ -1,12 +1,15 @@
 language: python
+dist: trusty
 python:
   - "2.7"
   - "3.5"
+  - "3.6"
 install:
-  - sudo apt-add-repository -y ppa:picaso/octave;
+  - sudo apt-add-repository -y ppa:octave/stable;
   - sudo apt-get update -qq;
   - sudo apt-get install -qq octave liboctave-dev gnuplot-x11;
+  - pip install -U pip
   - pip install .
-  - python -m octave_kernel.install
+  - python -m octave_kernel install --user
 script:
   - make test

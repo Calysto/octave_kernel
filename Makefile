@@ -13,8 +13,6 @@ clean:
 
 test: clean
 	pip install jupyter_kernel_test nbconvert
-	python setup.py build
-	python -m octave_kernel.install
 	python -V 2>&1 | grep "Python 3" && python test_octave_kernel.py || echo "Skipping unit test"
 	jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null;
 	make clean

@@ -1,3 +1,5 @@
-from ipykernel.kernelapp import IPKernelApp
+
 from .kernel import OctaveKernel
-IPKernelApp.launch_instance(kernel_class=OctaveKernel)
+
+if __name__ == '__main__':
+    OctaveKernel.run_as_main()
