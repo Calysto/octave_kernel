@@ -5,10 +5,15 @@ python:
   - "3.5"
   - "3.6"
 install:
-  - sudo apt-add-repository -y ppa:octave/stable;
-  - sudo apt-get update -qq;
-  - sudo apt-get install -qq octave liboctave-dev gnuplot-x11;
-  - pip install -U pip
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - conda install -c conda-forge octave pip
+  - cp -p /lib/x86_64-linux-gnu/libreadline.so.6 ~/miniconda/lib
   - pip install .
   - python -m octave_kernel install --user
 script:
