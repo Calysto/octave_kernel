@@ -3,6 +3,7 @@ include *.rst
 include *.py
 include Makefile
 recursive-include octave_kernel *.m
+recursive-include octave_kernel *.png
 prune .git
 prune docs/build
 prune dist

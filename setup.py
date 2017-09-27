@@ -12,7 +12,7 @@ LICENSE = 'BSD'
 REQUIRES = ["metakernel (>=0.20.7)", "jupyter_client (>=4.3.0)", "ipykernel"]
 INSTALL_REQUIRES = ["metakernel >=0.20.7", "jupyter_client >=4.3.0", "ipykernel"]
 PACKAGES = [DISTNAME]
-PACKAGE_DATA = {DISTNAME: ['*.m'] + glob.glob('%s/**/*.m' % DISTNAME) }
+PACKAGE_DATA = {DISTNAME: ['*.m'] + glob.glob('%s/**/*.m' % DISTNAME) + glob.glob('%s/**/*.png' % DISTNAME)}
 CLASSIFIERS = """\
 Intended Audience :: Science/Research
 License :: OSI Approved :: BSD License
