@@ -12,7 +12,15 @@ LICENSE = 'BSD'
 REQUIRES = ["metakernel (>=0.20.7)", "jupyter_client (>=4.3.0)", "ipykernel"]
 INSTALL_REQUIRES = ["metakernel >=0.20.7", "jupyter_client >=4.3.0", "ipykernel"]
 PACKAGES = [DISTNAME]
-PACKAGE_DATA = {DISTNAME: ['*.m'] + glob.glob('%s/**/*.m' % DISTNAME) + glob.glob('%s/**/*.png' % DISTNAME)}
+PACKAGE_DATA = {
+    DISTNAME: ['*.m'] + glob.glob('%s/**/*.*' % DISTNAME)
+}
+DATA_FILES = [
+    ('share/jupyter/kernels/octave', [
+        '%s/kernel.json' % DISTNAME
+     ] + glob.glob('%s/images/*.png' % DISTNAME)
+    )
+]
 CLASSIFIERS = """\
 Intended Audience :: Science/Research
 License :: OSI Approved :: BSD License
@@ -25,11 +33,7 @@ Topic :: Scientific/Engineering
 Topic :: Software Development
 Topic :: System :: Shells
 """
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
+from distutils.core import setup
 
 with open('octave_kernel/__init__.py', 'rb') as fid:
     for line in fid:
@@ -47,6 +51,7 @@ setup(
     packages=PACKAGES,
     package_data=PACKAGE_DATA,
     include_package_data=True,
+    data_files=DATA_FILES,
     url=URL,
     download_url=URL,
     license=LICENSE,

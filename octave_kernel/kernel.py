@@ -42,16 +42,6 @@ class OctaveKernel(ProcessMetaKernel):
     _octave_engine = None
     _language_version = None
 
-    kernel_json = {
-        "argv": [sys.executable,
-                 "-m", "octave_kernel",
-                 "-f", "{connection_file}"],
-        "display_name": "Octave",
-        "mimetype": "text/x-octave",
-        "language": "octave",
-        "name": "octave",
-    }
-
     @property
     def language_version(self):
         if self._language_version:
