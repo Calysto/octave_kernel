@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import codecs
 import glob
+import json
 import os
 import re
 import shutil
@@ -20,6 +21,7 @@ from . import __version__
 
 STDIN_PROMPT = '__stdin_prompt>'
 STDIN_PROMPT_REGEX = re.compile(r'\A.+?%s|debug> ' % STDIN_PROMPT)
+
 HELP_LINKS = [
     {
         'text': "GNU Octave",
@@ -33,11 +35,20 @@ HELP_LINKS = [
 ] + MetaKernel.help_links
 
 
+def get_kernel_json():
+    """Get the kernel json for the kernel.
+    """
+    here = os.path.dirname(__file__)
+    with open(os.path.join(here, 'kernel.json')) as fid:
+        return json.load(fid);
+
+
 class OctaveKernel(ProcessMetaKernel):
     implementation = 'Octave Kernel'
     implementation_version = __version__,
     language = 'octave'
     help_links = HELP_LINKS
+    kernel_json = get_kernel_json()
 
     _octave_engine = None
     _language_version = None
