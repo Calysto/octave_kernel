@@ -16,6 +16,5 @@ install:
   - conda install -c conda-forge octave pip
   - cp -p /lib/x86_64-linux-gnu/libreadline.so.6 ~/miniconda/lib
   - pip install .
-  - python -m octave_kernel install --user
 script:
   - make test
