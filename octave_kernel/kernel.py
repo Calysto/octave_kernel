@@ -21,7 +21,6 @@ from . import __version__
 
 STDIN_PROMPT = '__stdin_prompt>'
 STDIN_PROMPT_REGEX = re.compile(r'\A.+?%s|debug> ' % STDIN_PROMPT)
-
 HELP_LINKS = [
     {
         'text': "GNU Octave",
