@@ -41,6 +41,7 @@ def get_kernel_json():
     with open(os.path.join(here, 'kernel.json')) as fid:
         data = json.load(fid)
     data['argv'][0] = sys.executable
+    return data
 
 
 class OctaveKernel(ProcessMetaKernel):
