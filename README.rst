@@ -31,5 +31,12 @@ default opions of  ``--interactive --quiet --no-init-file``.  Note that the
 init file is explicitly called after the kernel has set ``more off`` to prevent
 a lockup when the pager is invoked in ``~/.octaverc``.
 
+Advanced Installation Notes::
+We automatically install a Jupyter kernelspec when installing the 
+python package.  This location can be found using ``jupyter kernelspec list``.
+If the default location is not desired, you can remove the directory for the
+``octave`` kernel, and install using `python -m octave_kernel install`.  See
+``python -m octave_kernel install --help`` for available options.
+
 .. _Octave: https://www.gnu.org/software/octave/download.html
 .. _online: http://nbviewer.ipython.org/github/Calysto/octave_kernel/blob/master/octave_kernel.ipynb
