@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import codecs
 import glob
+import json
 import os
 import re
 import shutil
@@ -33,24 +34,25 @@ HELP_LINKS = [
 ] + MetaKernel.help_links
 
 
+def get_kernel_json():
+    """Get the kernel json for the kernel.
+    """
+    here = os.path.dirname(__file__)
+    with open(os.path.join(here, 'kernel.json')) as fid:
+        data = json.load(fid)
+    data['argv'][0] = sys.executable
+    return data
+
+
 class OctaveKernel(ProcessMetaKernel):
     implementation = 'Octave Kernel'
     implementation_version = __version__,
     language = 'octave'
     help_links = HELP_LINKS
+    kernel_json = get_kernel_json()
 
     _octave_engine = None
     _language_version = None
-
-    kernel_json = {
-        "argv": [sys.executable,
-                 "-m", "octave_kernel",
-                 "-f", "{connection_file}"],
-        "display_name": "Octave",
-        "mimetype": "text/x-octave",
-        "language": "octave",
-        "name": "octave",
-    }
 
     @property
     def language_version(self):
