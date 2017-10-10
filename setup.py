@@ -34,9 +34,7 @@ Topic :: Software Development
 Topic :: System :: Shells
 """
 
-# We must use distutils and not setuptools because `python setup.py install`
-# does not handle `data_files` when using setuptools.
-from distutils.core import setup
+from setuptools import setup
 
 with open('octave_kernel/__init__.py', 'rb') as fid:
     for line in fid:
