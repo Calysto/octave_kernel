@@ -294,7 +294,8 @@ class OctaveEngine(object):
         resp = self.eval('available_graphics_toolkits', silent=True)
         if 'gnuplot' in resp:
             self.eval("graphics_toolkit('gnuplot')", silent=True)
-        self.eval('more off; source ~/.octaverc; cd("%s");' % cwd, silent=True)
+        cmd = 'more off; source ~/.octaverc; cd("%s");%s'
+        self.eval(cmd % (cwd, self.repl.prompt_change_cmd), silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
         self.eval('addpath("%s")' % here.replace(os.path.sep, '/'))
         self.plot_settings = plot_settings
