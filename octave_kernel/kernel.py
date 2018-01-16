@@ -38,7 +38,9 @@ def get_kernel_json():
     """Get the kernel json for the kernel.
     """
     here = os.path.dirname(__file__)
-    with open(os.path.join(here, 'kernel.json')) as fid:
+    default_json_file = os.path.join(here, 'kernel.json')
+    json_file = os.environ.get('OCTAVE_KERNEL_JSON', default_json_file)
+    with open(json_file) as fid:
         data = json.load(fid)
     data['argv'][0] = sys.executable
     return data
