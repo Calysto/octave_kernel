@@ -3,11 +3,16 @@ An Octave kernel for Jupyter
 Prerequisites: Install  `Jupyter Notebook <http://jupyter.readthedocs.org/en/latest/install.html>`_, and Octave_.  It is recommended that you also
 install ``gnuplot`` support in Octave for inline plotting.
 
-To install::
+To install via pip::
 
     pip install octave_kernel
 
 Add ``--user`` to install in your private environment.
+
+To install via conda::
+
+    conda config --add channels conda-forge 
+    conda install octave_kernel
 
 To use it, run one of:
 
