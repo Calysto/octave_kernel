@@ -18,11 +18,11 @@ To use it, run one of:
 
 .. code:: shell
 
-    ipython notebook
+    jupyter notebook
     # In the notebook interface, select Octave from the 'New' menu
-    ipython qtconsole --kernel octave
-    ipython console --kernel octave
-
+    jupyter qtconsole --kernel octave
+    jupyter console --kernel octave
+    
 This is based on `MetaKernel <http://pypi.python.org/pypi/metakernel>`_,
 which means it features a standard set of magics.
 
