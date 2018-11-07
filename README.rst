@@ -13,6 +13,7 @@ To install via conda::
 
     conda config --add channels conda-forge 
     conda install octave_kernel
+    conda install texinfo # For the inline documentation (shift-tab) to appear.
 
 To use it, run one of:
 
