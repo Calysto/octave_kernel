@@ -3,6 +3,7 @@ from __future__ import print_function
 import codecs
 import glob
 import json
+import logging
 import os
 import re
 import shutil
@@ -153,12 +154,15 @@ class OctaveEngine(object):
     def __init__(self, error_handler=None, stream_handler=None,
                  stdin_handler=None, plot_settings=None,
                  logger=None):
+        if not logger:
+            logger = logging.getLogger(__name__)
+            logging.basicConfig()
         self.logger = logger
         self.executable = self._get_executable()
         self.repl = self._create_repl()
         self.error_handler = error_handler
-        self.stream_handler = stream_handler
-        self.stdin_handler = stdin_handler
+        self.stream_handler = stream_handler or print
+        self.stdin_handler = stdin_handler or sys.stdin
         self._startup(plot_settings)
 
     @property
