@@ -424,15 +424,14 @@ class OctaveEngine(object):
     def _get_executable(self):
         """Find the best octave executable.
         """
+        # Attempt to get the octave executable
         executable = os.environ.get('OCTAVE_EXECUTABLE', None)
-        if not executable or not which(executable):
-            if which('octave-cli'):
-                executable = 'octave-cli'
-            elif which('octave'):
-                executable = 'octave'
-            else:
-                msg = ('Octave Executable not found, please add to PATH environment variable or set'
-                       '"OCTAVE_EXECUTABLE" environment variable')
-                raise OSError(msg)
-        executable = executable.replace(os.path.sep, '/')
-        return executable
+        if executable:
+            executable = which(executable)
+            if 'octave-cli' not in executable:
+                raise OSError('OCTAVE_EXECUTABLE does not point to an octave-cli file, please see README')
+        else:
+            executable = which('octave-cli')
+            if not executable:
+                raise OSError('octave-cli not found, please see README')
+        return executable.replace(os.path.sep, '/')
