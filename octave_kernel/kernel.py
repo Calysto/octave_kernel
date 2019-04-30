@@ -431,7 +431,7 @@ class OctaveEngine(object):
             elif which('octave'):
                 executable = 'octave'
             else:
-                msg = ('Octave Executable not found, please add to path or set'
+                msg = ('Octave Executable not found, please add to PATH environment variable or set'
                        '"OCTAVE_EXECUTABLE" environment variable')
                 raise OSError(msg)
         executable = executable.replace(os.path.sep, '/')
