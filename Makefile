@@ -1,5 +1,5 @@
 # Note: This is meant for octave_kernel developer use only
-.PHONY: all clean test release
+.PHONY: all clean test release docker-build docker-run
 
 export NAME=`python setup.py --name 2>/dev/null`
 export VERSION=`python setup.py --version 2>/dev/null`
@@ -10,6 +10,12 @@ all: clean
 clean:
 	rm -rf build
 	rm -rf dist
+
+docker-build:
+	docker build --rm --force-rm -t calysto/octave-notebook:latest .
+
+docker-run:
+	docker run -it --rm -p $(PORT):8888 calysto/octave-notebook
 
 test: clean
 	pip install jupyter_kernel_test nbconvert
