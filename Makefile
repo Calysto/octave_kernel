@@ -1,5 +1,5 @@
 # Note: This is meant for octave_kernel developer use only
-.PHONY: all clean test release
+.PHONY: all clean test release docker
 
 export NAME=`python setup.py --name 2>/dev/null`
 export VERSION=`python setup.py --version 2>/dev/null`
@@ -11,11 +11,17 @@ clean:
 	rm -rf build
 	rm -rf dist
 
+docker-build:
+	docker build --rm --force-rm -t calysto/octave-notebook:latest .
+
+docker-run:
+	docker run -it --rm -p $(PORT):8888 calysto/octave-notebook
+
 test: clean
 	pip install jupyter_kernel_test nbconvert
 	python -V 2>&1 | grep "Python 3" && python test_octave_kernel.py || echo "Skipping unit test"
 	jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null;
-	make clean
+	docker build
 
 release: test clean
 	pip install wheel
