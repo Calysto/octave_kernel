@@ -1,5 +1,5 @@
 # Note: This is meant for octave_kernel developer use only
-.PHONY: all clean test release docker
+.PHONY: all clean test release docker-build docker-run
 
 export NAME=`python setup.py --name 2>/dev/null`
 export VERSION=`python setup.py --version 2>/dev/null`
