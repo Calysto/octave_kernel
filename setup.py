@@ -9,7 +9,7 @@ MAINTAINER = 'Steven Silvester'
 MAINTAINER_EMAIL = 'steven.silvester@ieee.org'
 URL = 'http://github.com/Calysto/octave_kernel'
 LICENSE = 'BSD'
-REQUIRES = ["metakernel (>=0.20.11)", "jupyter_client (>=4.3.0)", "ipykernel"]
+REQUIRES = ["metakernel (>=0.21.2)", "jupyter_client (>=4.3.0)", "ipykernel"]
 INSTALL_REQUIRES = ["metakernel >=0.20.11", "jupyter_client >=4.3.0", "ipykernel"]
 PACKAGES = [DISTNAME]
 PACKAGE_DATA = {

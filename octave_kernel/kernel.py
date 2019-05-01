@@ -217,7 +217,7 @@ class OctaveEngine(object):
                 self.logger.debug(resp)
             return resp
         except KeyboardInterrupt:
-            return self._interrupt(True)
+            return self._interrupt(silent=True)
         except Exception as e:
             if self.error_handler:
                 self.error_handler(e)
@@ -368,7 +368,8 @@ class OctaveEngine(object):
         change_prompt = u("PS1('{0}'); PS2('{1}')")
 
         repl = REPLWrapper(cmd, orig_prompt, change_prompt,
-                           stdin_prompt_regex=STDIN_PROMPT_REGEX)
+                           stdin_prompt_regex=STDIN_PROMPT_REGEX,
+                           force_prompt_on_continuation=True)
         if os.name == 'nt':
             repl.child.crlf = '\n'
         repl.interrupt = self._interrupt
@@ -376,15 +377,16 @@ class OctaveEngine(object):
         repl.child.delaybeforesend = None
         return repl
 
-    def _interrupt(self, silent=False):
-        if (os.name == 'nt'):
+    def _interrupt(self, continuation=False, silent=False):
+        if os.name == 'nt':
             msg = '** Warning: Cannot interrupt Octave on Windows'
             if self.stream_handler:
                 self.stream_handler(msg)
             elif self.logger:
                 self.logger.warn(msg)
             return self._interrupt_expect(silent)
-        return REPLWrapper.interrupt(self.repl)
+
+        return REPLWrapper.interrupt(self.repl, continuation=continuation)
 
     def _interrupt_expect(self, silent):
         repl = self.repl
