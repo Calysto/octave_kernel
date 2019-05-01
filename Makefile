@@ -21,7 +21,7 @@ test: clean
 	pip install jupyter_kernel_test nbconvert
 	python -V 2>&1 | grep "Python 3" && python test_octave_kernel.py || echo "Skipping unit test"
 	jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null;
-	docker build
+	make clean
 
 release: test clean
 	pip install wheel
