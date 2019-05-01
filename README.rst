@@ -73,7 +73,7 @@ version of python:
 .. code:: shell
 
     which python  # use "where" if using cmd.exe
-   which jupyter
+    which jupyter
 
 
 Gnuplot Error
