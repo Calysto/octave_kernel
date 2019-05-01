@@ -16,7 +16,7 @@ install:
   - conda info -a
   - conda install -c conda-forge octave pip
   - pip install .
-  - make docker
+  - make docker-build
 script:
   - make test
   - python -m octave_kernel install --user
