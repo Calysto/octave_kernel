@@ -76,6 +76,13 @@ version of python:
    which jupyter
 
 
+Gnuplot Error
+~~~~~~~~~~~~~
+An error that starts with ``gnuplot> set terminal aqua enhanced title`` can be fixed by
+adding ``setenv("GNUTERM","qt");`` to ``~/.octaverc`` on MacOS or by installing
+``gunplot-x11`` and using ``setenv("GNUTERM", "X11")``.
+
+
 Advanced Configuration
 ----------------------
 We automatically install a Jupyter kernelspec when installing the
