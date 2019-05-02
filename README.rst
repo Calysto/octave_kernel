@@ -88,11 +88,11 @@ Advanced Configuration
 We automatically install a Jupyter kernelspec when installing the
 python package.  This location can be found using ``jupyter kernelspec list``.
 If the default location is not desired, remove the directory for the
-``octave`` kernel, and install using `python -m octave_kernel install`.  See
+``octave`` kernel, and install using ``python -m octave_kernel install``.  See
 ``python -m octave_kernel install --help`` for available options.
 
 The path to the Octave kernel JSON file can be specified by creating an
- ``OCTAVE_KERNEL_JSON`` environment variable.
+``OCTAVE_KERNEL_JSON`` environment variable.
 
 The command line options to Octave can be specified with an
 ``OCTAVE_CLI_OPTIONS`` environment variable.  The will be appended to the
