@@ -197,7 +197,9 @@ class OctaveEngine(object):
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
         else:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
-            cmds.append("graphics_toolkit('%s');" % settings['backend'])
+            if settings['backend'] != 'default':
+                cmds.append("graphics_toolkit('%s');" % settings['backend'])
+
         self.eval('\n'.join(cmds))
 
     def eval(self, code, timeout=None, silent=False):
