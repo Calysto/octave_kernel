@@ -98,7 +98,6 @@ class OctaveKernel(ProcessMetaKernel):
     def makeWrapper(self):
         """Start an Octave process and return a :class:`REPLWrapper` object.
         """
-        self.log.warn(str(self.plot_settings))
         return self.octave_engine.repl
 
     @classmethod
