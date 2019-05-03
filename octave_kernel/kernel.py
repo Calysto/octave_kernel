@@ -457,7 +457,10 @@ class OctaveEngine(object):
     def _cleanup(self):
         """Clean up resources used by the session.
         """
-        self.repl.terminate()
+        try:
+            self.repl.terminate()
+        except Exception as e:
+            self.logger.debug(str(e))
         workspace = os.path.join(os.getcwd(), 'octave-workspace')
         if os.path.exists(workspace):
             os.remove(workspace)
