@@ -316,7 +316,7 @@ class OctaveEngine(object):
 
     def _startup(self, plot_settings):
         cwd = os.getcwd().replace(os.path.sep, '/')
-        self._default_toolkit = self.eval('graphics_toolkit')
+        self._default_toolkit = self.eval('graphics_toolkit', silent=True).split()[-1]
         cmd = 'more off; source ~/.octaverc; cd("%s");%s'
         self.eval(cmd % (cwd, self.repl.prompt_change_cmd), silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
