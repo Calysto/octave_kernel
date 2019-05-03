@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import atexit
 import codecs
 import glob
 import json
@@ -13,7 +14,8 @@ import tempfile
 import uuid
 from xml.dom import minidom
 
-from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
+from traitlets import Dict, Unicode
+from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u, MetaKernelApp
 from metakernel.pexpect import which
 from IPython.display import Image, SVG
 
@@ -52,7 +54,9 @@ class OctaveKernel(ProcessMetaKernel):
     implementation_version = __version__,
     language = 'octave'
     help_links = HELP_LINKS
-    kernel_json = get_kernel_json()
+    kernel_json = Dict(get_kernel_json()).tag(config=True)
+    cli_options = Unicode('').tag(config=True)
+    inline_toolkit = Unicode('gnuplot').tag(config=True)
 
     _octave_engine = None
     _language_version = None
@@ -86,13 +90,22 @@ class OctaveKernel(ProcessMetaKernel):
                                            error_handler=self.Error,
                                            stdin_handler=self.raw_input,
                                            stream_handler=self.Print,
+                                           cli_options=self.cli_options,
+                                           inline_toolkit=self.inline_toolkit,
                                            logger=self.log)
         return self._octave_engine
 
     def makeWrapper(self):
         """Start an Octave process and return a :class:`REPLWrapper` object.
         """
+        self.log.warn(str(self.plot_settings))
         return self.octave_engine.repl
+
+    @classmethod
+    def run_as_main(cls, *args, **kwargs):
+        """Launch or install an octave_kernel.
+        """
+        OctaveKernelApp.launch_instance(kernel_class=cls, *args, **kwargs)
 
     def do_execute_direct(self, code, silent=False):
         if code.strip() in ['quit', 'quit()', 'exit', 'exit()']:
@@ -153,17 +166,21 @@ class OctaveEngine(object):
 
     def __init__(self, error_handler=None, stream_handler=None,
                  stdin_handler=None, plot_settings=None,
-                 logger=None):
+                 inline_toolkit='gnuplot',
+                 cli_options='', logger=None):
         if not logger:
             logger = logging.getLogger(__name__)
             logging.basicConfig()
         self.logger = logger
         self.executable = self._get_executable()
+        self.cli_options = cli_options
+        self.inline_toolkit = inline_toolkit
         self.repl = self._create_repl()
         self.error_handler = error_handler
         self.stream_handler = stream_handler or print
         self.stdin_handler = stdin_handler or sys.stdin
         self._startup(plot_settings)
+        atexit.register(self._cleanup)
 
     @property
     def plot_settings(self):
@@ -181,11 +198,7 @@ class OctaveEngine(object):
             if key in settings and settings.get(key, None) is None:
                 del settings[key]
 
-        if sys.platform == 'darwin':
-            settings.setdefault('format', 'svg')
-        else:
-            settings.setdefault('format', 'png')
-
+        settings.setdefault('format', 'png')
         settings.setdefault('backend', 'inline')
         settings.setdefault('width', -1)
         settings.setdefault('height', -1)
@@ -194,11 +207,14 @@ class OctaveEngine(object):
 
         cmds = []
         if settings['backend'] == 'inline':
+            cmds.append("graphics_toolkit('%s')" % self.inline_toolkit)
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
         else:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             if settings['backend'] != 'default':
                 cmds.append("graphics_toolkit('%s');" % settings['backend'])
+            else:
+                cmds.append("graphics_toolkit('%s');" % self._default_toolkit)
 
         self.eval('\n'.join(cmds))
 
@@ -243,6 +259,7 @@ class OctaveEngine(object):
         if settings['backend'] != 'inline':
             self.eval('drawnow("expose");')
             if not plot_dir:
+                self.logger.warn('bailing')
                 return
         fmt = settings['format']
         res = settings['resolution']
@@ -299,9 +316,7 @@ class OctaveEngine(object):
 
     def _startup(self, plot_settings):
         cwd = os.getcwd().replace(os.path.sep, '/')
-        resp = self.eval('available_graphics_toolkits', silent=True)
-        if 'gnuplot' in resp:
-            self.eval("graphics_toolkit('gnuplot')", silent=True)
+        self._default_toolkit = self.eval('graphics_toolkit')
         cmd = 'more off; source ~/.octaverc; cd("%s");%s'
         self.eval(cmd % (cwd, self.repl.prompt_change_cmd), silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
@@ -364,7 +379,7 @@ class OctaveEngine(object):
         cmd += ' --interactive --quiet --no-init-file '
 
         # Add cli options provided by the user.
-        cmd += os.environ.get('OCTAVE_CLI_OPTIONS', '')
+        cmd += os.environ.get('OCTAVE_CLI_OPTIONS', self.cli_options)
 
         orig_prompt = u('octave.*>')
         change_prompt = u("PS1('{0}'); PS2('{1}')")
@@ -439,3 +454,15 @@ class OctaveEngine(object):
             if not executable:
                 raise OSError('octave-cli not found, please see README')
         return executable.replace(os.path.sep, '/')
+
+    def _cleanup(self):
+        """Clean up resources used by the session.
+        """
+        self.repl.terminate()
+        workspace = os.path.join(os.getcwd(), 'octave-workspace')
+        if os.path.exists(workspace):
+            os.remove(workspace)
+
+
+class OctaveKernelApp(MetaKernelApp):
+    name = 'octave_kernel'
