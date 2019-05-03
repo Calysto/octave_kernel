@@ -12,7 +12,6 @@ if __name__ == "__main__":
     print('\nConnecting to Octave...')
     try:
         o = OctaveKernel()
-        o.makeWrapper()
         print('Octave connection established')
         print(o.banner)
         e = o.octave_engine
