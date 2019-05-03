@@ -24,7 +24,7 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res, start_ind)
 
         if (wid > 0)
           size_opt = sprintf('-S%d,%d', wid, hgt);
-        else 
+        else
           size_opt = sprintf('-r%d', res);
         end
 
@@ -40,6 +40,11 @@ function _make_figures(plot_dir, fmt, name, wid, hgt, res, start_ind)
                % Fall back on a standard figure save.
                safe_print(h, filepath, pngpath, size_opt);
             end;
+        elseif (fmt == 'svg' && strcmp(graphics_toolkit, 'gnuplot'))
+            % there is a bug in gnuplot 5.2 that prevents svgs from drawing.
+            %  e.g. "no element found: line 1, column 0"
+            set(0, 'currentfigure', h)
+            drawnow('svg', filepath)
         else
             safe_print(h, filepath, pngpath, size_opt);
         end;
@@ -85,34 +90,32 @@ function im = check_imwrite(h)
     return;
   end;
 
+  % bail if image is more than 2-dimensions
+  if (ndims(cdata) > 2)
+    return;
+  end
+
   im = artist;
 end;
 
 
-function save_image(im, pngpath) 
+function save_image(im, pngpath)
   cdata = double(get(im, 'cdata'));
-
-  if (ndims(cdata) == 2)
-    mapping = get(im, 'cdatamapping');
-    if (strcmp(mapping, 'scaled') == 1)
-      clim = get(im, 'clim');
-      cdata = cdata - clim(1);
-      cdata = cdata ./ (clim(2) - clim(1));
-    end;
-
-    cmap = colormap(get(im, 'parent'));
-    [I, ~] = gray2ind(cdata, length(cmap));
-    imwrite(I, cmap, pngpath);
-
-  else
-    imwrite(cdata, pngpath);
+  mapping = get(im, 'cdatamapping');
+  if (strcmp(mapping, 'scaled') == 1)
+    clim = get(im, 'clim');
+    cdata = cdata - clim(1);
+    cdata = cdata ./ (clim(2) - clim(1));
   end;
 
+  cmap = colormap(get(im, 'parent'));
+  [I, ~] = gray2ind(cdata, length(cmap));
+  imwrite(I, cmap, pngpath);
 end;
 
 
-function safe_print(h, filepath, altpath, size_opt) 
-  try 
+function safe_print(h, filepath, altpath, size_opt)
+  try
     inner_print(h, filepath, size_opt);
   catch
     try
