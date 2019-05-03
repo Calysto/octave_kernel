@@ -114,10 +114,11 @@ An error that starts with ``gnuplot> set terminal aqua enhanced title`` can be f
 adding ``setenv("GNUTERM","qt");`` to ``~/.octaverc`` on MacOS or by installing
 ``gunplot-x11`` and using ``setenv("GNUTERM", "X11")``.
 
+
 Blank Plot
 ~~~~~~~~~~
-Specify a different format using the `%plot -f <backend>` magic or using a configuration setting.
-On some systems, the default 'png' produces a black plot.  On other systems 'svg' produces a
+Specify a different format using the ``%plot -f <backend>`` magic or using a configuration setting.
+On some systems, the default ``'png'`` produces a black plot.  On other systems ``'svg'`` produces a
 black plot.
 
 
