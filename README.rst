@@ -73,7 +73,8 @@ init file is explicitly called after the kernel has set ``more off`` to prevent
 a lockup when the pager is invoked in ``~/.octaverc``.
 
 The inline toolkit is the ``graphics_toolkit`` used to generate plots for the inline
-backend.  It defaults to ``gnuplot``.
+backend.  It defaults to ``gnuplot``.  The different backend can be used for inline
+plotting either by using this configuration or by using the plot magic and putting the backend name after ``inline:``, e.g. ``plot -b inline:fltk``.
 
 
 Troubleshooting
