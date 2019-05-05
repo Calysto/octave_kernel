@@ -208,6 +208,10 @@ class OctaveEngine(object):
         if settings['backend'] == 'inline':
             cmds.append("graphics_toolkit('%s')" % self.inline_toolkit)
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
+        elif settings['backend'].startswith('inline:'):
+            backend = settings['backend'].replace('inline:', '')
+            cmds.append("graphics_toolkit('%s')" % backend)
+            cmds.append("set(0, 'defaultfigurevisible', 'off');")
         else:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             if settings['backend'] != 'default':
@@ -255,10 +259,9 @@ class OctaveEngine(object):
             The plot directory containing the files.
         """
         settings = self._plot_settings
-        if settings['backend'] != 'inline':
+        if not settings['backend'].startswith('inline'):
             self.eval('drawnow("expose");')
             if not plot_dir:
-                self.logger.warn('bailing')
                 return
         fmt = settings['format']
         res = settings['resolution']
