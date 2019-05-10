@@ -50,6 +50,7 @@ def get_kernel_json():
 
 
 class OctaveKernel(ProcessMetaKernel):
+    app_name = 'octave_kernel'
     implementation = 'Octave Kernel'
     implementation_version = __version__,
     language = 'octave'
@@ -99,12 +100,6 @@ class OctaveKernel(ProcessMetaKernel):
         """Start an Octave process and return a :class:`REPLWrapper` object.
         """
         return self.octave_engine.repl
-
-    @classmethod
-    def run_as_main(cls, *args, **kwargs):
-        """Launch or install an octave_kernel.
-        """
-        OctaveKernelApp.launch_instance(kernel_class=cls, *args, **kwargs)
 
     def do_execute_direct(self, code, silent=False):
         if code.strip() in ['quit', 'quit()', 'exit', 'exit()']:
@@ -467,7 +462,3 @@ class OctaveEngine(object):
         workspace = os.path.join(os.getcwd(), 'octave-workspace')
         if os.path.exists(workspace):
             os.remove(workspace)
-
-
-class OctaveKernelApp(MetaKernelApp):
-    name = 'octave_kernel'
