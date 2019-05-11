@@ -58,6 +58,7 @@ The kernel can be configured by adding an ``octave_kernel_config.py`` file to th
 'format', 'backend', 'width', 'height', and 'resolution'.
 
 .. code:: bash
+
     cat ~/.jupyter/octave_kernel_config.py
     # use Qt as the default backend for plots
     c.OctaveKernel.plot_settings = dict(backend='qt')
