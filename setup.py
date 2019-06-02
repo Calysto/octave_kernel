@@ -59,6 +59,7 @@ setup(
     platforms=["Any"],
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/x-rst',
     classifiers=list(filter(None, CLASSIFIERS.split('\n'))),
     requires=REQUIRES,
     install_requires=INSTALL_REQUIRES
