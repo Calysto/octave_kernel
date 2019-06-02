@@ -54,7 +54,7 @@ Configuration
 -------------
 The kernel can be configured by adding an ``octave_kernel_config.py`` file to the
 ``jupyter`` config path.  The ``OctaveKernel`` class offers ``plot_settings``, ``inline_toolkit``,
- ``kernel_json``, and ``cli_options`` as configurable traits.  The available plot settings are:
+``kernel_json``, and ``cli_options`` as configurable traits.  The available plot settings are:
 'format', 'backend', 'width', 'height', and 'resolution'.
 
 .. code:: bash
