@@ -159,6 +159,7 @@ class OctaveKernel(ProcessMetaKernel):
 class OctaveEngine(object):
 
     def __init__(self, error_handler=None, stream_handler=None,
+                 line_handler=None,
                  stdin_handler=None, plot_settings=None,
                  inline_toolkit='gnuplot',
                  cli_options='', logger=None):
@@ -171,8 +172,9 @@ class OctaveEngine(object):
         self.inline_toolkit = inline_toolkit
         self.repl = self._create_repl()
         self.error_handler = error_handler
-        self.stream_handler = stream_handler or print
+        self.stream_handler = stream_handler
         self.stdin_handler = stdin_handler or sys.stdin
+        self.line_handler = line_handler
         self._startup(plot_settings)
         atexit.register(self._cleanup)
 
@@ -220,6 +222,8 @@ class OctaveEngine(object):
         """Evaluate code using the engine.
         """
         stream_handler = None if silent else self.stream_handler
+        line_handler = None if silent else self.line_handler
+
         if self.logger:
             self.logger.debug('Octave eval:')
             self.logger.debug(code)
@@ -227,6 +231,7 @@ class OctaveEngine(object):
             resp = self.repl.run_command(code.rstrip(),
                                          timeout=timeout,
                                          stream_handler=stream_handler,
+                                         line_handler=line_handler,
                                          stdin_handler=self.stdin_handler)
             resp = resp.replace(STDIN_PROMPT, '')
             if self.logger and resp:
