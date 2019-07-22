@@ -19,8 +19,8 @@ class OctaveKernelTests(jkt.KernelTests):
 
     completion_samples = [
         {
-            'text': 'one',
-            'matches': {'ones', 'onenormest'},
+            'text': 'acos',
+            'matches': {'acos', 'acosd', 'acosh'},
         },
     ]
 
