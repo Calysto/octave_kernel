@@ -1,6 +1,9 @@
 An Octave kernel for Jupyter
 ============================
 
+.. image:: https://mybinder.org/badge_logo.svg
+ :target: https://mybinder.org/v2/gh/Calysto/octave_kernel/master?filepath=octave_kernel.ipynb
+
 Prerequisites
 -------------
 `Jupyter Notebook <http://jupyter.readthedocs.org/en/latest/install.html>`_ and GNU Octave_.
