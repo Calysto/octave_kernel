@@ -1,0 +1,8 @@
+name: octave-kernel
+channels:
+- conda-forge
+dependencies:
+- gnuplot
+- octave_kernel
+- texinfo
+
