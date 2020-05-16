@@ -2,7 +2,7 @@ An Octave kernel for Jupyter
 ============================
 
 .. image:: https://mybinder.org/badge_logo.svg
- :target: https://mybinder.org/v2/gh/Calysto/octave_kernel/master?filepath=octave_kernel.ipynb
+ :target: https://mybinder.org/v2/gh/Calysto/octave_kernel/master?urlpath=/lab/tree/octave_kernel.ipynb
 
 Prerequisites
 -------------
