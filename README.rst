@@ -58,7 +58,7 @@ Configuration
 The kernel can be configured by adding an ``octave_kernel_config.py`` file to the
 ``jupyter`` config path.  The ``OctaveKernel`` class offers ``plot_settings``, ``inline_toolkit``,
 ``kernel_json``, and ``cli_options`` as configurable traits.  The available plot settings are:
-'format', 'backend', 'width', 'height', and 'resolution'.
+'format', 'backend', 'width', 'height', 'resolution', and 'plot_dir'.
 
 .. code:: bash
 
@@ -118,6 +118,37 @@ Gnuplot Error
 An error that starts with ``gnuplot> set terminal aqua enhanced title`` can be fixed by
 adding ``setenv("GNUTERM","qt");`` to ``~/.octaverc`` on MacOS or by installing
 ``gunplot-x11`` and using ``setenv("GNUTERM", "X11")``.
+
+Octave-Snap (Linux)
+~~~~~~~~~~~~~~~~~~~
+You can check if you are using a snap version of Linux by checing the path to your Octave
+installation.
+
+.. code:: shell
+
+    which octave
+
+If the returned path has ``snap`` in it, then Octave is running in a container and you will need to configure the kernel appropriately.
+
+1) Set the environment variable ``OCTAVE_EXECUTABLE="octave"``
+
+.. code:: shell
+
+    echo export OCTAVE_EXECUTABLE=\"octave\" >> ~/.bashrc
+
+2) Make a directory for the temporary plot directories that the kernel uses. This cannot be a hidden directory.
+
+.. code:: shell
+
+    mkdir ~/octavePlots
+
+3) Set ``plot_dir`` to point to your plot directory in ``octave_kernel_config.py``.
+
+.. code:: shell
+
+	c.OctaveKernel.plot_settings = dict(plot_dir='<home>/octavePlots')
+
+where ``<home>`` is the absolute path to your home directory. Do not use ``~`` as this resolves to a different location for Octave-Snap.
 
 
 Blank Plot
