@@ -136,7 +136,7 @@ If the returned path has ``snap`` in it, then Octave is running in a container a
 
     echo export OCTAVE_EXECUTABLE=\"octave\" >> ~/.bashrc
 
-2) Make a directory for the temporary plot directories that the kernel uses. This _cannot_ be a hidden directory.
+2) Make a directory for the temporary plot directories that the kernel uses. This *cannot* be a hidden directory.
 
 .. code:: shell
 
