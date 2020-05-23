@@ -121,7 +121,7 @@ adding ``setenv("GNUTERM","qt");`` to ``~/.octaverc`` on MacOS or by installing
 
 Octave-Snap (Linux)
 ~~~~~~~~~~~~~~~~~~~
-You can check if you are using a snap version on Linux by checing the path to your Octave
+You can check if you are using a snap version on Linux by checking the path to your Octave
 installation.
 
 .. code:: shell
