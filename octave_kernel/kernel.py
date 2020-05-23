@@ -189,7 +189,7 @@ class OctaveEngine(object):
 
         # Remove "None" keys so we can use setdefault below.
         keys = ['format', 'backend', 'width', 'height', 'resolution',
-                'backend', 'name']
+                'backend', 'name', 'plot_dir']
         for key in keys:
             if key in settings and settings.get(key, None) is None:
                 del settings[key]
@@ -200,6 +200,7 @@ class OctaveEngine(object):
         settings.setdefault('height', -1)
         settings.setdefault('resolution', 0)
         settings.setdefault('name', 'Figure')
+        settings.setdefault('plot_dir', None)
 
         cmds = []
         if settings['backend'] == 'inline':
@@ -268,7 +269,7 @@ class OctaveEngine(object):
         wid = settings['width']
         hgt = settings['height']
         name = settings['name']
-        plot_dir = plot_dir or tempfile.mkdtemp()
+        plot_dir = plot_dir or tempfile.mkdtemp(dir=settings['plot_dir'])
         plot_dir = plot_dir.replace(os.path.sep, '/')
 
         # Do not overwrite any existing plot files.
@@ -448,9 +449,11 @@ class OctaveEngine(object):
         # Attempt to get the octave executable
         executable = os.environ.get('OCTAVE_EXECUTABLE', None)
         if executable:
-            executable = which(executable)
-            if 'octave-cli' not in executable:
-                raise OSError('OCTAVE_EXECUTABLE does not point to an octave-cli file, please see README')
+            fullpath = which(executable)
+            if 'snap' not in fullpath:
+                executable = fullpath
+                if 'octave-cli' not in executable:
+                    raise OSError('OCTAVE_EXECUTABLE does not point to an octave-cli file, please see README')
         else:
             executable = which('octave-cli')
             if not executable:
