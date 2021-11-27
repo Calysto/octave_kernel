@@ -1,0 +1,38 @@
+
+name: tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    # Run weekly
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0 0 * * 0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Base Setup
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+    - name: Install Octave
+      run: |
+        sudo add-apt-repository -y ppa:octave/stable
+        sudo apt-get update -qq
+        sudo apt-get install -y octave
+    - name: Install dependencies
+      run: |
+        pip install .[test]
+        pip install git+https://github.com/blink1073/jupyter_kernel_test.git@test-ir-kernel
+        make docker-build
+    - name: Run test
+      run: |
+         make test
+         python -m octave_kernel install --user
