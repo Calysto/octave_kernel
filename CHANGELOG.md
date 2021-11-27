@@ -2,7 +2,7 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
-## 0.33.0
+## 0.33.1
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/0.32.0...94f977d10ee6e1e278a2b2d79239f953a3274b7b))
 
