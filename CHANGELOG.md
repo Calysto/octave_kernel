@@ -2,14 +2,29 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.33.0
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/0.32.0...94f977d10ee6e1e278a2b2d79239f953a3274b7b))
+
+### Maintenance and upkeep improvements
+
+- Prep for jupyter releaser usage [#200](https://github.com/Calysto/octave_kernel/pull/200) ([@blink1073](https://github.com/blink1073))
+- Upgrade to jupyter packaging and github actions [#199](https://github.com/Calysto/octave_kernel/pull/199) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2020-05-23&to=2021-11-27&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2020-05-23..2021-11-27&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.32.0
 
 - Snap plot fix [#175](https://github.com/Calysto/octave_kernel/pull/175) ([@PhilFreeman](https://github.com/PhilFreeman))
 - Add libglu1 to apt.txt, switch to JupyterLab for Binder [#173](https://github.com/Calysto/octave_kernel/pull/173) ([@jtpio](https://github.com/jtpio))
 - Add Binder files [#172](https://github.com/Calysto/octave_kernel/pull/172) ([@jtpio](https://github.com/jtpio))
 - Fix tests with Octave 5. [#160](https://github.com/Calysto/octave_kernel/pull/160) ([@QuLogic](https://github.com/QuLogic))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## v0.31.0
 
