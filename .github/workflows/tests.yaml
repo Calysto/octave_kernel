@@ -24,9 +24,8 @@ jobs:
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
     - name: Install Octave
       run: |
-        sudo add-apt-repository -y ppa:octave/stable
-        sudo apt-get update -qq
-        sudo apt-get install -y octave
+        sudo apt-get update
+        sudo apt-get install octave
     - name: Install dependencies
       run: |
         pip install .[test]
