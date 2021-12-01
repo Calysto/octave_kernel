@@ -18,7 +18,7 @@ docker-run:
 	docker run -it --rm -p $(PORT):8888 calysto/octave-notebook
 
 test: clean
-	python test_octave_kernel.py || echo "Skipping unit test"
+	python test_octave_kernel.py
 	jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null;
 	make clean
 
