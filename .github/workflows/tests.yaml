@@ -29,7 +29,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install .[test]
-        pip install git+https://github.com/jupyter/jupyter_kernel_test.git@master
         make docker-build
     - name: Run test
       run: |
