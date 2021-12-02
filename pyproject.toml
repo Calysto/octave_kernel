@@ -17,4 +17,4 @@ message_template = "Bump to {new_version}"
 tag_template = "v{new_version}"
 
 [[tool.tbump.file]]
-src = "octave_kernel/__init__.py"
+src = "octave_kernel/_version.py"

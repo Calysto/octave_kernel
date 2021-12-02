@@ -1,5 +1,4 @@
 """An Octave kernel for Jupyter"""
 
-__version__ = '0.33.1'
-
+from ._vesion import __version__
 from .kernel import OctaveKernel

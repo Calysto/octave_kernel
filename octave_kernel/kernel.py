@@ -19,7 +19,7 @@ from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u, MetaKernel
 from metakernel.pexpect import which
 from IPython.display import Image, SVG
 
-from . import __version__
+from ._version import __version__
 
 
 STDIN_PROMPT = '__stdin_prompt>'
