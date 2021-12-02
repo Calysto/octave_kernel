@@ -19,7 +19,7 @@ from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u, MetaKernel
 from metakernel.pexpect import which
 from IPython.display import Image, SVG
 
-from . import __version__
+from ._version import __version__
 
 
 STDIN_PROMPT = '__stdin_prompt>'
@@ -52,7 +52,7 @@ def get_kernel_json():
 class OctaveKernel(ProcessMetaKernel):
     app_name = 'octave_kernel'
     implementation = 'Octave Kernel'
-    implementation_version = __version__,
+    implementation_version = __version__
     language = 'octave'
     help_links = HELP_LINKS
     kernel_json = Dict(get_kernel_json()).tag(config=True)
