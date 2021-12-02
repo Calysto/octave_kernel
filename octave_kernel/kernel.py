@@ -52,7 +52,7 @@ def get_kernel_json():
 class OctaveKernel(ProcessMetaKernel):
     app_name = 'octave_kernel'
     implementation = 'Octave Kernel'
-    implementation_version = __version__,
+    implementation_version = __version__
     language = 'octave'
     help_links = HELP_LINKS
     kernel_json = Dict(get_kernel_json()).tag(config=True)
