@@ -26,6 +26,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install octave
+    - name: Check Octave Version
+      run: octave --version
     - name: Install dependencies
       run: |
         pip install .[test]
