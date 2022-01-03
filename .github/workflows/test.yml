@@ -36,8 +36,9 @@ jobs:
       run: |
         conda install -y octave
         run: sudo apt-get install xvfb
-    - run: |
-      xvfb --auto-servernum octave --eval "available_graphics_toolkits"
+    - name: Check available toolkits
+      run: |
+        xvfb --auto-servernum octave --eval "available_graphics_toolkits"
 
     #     pip install .[test]
     #     make docker-build
