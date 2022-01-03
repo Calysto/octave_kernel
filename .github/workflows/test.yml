@@ -35,7 +35,10 @@ jobs:
     - name: Install dependencies
       run: |
         conda install -y octave
-        octave --eval "available_graphics_toolkits"
+    - name: Show graphics toolkits
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: octave --eval "available_graphics_toolkits"
 
     #     pip install .[test]
     #     make docker-build
