@@ -35,7 +35,7 @@ jobs:
     - name: Install dependencies
       run: |
         conda install -y octave
-        run: sudo apt-get install xvfb
+        sudo apt-get install xvfb
     - name: Check available toolkits
       run: |
         xvfb --auto-servernum octave --eval "available_graphics_toolkits"

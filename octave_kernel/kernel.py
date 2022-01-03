@@ -88,6 +88,7 @@ class OctaveKernel(ProcessMetaKernel):
         if self._octave_engine:
             return self._octave_engine
         self._octave_engine = OctaveEngine(plot_settings=self.plot_settings,
+                                           defer_startup=True,
                                            error_handler=self.Error,
                                            stdin_handler=self.raw_input,
                                            stream_handler=self.Print,
@@ -107,8 +108,7 @@ class OctaveKernel(ProcessMetaKernel):
             self.do_shutdown(True)
             return
         if not self.octave_engine._has_startup:
-            self.octave_engine._has_startup = True
-            self.octave_engine._startup(self.plot_settings)
+            self.octave_engine._startup()
         val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
         if not silent:
             try:
@@ -164,7 +164,7 @@ class OctaveEngine(object):
     def __init__(self, error_handler=None, stream_handler=None,
                  line_handler=None,
                  stdin_handler=None, plot_settings=None,
-                 inline_toolkit='qt',
+                 inline_toolkit='qt', defer_startup = False,
                  cli_options='', logger=None):
         if not logger:
             logger = logging.getLogger(__name__)
@@ -179,6 +179,9 @@ class OctaveEngine(object):
         self.stdin_handler = stdin_handler or sys.stdin
         self.line_handler = line_handler
         self._has_startup = False
+        self._plot_settings = plot_settings
+        if not defer_startup:
+            self._startup()
         atexit.register(self._cleanup)
 
     @property
@@ -320,14 +323,15 @@ class OctaveEngine(object):
             shutil.rmtree(plot_dir, True)
         return images
 
-    def _startup(self, plot_settings):
+    def _startup(self):
+        self._has_startup = True
         cwd = os.getcwd().replace(os.path.sep, '/')
         self._default_toolkit = self.eval('graphics_toolkit', silent=True).split()[-1]
         cmd = 'more off; source ~/.octaverc; cd("%s");%s'
         self.eval(cmd % (cwd, self.repl.prompt_change_cmd), silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
         self.eval('addpath("%s")' % here.replace(os.path.sep, '/'))
-        self.plot_settings = plot_settings
+        self.plot_settings = self._plot_settings
 
     def _handle_svg(self, filename):
         """
