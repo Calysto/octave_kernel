@@ -35,9 +35,11 @@ jobs:
     - name: Install dependencies
       run: |
         conda install -y octave
-        pip install .[test]
-        make docker-build
-    - name: Run test
-      run: |
-         make test
-         python -m octave_kernel install --user
+        octave --eval "available_graphics_toolkits"
+
+    #     pip install .[test]
+    #     make docker-build
+    # - name: Run test
+    #   run: |
+    #      make test
+    #      python -m octave_kernel install --user
