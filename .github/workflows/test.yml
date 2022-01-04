@@ -11,10 +11,6 @@ on:
     # * is a special character in YAML so you have to quote this string
     - cron:  '0 0 * * 0'
 
-defaults:
-  run:
-    shell: bash -l {0}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,9 +31,9 @@ jobs:
     - name: Install dependencies
       run: |
         conda install -y octave
-        sudo apt-get install xvfb
     - name: Check available toolkits
       run: |
+        export PATH=/usr/share/miniconda3/bin:$PATH
         xvfb --auto-servernum octave --eval "available_graphics_toolkits"
 
     #     pip install .[test]
