@@ -36,7 +36,7 @@ jobs:
       run: |
         conda install -y octave
         pip install .[test]
-        # make docker-build
+        make docker-build
     - name: Run test
       run: |
          xvfb-run --auto-servernum make test
