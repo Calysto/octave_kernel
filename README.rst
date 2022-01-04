@@ -8,8 +8,6 @@ Prerequisites
 -------------
 `Jupyter Notebook <http://jupyter.readthedocs.org/en/latest/install.html>`_ and GNU Octave_.
 
-It is recommended to also install ``gnuplot`` for Octave to enable inline plotting.
-
 Installation
 ------------
 To install using pip::
@@ -24,7 +22,7 @@ To install using conda::
     conda install octave_kernel
     conda install texinfo # For the inline documentation (shift-tab) to appear.
 
-We require the ``octave-cli`` executable to run the kernel.
+We require the ``octave`` executable to run the kernel.
 Add that executable's directory to the ``PATH`` environment variable or use the
 ``OCTAVE_EXECUTABLE`` to point to the executable itself.
 Note that on Octave 5 on Windows, the executable is in ``"Octave-5.x.x.x\mingw64\bin"``.
@@ -77,7 +75,7 @@ init file is explicitly called after the kernel has set ``more off`` to prevent
 a lockup when the pager is invoked in ``~/.octaverc``.
 
 The inline toolkit is the ``graphics_toolkit`` used to generate plots for the inline
-backend.  It defaults to ``gnuplot``.  The different backend can be used for inline
+backend.  It defaults to ``qt``.  The different backend can be used for inline
 plotting either by using this configuration or by using the plot magic and putting the backend name after ``inline:``, e.g. ``plot -b inline:fltk``.
 
 
