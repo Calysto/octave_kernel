@@ -2,6 +2,27 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.34.0
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.33.1...0ae34050c2e6a2cbf45b9cdb1a69762fece9e081))
+
+### Enhancements made
+
+- Use octave executable and qt backend by default [#204](https://github.com/Calysto/octave_kernel/pull/204) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Fail if kernel test fails [#203](https://github.com/Calysto/octave_kernel/pull/203) ([@blink1073](https://github.com/blink1073))
+- Use published jupyter_kernel_test [#202](https://github.com/Calysto/octave_kernel/pull/202) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2021-11-27&to=2022-01-04&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2021-11-27..2022-01-04&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.33.1
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/0.32.0...94f977d10ee6e1e278a2b2d79239f953a3274b7b))
@@ -16,8 +37,6 @@
 ([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2020-05-23&to=2021-11-27&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2020-05-23..2021-11-27&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.32.0
 
