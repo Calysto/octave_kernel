@@ -35,13 +35,9 @@ jobs:
     - name: Install dependencies
       run: |
         conda install -y octave
-    - name: Check available toolkits
+        pip install .[test]
+        # make docker-build
+    - name: Run test
       run: |
-        xvfb-run --auto-servernum octave --eval "available_graphics_toolkits"
-
-    #     pip install .[test]
-    #     make docker-build
-    # - name: Run test
-    #   run: |
-    #      make test
-    #      python -m octave_kernel install --user
+         xvfb-run --auto-servernum make test
+         python -m octave_kernel install --user
