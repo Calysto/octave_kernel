@@ -57,7 +57,7 @@ class OctaveKernel(ProcessMetaKernel):
     help_links = HELP_LINKS
     kernel_json = Dict(get_kernel_json()).tag(config=True)
     cli_options = Unicode('').tag(config=True)
-    inline_toolkit = Unicode('gnuplot').tag(config=True)
+    inline_toolkit = Unicode('qt').tag(config=True)
 
     _octave_engine = None
     _language_version = None
@@ -88,6 +88,7 @@ class OctaveKernel(ProcessMetaKernel):
         if self._octave_engine:
             return self._octave_engine
         self._octave_engine = OctaveEngine(plot_settings=self.plot_settings,
+                                           defer_startup=True,
                                            error_handler=self.Error,
                                            stdin_handler=self.raw_input,
                                            stream_handler=self.Print,
@@ -106,6 +107,8 @@ class OctaveKernel(ProcessMetaKernel):
             self._octave_engine = None
             self.do_shutdown(True)
             return
+        if not self.octave_engine._has_startup:
+            self.octave_engine._startup()
         val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
         if not silent:
             try:
@@ -161,7 +164,7 @@ class OctaveEngine(object):
     def __init__(self, error_handler=None, stream_handler=None,
                  line_handler=None,
                  stdin_handler=None, plot_settings=None,
-                 inline_toolkit='gnuplot',
+                 inline_toolkit='qt', defer_startup = False,
                  cli_options='', logger=None):
         if not logger:
             logger = logging.getLogger(__name__)
@@ -175,7 +178,10 @@ class OctaveEngine(object):
         self.stream_handler = stream_handler
         self.stdin_handler = stdin_handler or sys.stdin
         self.line_handler = line_handler
-        self._startup(plot_settings)
+        self._has_startup = False
+        self._plot_settings = plot_settings
+        if not defer_startup:
+            self._startup()
         atexit.register(self._cleanup)
 
     @property
@@ -317,14 +323,15 @@ class OctaveEngine(object):
             shutil.rmtree(plot_dir, True)
         return images
 
-    def _startup(self, plot_settings):
+    def _startup(self):
+        self._has_startup = True
         cwd = os.getcwd().replace(os.path.sep, '/')
         self._default_toolkit = self.eval('graphics_toolkit', silent=True).split()[-1]
         cmd = 'more off; source ~/.octaverc; cd("%s");%s'
         self.eval(cmd % (cwd, self.repl.prompt_change_cmd), silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
         self.eval('addpath("%s")' % here.replace(os.path.sep, '/'))
-        self.plot_settings = plot_settings
+        self.plot_settings = self._plot_settings
 
     def _handle_svg(self, filename):
         """
@@ -372,7 +379,7 @@ class OctaveEngine(object):
 
     def _create_repl(self):
         cmd = self.executable
-        if 'octave-cli' not in cmd:
+        if 'octave' not in cmd:
             version_cmd = [self.executable, '--version']
             version = subprocess.check_output(version_cmd).decode('utf-8')
             if 'version 4' in version:
@@ -452,12 +459,12 @@ class OctaveEngine(object):
             fullpath = which(executable)
             if 'snap' not in fullpath:
                 executable = fullpath
-                if 'octave-cli' not in executable:
-                    raise OSError('OCTAVE_EXECUTABLE does not point to an octave-cli file, please see README')
+                if 'octave' not in executable:
+                    raise OSError('OCTAVE_EXECUTABLE does not point to an octave file, please see README')
         else:
-            executable = which('octave-cli')
+            executable = which('octave')
             if not executable:
-                raise OSError('octave-cli not found, please see README')
+                raise OSError('octave not found, please see README')
         return executable.replace(os.path.sep, '/')
 
     def _cleanup(self):
