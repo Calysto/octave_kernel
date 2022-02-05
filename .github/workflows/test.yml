@@ -39,5 +39,6 @@ jobs:
         make docker-build
     - name: Run test
       run: |
+         python -m octave_kernel.check
          xvfb-run --auto-servernum make test
          python -m octave_kernel install --user
