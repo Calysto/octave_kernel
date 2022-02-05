@@ -164,7 +164,7 @@ class OctaveEngine(object):
     def __init__(self, error_handler=None, stream_handler=None,
                  line_handler=None,
                  stdin_handler=None, plot_settings=None,
-                 inline_toolkit='', defer_startup = False,
+                 inline_toolkit=None, defer_startup = False,
                  cli_options='', logger=None):
         if not logger:
             logger = logging.getLogger(__name__)
