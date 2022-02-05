@@ -57,7 +57,7 @@ class OctaveKernel(ProcessMetaKernel):
     help_links = HELP_LINKS
     kernel_json = Dict(get_kernel_json()).tag(config=True)
     cli_options = Unicode('').tag(config=True)
-    inline_toolkit = Unicode('qt').tag(config=True)
+    inline_toolkit = Unicode('').tag(config=True)
 
     _octave_engine = None
     _language_version = None
@@ -164,7 +164,7 @@ class OctaveEngine(object):
     def __init__(self, error_handler=None, stream_handler=None,
                  line_handler=None,
                  stdin_handler=None, plot_settings=None,
-                 inline_toolkit='qt', defer_startup = False,
+                 inline_toolkit=None, defer_startup = False,
                  cli_options='', logger=None):
         if not logger:
             logger = logging.getLogger(__name__)
@@ -209,8 +209,11 @@ class OctaveEngine(object):
         settings.setdefault('plot_dir', None)
 
         cmds = []
+
+        default_inline_toolkit = self.inline_toolkit or self._default_toolkit
+
         if settings['backend'] == 'inline':
-            cmds.append("graphics_toolkit('%s')" % self.inline_toolkit)
+            cmds.append("graphics_toolkit('%s')" % default_inline_toolkit)
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
         elif settings['backend'].startswith('inline:'):
             backend = settings['backend'].replace('inline:', '')

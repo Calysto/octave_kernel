@@ -19,6 +19,7 @@ docker-run:
 
 test: clean
 	python test_octave_kernel.py
+	python -m octave_kernel.check
 	jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null;
 	make clean
 

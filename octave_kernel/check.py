@@ -15,6 +15,7 @@ if __name__ == "__main__":
         print('Octave connection established')
         print(o.banner)
         e = o.octave_engine
+        e._startup()
         toolkits = e.eval('available_graphics_toolkits', silent=True)[8:]
         print('Graphics toolkit: %s' % e._default_toolkit)
         print('Available toolkits: %s' % toolkits)
