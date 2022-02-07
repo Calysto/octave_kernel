@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.34.1
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.34.0...d6b0a4a0beae56e5b85e6640cf29fb2a504fc1d5))
+
+### Bugs fixed
+
+- Improve handling of default inline toolkit [#209](https://github.com/Calysto/octave_kernel/pull/209) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2022-01-04&to=2022-02-07&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2022-01-04..2022-02-07&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.34.0
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.33.1...0ae34050c2e6a2cbf45b9cdb1a69762fece9e081))
@@ -20,8 +36,6 @@
 ([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2021-11-27&to=2022-01-04&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2021-11-27..2022-01-04&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.33.1
 
