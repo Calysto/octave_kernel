@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.34.2
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.34.1...0c2501cc4d452cad5ee17f6a5369d57c6da30a90))
+
+### Bugs fixed
+
+- Fix error: '_make_figures' undefined near line 1, column 1 [#212](https://github.com/Calysto/octave_kernel/pull/212) ([@mokeyish](https://github.com/mokeyish))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2022-02-07&to=2022-03-31&type=c))
+
+[@mokeyish](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Amokeyish+updated%3A2022-02-07..2022-03-31&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.34.1
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.34.0...d6b0a4a0beae56e5b85e6640cf29fb2a504fc1d5))
@@ -15,8 +31,6 @@
 ([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2022-01-04&to=2022-02-07&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2022-01-04..2022-02-07&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.34.0
 
