@@ -273,6 +273,8 @@ class OctaveEngine(object):
             self.eval('drawnow("expose");')
             if not plot_dir:
                 return
+        if not self._has_startup:
+            self._startup()
         fmt = settings['format']
         res = settings['resolution']
         wid = settings['width']
