@@ -40,7 +40,7 @@ directory = "jupyter-data"
 skip = ["check-links"]
 
 [tool.jupyter-releaser.hooks]
-before-build-python = ["make data-files"]
+after-prep-git = ["make data-files"]
 
 [tool.tbump.version]
 current = "0.34.2"
