@@ -10,9 +10,15 @@ data-files: clean
 install: data-files
 	pip install -e ".[test]"
 
+
 clean:
+	rm -rf jupyter-data
 	rm -rf build
 	rm -rf dist
+
+
+build: data-files
+	python -m build .
 
 docker-build:
 	docker build --rm --force-rm -t calysto/octave-notebook:latest .
