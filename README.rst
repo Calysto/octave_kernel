@@ -161,6 +161,7 @@ Local Installation
 To install from a git checkout, run:
 
 .. code:: shell
+
     make install
 
 
