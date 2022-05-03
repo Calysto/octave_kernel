@@ -19,6 +19,7 @@ git tag $VERSION; true;
 git push --all
 git push --tags
 rm -rf dist build
+make data-files
 python -m build .
 twine check dist/*
 twine upload dist/*

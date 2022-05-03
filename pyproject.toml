@@ -1,9 +1,46 @@
 [build-system]
-requires=["jupyter_packaging~=0.9,<2", "ipykernel", "jupyter_client", "metakernel"]
-build-backend = "jupyter_packaging.build_api"
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "octave_kernel"
+description = "'A Jupyter kernel for Octave.'"
+license = {file = "LICENSE.txt"}
+authors = [{name = "'Steven Silvester'", email = "steven.silvester@ieee.org"}]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development",
+    "Topic :: System :: Shells",
+]
+urls = {Homepage = "http://github.com/Calysto/octave_kernel"}
+requires-python = ">=3.7"
+dependencies = [
+    "metakernel >=0.24.0",
+    "jupyter_client >=4.3.0",
+    "ipykernel",
+]
+dynamic = ["version"]
+
+[project.readme]
+file = "README.rst"
+content-type = "text/x-rst"
+
+[project.optional-dependencies]
+test = ["pytest", "nbconvert", "jupyter_kernel_test", "nbconvert"]
+
+[tool.flit.external-data]
+directory = "jupyter-data"
 
 [tool.jupyter-releaser]
 skip = ["check-links"]
+
+[tool.jupyter-releaser.hooks]
+before-build-python = ["make data-files"]
 
 [tool.tbump.version]
 current = "0.34.2"
