@@ -18,7 +18,9 @@ clean:
 
 
 build: data-files
+	pip install build twine
 	python -m build .
+	twine check --strict dist/*
 
 docker-build:
 	docker build --rm --force-rm -t calysto/octave-notebook:latest .
