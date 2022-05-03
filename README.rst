@@ -155,6 +155,15 @@ Specify a different format using the ``%plot -f <backend>`` magic or using a con
 On some systems, the default ``'png'`` produces a black plot.  On other systems ``'svg'`` produces a
 black plot.
 
+Local Installation
+------------------
+
+To install from a git checkout, run:
+
+.. code:: shell
+
+    make install
+
 
 .. _Octave: https://www.gnu.org/software/octave/download.html
 .. _online: http://nbviewer.ipython.org/github/Calysto/octave_kernel/blob/master/octave_kernel.ipynb

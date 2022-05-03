@@ -1,15 +1,26 @@
 # Note: This is meant for octave_kernel developer use only
-.PHONY: all clean test release docker-build docker-run
+.PHONY: data-files build install clean test docker-build docker-run
 
-export NAME=`python setup.py --name 2>/dev/null`
-export VERSION=`python setup.py --version 2>/dev/null`
 
-all: clean
+data-files: clean
+	mkdir -p jupyter-data/share/jupyter/kernels/octave
+	cp octave_kernel/kernel.json jupyter-data/share/jupyter/kernels/octave
+	cp -r octave_kernel/images jupyter-data/share/jupyter/kernels/octave/images
+
+install: data-files
 	pip install -e ".[test]"
 
+
 clean:
+	rm -rf jupyter-data
 	rm -rf build
 	rm -rf dist
+
+
+build: data-files
+	pip install build twine
+	python -m build .
+	twine check --strict dist/*
 
 docker-build:
 	docker build --rm --force-rm -t calysto/octave-notebook:latest .
@@ -22,16 +33,3 @@ test: clean
 	python -m octave_kernel.check
 	jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null;
 	make clean
-
-release: test clean
-	pip install wheel
-	python setup.py register
-	python setup.py bdist_wheel --universal
-	python setup.py sdist
-	git commit -a -m "Release $(VERSION)"; true
-	git tag v$(VERSION)
-	git push origin --all
-	git push origin --tags
-	twine upload dist/*
-	printf '\nUpgrade octave_kernel-feedstock with release and sha256 sum:'
-	shasum -a 256 dist/*.tar.gz

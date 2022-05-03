@@ -18,7 +18,7 @@ jobs:
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - name: Install Dependencies
         run: |
-          pip install -e .
+          make install
       - name: Check Release
         if: ${{ matrix.group == 'check_release' }}
         uses: jupyter-server/jupyter_releaser/.github/actions/check-release@v1
