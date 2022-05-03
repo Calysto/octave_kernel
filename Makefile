@@ -1,5 +1,5 @@
 # Note: This is meant for octave_kernel developer use only
-.PHONY: data-files install clean test docker-build docker-run
+.PHONY: data-files build install clean test docker-build docker-run
 
 
 data-files: clean
