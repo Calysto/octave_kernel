@@ -37,6 +37,7 @@ test = ["pytest", "nbconvert", "jupyter_kernel_test", "nbconvert"]
 "jupyter-data/share" = "share"
 
 [tool.hatch.build.targets.sdist]
+artifacts = ["jupyter-data"]
 include = [
     "/jupyter-data",
     "/octave_kernel",
