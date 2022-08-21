@@ -19,7 +19,7 @@ USER $NB_UID
 # Install extra packages
 RUN conda install --quiet --yes \
     'octave_kernel'  && \
-    conda clean -tipsy && \
+    conda clean -tipy && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
