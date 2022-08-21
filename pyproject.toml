@@ -34,7 +34,7 @@ content-type = "text/x-rst"
 test = ["pytest", "nbconvert", "jupyter_kernel_test", "nbconvert"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"jupyter-data/share/jupyter" = "share/jupyter"
+"jupyter-data/share/jupyter/kernels/octave" = "share/jupyter/kernels/octave"
 
 [tool.hatch.version]
 path = "octave_kernel/_version.py"
