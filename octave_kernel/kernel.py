@@ -190,6 +190,9 @@ class OctaveEngine(object):
 
     @plot_settings.setter
     def plot_settings(self, settings):
+        if not self._has_startup:
+            self._default_toolkit = self.eval('graphics_toolkit', silent=True).split()[-1]
+
         settings = settings or dict(backend='inline')
         self._plot_settings = settings
 
