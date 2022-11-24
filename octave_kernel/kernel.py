@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import atexit
+import base64
 import codecs
 import glob
 import json
@@ -35,6 +36,14 @@ HELP_LINKS = [
     },
 
 ] + MetaKernel.help_links
+
+class PDF(object):
+    """Wrapper for PDF object for display.
+    """
+    def __init__(self, filename):
+        with open(filename, 'rb') as f:
+            data = f.read()
+            self._repr_pdf_ = base64.b64encode(data)
 
 
 def get_kernel_json():
@@ -319,6 +328,8 @@ class OctaveEngine(object):
             try:
                 if fname.lower().endswith('.svg'):
                     im = self._handle_svg(filename)
+                elif fname.lower().endswith('.pdf'):
+                    im = PDF(filename)
                 else:
                     im = Image(filename)
                 images.append(im)
