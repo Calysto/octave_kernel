@@ -2,6 +2,12 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.35.0
+
+No merged PRs
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.34.2
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.34.1...0c2501cc4d452cad5ee17f6a5369d57c6da30a90))
@@ -15,8 +21,6 @@
 ([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2022-02-07&to=2022-03-31&type=c))
 
 [@mokeyish](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Amokeyish+updated%3A2022-02-07..2022-03-31&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.34.1
 
