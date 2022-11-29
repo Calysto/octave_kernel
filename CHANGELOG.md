@@ -2,11 +2,25 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.35.1
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.35.0...59c1841ae47ec594516d0aca355e0ef14f7eb61f))
+
+### Bugs fixed
+
+- Include test and example notebook in sdist [#228](https://github.com/Calysto/octave_kernel/pull/228) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2022-11-28&to=2022-11-29&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2022-11-28..2022-11-29&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.35.0
 
 No merged PRs
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.34.2
 
