@@ -41,7 +41,9 @@ artifacts = ["jupyter-data"]
 include = [
     "/jupyter-data",
     "/octave_kernel",
-    "/*.md"
+    "/*.md",
+    "/*.ipynb",
+    "/*.py"
 ]
 
 [tool.hatch.version]
