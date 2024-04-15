@@ -22,10 +22,10 @@ To install using conda::
     conda install octave_kernel
     conda install texinfo # For the inline documentation (shift-tab) to appear.
 
-We require the ``octave`` executable to run the kernel.
+We require the ``octave-cli`` or ``octave`` executable to run the kernel.
 Add that executable's directory to the ``PATH`` environment variable or create the
 environment variable ``OCTAVE_EXECUTABLE`` to point to the executable itself.
-Note that on Octave 5 on Windows, the executable is in ``"Octave-5.x.x.x\mingw64\bin"``.
+Note that on Octave 5+ on Windows, the executable is in ``"Octave-x.x.x.x\mingw64\bin"``.
 
 We automatically install a Jupyter kernelspec when installing the
 python package.  This location can be found using ``jupyter kernelspec list``.
