@@ -33,8 +33,11 @@ content-type = "text/x-rst"
 [project.optional-dependencies]
 test = ["pytest", "nbconvert", "jupyter_kernel_test", "nbconvert"]
 
+# Used to call hatch_build.py
+[tool.hatch.build.hooks.custom]
+
 [tool.hatch.build.targets.wheel.shared-data]
-"jupyter-data/share" = "share"
+"jupyter-data" = "share/jupyter/kernels/octave"
 
 [tool.hatch.build.targets.sdist]
 artifacts = ["jupyter-data"]
@@ -48,27 +51,7 @@ include = [
 
 [tool.hatch.version]
 path = "octave_kernel/_version.py"
-source = "code"
-
-[tool.jupyter-releaser]
-skip = ["check-links"]
-
-[tool.jupyter-releaser.hooks]
-after-prep-git = ["make data-files"]
-
-[tool.tbump.version]
-current = "0.35.1"
-regex = '''
-  (?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)
-  ((?P<channel>a|b|rc|.dev)(?P<release>\d+))?
-'''
-
-[tool.tbump.git]
-message_template = "Bump to {new_version}"
-tag_template = "v{new_version}"
-
-[[tool.tbump.file]]
-src = "octave_kernel/_version.py"
+validate-bump = false
 
 [tool.check-wheel-contents]
 ignore = ["W002"]
