@@ -51,7 +51,6 @@ include = [
 
 [tool.hatch.version]
 path = "octave_kernel/_version.py"
-source = "code"
 validate-bump = false
 
 [tool.check-wheel-contents]
