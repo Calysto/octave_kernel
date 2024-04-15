@@ -481,9 +481,11 @@ class OctaveEngine(object):
                 if 'octave' not in executable:
                     raise OSError('OCTAVE_EXECUTABLE does not point to an octave file, please see README')
         else:
-            executable = which('octave')
+            executable = which('octave-cli')
             if not executable:
-                raise OSError('octave not found, please see README')
+                executable = which('octave')
+                if not executable:
+                    raise OSError('octave not found, please see README')
         return executable.replace(os.path.sep, '/')
 
     def _cleanup(self):
