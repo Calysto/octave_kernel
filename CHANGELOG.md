@@ -2,6 +2,31 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.36.0
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.35.1...79d09bfd8f9e6ef05516a2263453f257e15e90be))
+
+### Enhancements made
+
+- Prefer octave-cli if available [#236](https://github.com/Calysto/octave_kernel/pull/236) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Switch to hatch custom build [#238](https://github.com/Calysto/octave_kernel/pull/238) ([@blink1073](https://github.com/blink1073))
+- Update Release Scripts [#237](https://github.com/Calysto/octave_kernel/pull/237) ([@blink1073](https://github.com/blink1073))
+
+### Other merged PRs
+
+- Clarify use environment variable wording [#229](https://github.com/Calysto/octave_kernel/pull/229) ([@goyalyashpal](https://github.com/goyalyashpal))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2022-11-29&to=2024-04-15&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2022-11-29..2024-04-15&type=Issues) | [@goyalyashpal](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Agoyalyashpal+updated%3A2022-11-29..2024-04-15&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.35.1
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.35.0...59c1841ae47ec594516d0aca355e0ef14f7eb61f))
@@ -15,8 +40,6 @@
 ([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2022-11-28&to=2022-11-29&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2022-11-28..2022-11-29&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.35.0
 
