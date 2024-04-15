@@ -3,8 +3,8 @@ name: tests
 
 on:
   push:
-  pull_request:
     branches: [ "main" ]
+  pull_request:
   schedule:
     # Run weekly
     # * is a special character in YAML so you have to quote this string
