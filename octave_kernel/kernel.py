@@ -237,8 +237,7 @@ class OctaveEngine(object):
                 cmds.append("graphics_toolkit('%s');" % settings['backend'])
             else:
                 cmds.append("graphics_toolkit('%s');" % self._default_toolkit)
-
-        self.eval('\n'.join(cmds))
+        self.eval('\n'.join(cmds), silent=True)
 
     def eval(self, code, timeout=None, silent=False):
         """Evaluate code using the engine.
@@ -256,6 +255,7 @@ class OctaveEngine(object):
                                          line_handler=line_handler,
                                          stdin_handler=self.stdin_handler)
             resp = resp.replace(STDIN_PROMPT, '')
+            resp = resp.strip()
             if self.logger and resp:
                 self.logger.debug(resp)
             return resp
@@ -282,7 +282,7 @@ class OctaveEngine(object):
         """
         settings = self._plot_settings
         if not settings['backend'].startswith('inline'):
-            self.eval('drawnow("expose");')
+            self.eval('drawnow("expose");', silent=True)
             if not plot_dir:
                 return
         if not self._has_startup:
@@ -349,7 +349,7 @@ class OctaveEngine(object):
         cmd = 'more off; source ~/.octaverc; cd("%s");%s'
         self.eval(cmd % (cwd, self.repl.prompt_change_cmd), silent=True)
         here = os.path.realpath(os.path.dirname(__file__))
-        self.eval('addpath("%s")' % here.replace(os.path.sep, '/'))
+        self.eval('addpath("%s")' % here.replace(os.path.sep, '/'), silent=True)
         self.plot_settings = self._plot_settings
 
     def _handle_svg(self, filename):
