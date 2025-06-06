@@ -396,13 +396,23 @@ class OctaveEngine(object):
         svg.setAttribute('height', '%dpx' % height)
         return svg.toxml()
 
+    def _validate_exe_and_get_version(self):
+        version_cmd = [self.executable, '--version']
+        try:
+            version = subprocess.check_output(version_cmd).decode('utf-8')
+            assert version.startswith('GNU Octave')
+        except (subprocess.CalledProcessError, AssertionError):
+            raise OSError('OCTAVE_EXECUTABLE does not point to an octave file, please see README')
+        return version    
+
     def _create_repl(self):
         cmd = self.executable
-        if 'octave' not in cmd:
-            version_cmd = [self.executable, '--version']
-            version = subprocess.check_output(version_cmd).decode('utf-8')
-            if 'version 4' in version:
-                cmd += ' --no-gui'
+
+        # Check for valid octave executable and get its version string
+        version = self._validate_exe_and_get_version()
+        if 'version 4' in version:
+            cmd += ' --no-gui'
+
         # Interactive mode prevents crashing on Windows on syntax errors.
         # Delay sourcing the "~/.octaverc" file in case it displays a pager.
         cmd += ' --interactive --quiet --no-init-file '
@@ -478,8 +488,6 @@ class OctaveEngine(object):
             fullpath = which(executable)
             if 'snap' not in fullpath:
                 executable = fullpath
-                if 'octave' not in executable:
-                    raise OSError('OCTAVE_EXECUTABLE does not point to an octave file, please see README')
         else:
             executable = which('octave-cli')
             if not executable:
