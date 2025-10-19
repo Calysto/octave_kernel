@@ -18,7 +18,7 @@ classifiers = [
     "Topic :: System :: Shells",
 ]
 urls = {Homepage = "http://github.com/Calysto/octave_kernel"}
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "metakernel >=0.24.0",
     "jupyter_client >=4.3.0",
