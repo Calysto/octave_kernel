@@ -165,5 +165,5 @@ To install from a git checkout, run:
     make install
 
 
-.. _Octave: https://www.gnu.org/software/octave/download.html
+.. _Octave: https://octave.org/download
 .. _online: http://nbviewer.ipython.org/github/Calysto/octave_kernel/blob/main/octave_kernel.ipynb
