@@ -12,11 +12,11 @@ on:
 
 defaults:
   run:
-    shell: bash -l {0}
+    shell: bash -leu {0}
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
@@ -28,7 +28,6 @@ jobs:
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
     - name: Install octave
       run: |
-        sudo apt-add-repository ppa:octave/stable
         sudo apt-get install -y octave
     - name: Install dependencies
       run: |
