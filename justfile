@@ -2,7 +2,12 @@
 
 PORT := "8888"
 
+# List available recipes
+default:
+    @just --list
+
 install:
+    uv tool run prek install
     uv sync --extra test
 
 docker-build:
@@ -15,3 +20,6 @@ test:
     uv run --extra test python test_octave_kernel.py
     uv run python -m octave_kernel.check
     uv run --extra test jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null
+
+pre-commit *args="":
+    uv tool run prek --all-files {{args}}

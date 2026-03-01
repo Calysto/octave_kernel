@@ -53,5 +53,24 @@ include = [
 path = "octave_kernel/_version.py"
 validate-bump = false
 
+[tool.interrogate]
+ignore-init-module=true
+ignore-init-method = true
+ignore-private=true
+ignore-semiprivate=true
+ignore-property-decorators=true
+ignore-nested-functions=true
+ignore-nested-classes=true
+fail-under=100
+exclude = ["tests", "docs"]
+
+[tool.pydoclint]
+style = 'numpy'
+arg-type-hints-in-signature = false
+check-return-types = false
+allow-init-docstring = true
+skip-checking-raises = true
+native-mode-noqa-location = "docstring"
+
 [tool.check-wheel-contents]
 ignore = ["W002"]
