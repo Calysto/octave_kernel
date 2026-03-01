@@ -33,7 +33,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y octave
     - name: Install just
-      uses: extractions/setup-just@v2
+      uses: extractions/setup-just@v3
     - name: Install dependencies
       run: |
         just install
@@ -51,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - uses: extractions/setup-just@v2
+      - uses: extractions/setup-just@v3
       - uses: jupyterlab/maintainer-tools/.github/actions/make-sdist@v1
 
   test_sdist:
@@ -73,7 +73,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v4
       - name: Install just
-        uses: extractions/setup-just@v2
+        uses: extractions/setup-just@v3
       - name: Run pre-commit
         run: just pre-commit
 
