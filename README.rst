@@ -158,11 +158,11 @@ black plot.
 Local Installation
 ------------------
 
-To install from a git checkout, run:
+To install from a git checkout run:
 
 .. code:: shell
 
-    make install
+    pip install -e .
 
 
 .. _Octave: https://octave.org/download
