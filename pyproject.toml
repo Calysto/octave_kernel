@@ -31,7 +31,7 @@ file = "README.rst"
 content-type = "text/x-rst"
 
 [project.optional-dependencies]
-test = ["pytest", "nbconvert", "jupyter_kernel_test", "nbconvert"]
+test = ["pytest", "nbconvert", "jupyter_kernel_test"]
 
 # Used to call hatch_build.py
 [tool.hatch.build.hooks.custom]
