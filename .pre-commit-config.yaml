@@ -1,0 +1,74 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-ast
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-toml
+      - id: debug-statements
+      - id: name-tests-test
+        args: ["--pytest-test-first"]
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.6.14
+    hooks:
+      - id: uv-lock
+
+  - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
+    rev: v1.7.7.23
+    hooks:
+      - id: actionlint
+
+  - repo: https://github.com/hukkin/mdformat
+    rev: 1.0.0
+    hooks:
+      - id: mdformat
+        verbose: true
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.3
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: ["-i", "-c", "pyproject.toml", "-v", "octave_kernel"]
+        pass_filenames: false
+
+  - repo: https://github.com/jsh9/pydoclint
+    rev: 0.8.3
+    hooks:
+      - id: pydoclint
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.2
+    hooks:
+      - id: ruff-format
+      - id: ruff-check
+        args: ["--fix", "--show-fixes"]
+
+  - repo: https://github.com/PyCQA/doc8
+    rev: "v1.1.2"
+    hooks:
+      - id: doc8
+        args: ["--quiet", "--max-line-length=200"]
+        files: ^(docs/source/.*|.*\.md|.*\.rst)$
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: "v2.2.6"
+    hooks:
+      - id: codespell
+        args: ["-L", "ect,ans"]
+        exclude: '\.ipynb$'
+
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: "v1.10.0"
+    hooks:
+      - id: rst-backticks
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal
+

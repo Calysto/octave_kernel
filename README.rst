@@ -70,7 +70,7 @@ The path to the Octave kernel JSON file can also be specified by creating an
 
 The command line options to Octave can also be specified with an
 ``OCTAVE_CLI_OPTIONS`` environment variable.  The cli options be appended to the
-default opions of  ``--interactive --quiet --no-init-file``.  Note that the
+default options of  ``--interactive --quiet --no-init-file``.  Note that the
 init file is explicitly called after the kernel has set ``more off`` to prevent
 a lockup when the pager is invoked in ``~/.octaverc``.
 
@@ -144,7 +144,7 @@ If the returned path has ``snap`` in it, then Octave is running in a container a
 
 .. code:: shell
 
-	c.OctaveKernel.plot_settings = dict(plot_dir='<home>/octavePlots')
+    c.OctaveKernel.plot_settings = dict(plot_dir='<home>/octavePlots')
 
 where ``<home>`` is the absolute path to your home directory. Do not use ``~`` as this resolves to a different location for Octave-Snap.
 

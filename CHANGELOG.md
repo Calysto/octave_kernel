@@ -51,7 +51,7 @@ No merged PRs
 
 ### Bugs fixed
 
-- Fix error: '_make_figures' undefined near line 1, column 1 [#212](https://github.com/Calysto/octave_kernel/pull/212) ([@mokeyish](https://github.com/mokeyish))
+- Fix error: '\_make_figures' undefined near line 1, column 1 [#212](https://github.com/Calysto/octave_kernel/pull/212) ([@mokeyish](https://github.com/mokeyish))
 
 ### Contributors to this release
 

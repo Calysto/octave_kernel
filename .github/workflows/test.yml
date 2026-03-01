@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
     - name: Install uv
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - uses: extractions/setup-just@v2
       - uses: jupyterlab/maintainer-tools/.github/actions/make-sdist@v1
@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - name: Install uv
@@ -82,6 +82,6 @@ jobs:
   link_check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - uses: jupyterlab/maintainer-tools/.github/actions/check-links@v1
