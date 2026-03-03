@@ -524,7 +524,16 @@ class OctaveEngine(object):
             executable = which("octave-cli")
             if not executable:
                 executable = which("octave")
-                if not executable:
+            if not executable:
+                # Try flatpak as a fallback.
+                try:
+                    subprocess.check_call(
+                        ["flatpak", "info", "org.octave.Octave"],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                    )
+                    executable = "flatpak run org.octave.Octave --no-gui"
+                except (subprocess.CalledProcessError, FileNotFoundError):
                     raise OSError("octave not found, please see README")
         return executable.replace(os.path.sep, "/")
 
