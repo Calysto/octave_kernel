@@ -125,7 +125,7 @@ class OctaveKernel(ProcessMetaKernel):
             return
         if not self.octave_engine._has_startup:
             self.octave_engine._startup()
-        val = ProcessMetaKernel.do_execute_direct(self, code, silent=True)
+        val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
 
         if not silent:
             try:

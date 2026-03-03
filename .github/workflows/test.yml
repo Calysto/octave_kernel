@@ -45,6 +45,7 @@ jobs:
       run: |
          uv run python -m octave_kernel.check
          xvfb-run --auto-servernum just test
+         xvfb-run --auto-servernum just test-notebook
          uv run python -m octave_kernel install --user
 
   test-macos:
