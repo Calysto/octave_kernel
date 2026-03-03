@@ -16,10 +16,14 @@ defaults:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        os: ["ubuntu-24.04"]
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.14t']
+        include:
+          - os: macos-latest
+            python-version: "3.10"
       fail-fast: false
 
     steps:
@@ -28,20 +32,31 @@ jobs:
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
     - name: Install uv
       uses: astral-sh/setup-uv@v4
-    - name: Install octave
+    - name: Install octave on linux
+      if: ${{ startsWith(matrix.os, 'ubuntu') }}
       run: |
         sudo apt-get update
         sudo apt-get install -y octave
+    - name: Install octave on macos
+      if: ${{ startsWith(matrix.os, 'macos') }}
+      run: brew install octave
     - name: Install just
       uses: extractions/setup-just@v2
     - name: Install dependencies
       run: |
         just install
         just docker-build
-    - name: Run test
+    - name: Run test on linux
+      if: ${{ startsWith(matrix.os, 'ubuntu') }}
       run: |
          uv run python -m octave_kernel.check
          xvfb-run --auto-servernum just test
+         uv run python -m octave_kernel install --user
+    - name: Run test on macos
+      if: ${{ startsWith(matrix.os, 'macos') }}
+      run: |
+         uv run python -m octave_kernel.check
+         just test
          uv run python -m octave_kernel install --user
 
   make_sdist:
