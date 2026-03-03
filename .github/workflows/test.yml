@@ -63,6 +63,29 @@ jobs:
     - name: Run test on macos
       run: just test
 
+  test-flatpak:
+    runs-on: "ubuntu-latest"
+    steps:
+    - uses: actions/checkout@v6
+    - name: Base Setup
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+    - name: Install just
+      uses: extractions/setup-just@v2
+    - name: Install flatpak and octave via flatpak
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y flatpak dbus-x11
+        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        sudo flatpak install -y --noninteractive flathub org.octave.Octave
+    - name: Install dependencies
+      run: just install
+    - name: Run test with flatpak octave
+      run: |
+        uv run python -m octave_kernel.check
+        dbus-run-session -- xvfb-run --auto-servernum just test
+
   make_sdist:
     name: Make SDist
     runs-on: ubuntu-latest
