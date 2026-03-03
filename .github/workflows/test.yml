@@ -15,15 +15,11 @@ defaults:
     shell: bash -leu {0}
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
+  test-linux:
+    runs-on: "ubuntu-latest"
     strategy:
       matrix:
-        os: ["ubuntu-24.04"]
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.14t']
-        include:
-          - os: macos-latest
-            python-version: "3.10"
       fail-fast: false
 
     steps:
@@ -32,14 +28,10 @@ jobs:
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
     - name: Install uv
       uses: astral-sh/setup-uv@v4
-    - name: Install octave on linux
-      if: ${{ startsWith(matrix.os, 'ubuntu') }}
+    - name: Install octave
       run: |
         sudo apt-get update
         sudo apt-get install -y octave
-    - name: Install octave on macos
-      if: ${{ startsWith(matrix.os, 'macos') }}
-      run: brew install octave
     - name: Install just
       uses: extractions/setup-just@v2
     - name: Install dependencies
@@ -47,13 +39,23 @@ jobs:
         just install
         just docker-build
     - name: Run test on linux
-      if: ${{ startsWith(matrix.os, 'ubuntu') }}
       run: |
          uv run python -m octave_kernel.check
          xvfb-run --auto-servernum just test
          uv run python -m octave_kernel install --user
+
+  test-macos:
+    runs-on: "macos-latest"
+    steps:
+    - name: Base Setup
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+    - name: Install octave
+      run: brew install octave
+    - name: Install just
+      uses: extractions/setup-just@v2
     - name: Run test on macos
-      if: ${{ startsWith(matrix.os, 'macos') }}
       run: |
          uv run python -m octave_kernel.check
          just test
