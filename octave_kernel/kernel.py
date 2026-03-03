@@ -125,7 +125,8 @@ class OctaveKernel(ProcessMetaKernel):
             return
         if not self.octave_engine._has_startup:
             self.octave_engine._startup()
-        val = ProcessMetaKernel.do_execute_direct(self, code, silent=silent)
+        val = ProcessMetaKernel.do_execute_direct(self, code, silent=True)
+
         if not silent:
             try:
                 plot_dir = self.octave_engine.make_figures()
@@ -265,7 +266,6 @@ class OctaveEngine(object):
                 cmds.append("graphics_toolkit('%s');" % settings["backend"])
             else:
                 cmds.append("graphics_toolkit('%s');" % self._default_toolkit)
-
         self.eval("\n".join(cmds))
 
     def eval(self, code, timeout=None, silent=False):
@@ -378,9 +378,9 @@ class OctaveEngine(object):
     def _startup(self):
         self._has_startup = True
         cwd = os.getcwd().replace(os.path.sep, "/")
-        self._default_toolkit = self.eval("graphics_toolkit", silent=True).split()[-1]
         cmd = 'more off; source ~/.octaverc; cd("%s");%s'
         self.eval(cmd % (cwd, self.repl.prompt_change_cmd), silent=True)
+        self._default_toolkit = self.eval("graphics_toolkit", silent=True).split()[-1]
         here = os.path.realpath(os.path.dirname(__file__))
         self.eval('addpath("%s")' % here.replace(os.path.sep, "/"))
         self.plot_settings = self._plot_settings

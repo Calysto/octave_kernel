@@ -34,7 +34,7 @@ jobs:
     - name: Install octave
       run: |
         sudo apt-get update
-        sudo apt-get install -y octave
+        sudo apt-get install -y octave gnuplot
     - name: Install just
       uses: extractions/setup-just@v2
     - name: Install dependencies
