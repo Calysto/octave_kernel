@@ -215,7 +215,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -537,17 +537,18 @@ wheels = [
 
 [[package]]
 name = "metakernel"
-version = "0.30.4"
+version = "0.31.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "comm" },
     { name = "ipykernel" },
     { name = "jedi" },
     { name = "jupyter-core" },
     { name = "pexpect" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/01/5f/ba95216f06a45837b545c42a5a0503a3650c7ab451bf947d1142a6146e95/metakernel-0.30.4.tar.gz", hash = "sha256:48858f88630db0470f224713d07638ffd411b75c313f06316462d43a3cb082e8", size = 191916, upload-time = "2025-11-05T15:34:16.007Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fe/6e/46bc45385ee5f7566e9d97e25c9507bc014ce0d13d80b97c26405d500cd9/metakernel-0.31.0.tar.gz", hash = "sha256:eeb6cbd357925709cb2b390a78d9b503a1267b48c13c0bf4eaf0d51068526e3f", size = 448687, upload-time = "2026-03-03T13:49:33.139Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f5/6d/d18ea414aa7d7a6fc690d4453b422268f768da97d7c6e669dc302a5394b8/metakernel-0.30.4-py3-none-any.whl", hash = "sha256:7a6bdf4cdc6ebd5354eccbdf2ab49eebd14f73c2383e3ff45b54145f255d400d", size = 217708, upload-time = "2025-11-05T15:34:14.003Z" },
+    { url = "https://files.pythonhosted.org/packages/5d/9b/e9eeffefab5cafa6778d6275ead313c0914e1467e22969d652fb9e22af17/metakernel-0.31.0-py3-none-any.whl", hash = "sha256:da3ba87a353d04b3c77cf70ea78bced53ba31a930e7aedade8fea0a721262644", size = 196043, upload-time = "2026-03-03T13:49:30.892Z" },
 ]
 
 [[package]]
