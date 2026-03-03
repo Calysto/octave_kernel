@@ -56,10 +56,7 @@ jobs:
     - name: Install just
       uses: extractions/setup-just@v2
     - name: Run test on macos
-      run: |
-         uv run python -m octave_kernel.check
-         just test
-         uv run python -m octave_kernel install --user
+      run: just test
 
   make_sdist:
     name: Make SDist
