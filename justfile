@@ -8,7 +8,7 @@ default:
 
 install:
     uv tool run prek install
-    uv sync --extra test
+    uv sync --group test
 
 docker-build:
     docker build --rm --force-rm -t calysto/octave-notebook:latest .
@@ -17,13 +17,13 @@ docker-run:
     docker run -it --rm -p {{PORT}}:8888 calysto/octave-notebook
 
 test:
-    uv sync --extra test
+    uv sync --group test
     uv run python -m unittest -v test_octave_kernel.py
     uv run python -m octave_kernel.check
     uv run python test_octave_kernel.py
 
 test-notebook:
-    uv run --extra test jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null
+    uv run --group test jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null
 
 pre-commit *args="":
     uv tool run prek --all-files {{args}}
