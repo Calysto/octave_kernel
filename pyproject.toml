@@ -16,6 +16,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development",
     "Topic :: System :: Shells",
+    "Typing :: Typed",
 ]
 urls = {Homepage = "http://github.com/Calysto/octave_kernel"}
 requires-python = ">=3.10"
@@ -32,6 +33,9 @@ content-type = "text/x-rst"
 
 [project.optional-dependencies]
 test = ["pytest", "nbconvert", "jupyter_kernel_test"]
+
+[dependency-groups]
+typing = ["pip", "mypy>=1.0"]
 
 # Used to call hatch_build.py
 [tool.hatch.build.hooks.custom]
@@ -64,9 +68,28 @@ ignore-nested-classes=true
 fail-under=100
 exclude = ["tests", "docs"]
 
+[tool.mypy]
+python_version = "3.10"
+strict = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+warn_unreachable = true
+exclude = [
+    "hatch_build.*\\.py"
+]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disable_error_code = ["no-untyped-def", "no-untyped-call"]
+
+[[tool.mypy.overrides]]
+module = ["jupyter_kernel_test.*"]
+ignore_missing_imports = true
+
 [tool.pydoclint]
 style = 'numpy'
-arg-type-hints-in-signature = false
+arg-type-hints-in-signature = true
+arg-type-hints-in-docstring = false
 check-return-types = false
 allow-init-docstring = true
 skip-checking-raises = true

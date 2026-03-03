@@ -4,7 +4,7 @@ import unittest
 import jupyter_kernel_test as jkt
 
 
-class OctaveKernelTests(jkt.KernelTests):
+class OctaveKernelTests(jkt.KernelTests):  # type:ignore[misc]
     def setUp(self) -> None:
         # Make sure any initial output is emitted (for example toolkit warnings).
         self.execute_helper(self.code_hello_world)

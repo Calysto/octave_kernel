@@ -118,6 +118,8 @@ jobs:
         uses: extractions/setup-just@v2
       - name: Run pre-commit
         run: just pre-commit
+      - name: Run typing check
+        run: just typing
 
   check_release:
     runs-on: ubuntu-latest

@@ -25,5 +25,8 @@ test:
 test-notebook:
     uv run --extra test jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null
 
+typing:
+    uv run --group typing mypy . --install-types --non-interactive
+
 pre-commit *args="":
     uv tool run prek --all-files {{args}}
