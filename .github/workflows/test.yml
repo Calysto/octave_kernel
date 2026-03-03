@@ -58,7 +58,7 @@ jobs:
     - name: Install just
       uses: extractions/setup-just@v2
     - name: Install octave
-      run: brew install octave gnuplot
+      run: brew install octave
     - name: Run test on macos
       run: just test
 

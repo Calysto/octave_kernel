@@ -6,6 +6,10 @@ import jupyter_kernel_test as jkt
 
 
 class OctaveKernelTests(jkt.KernelTests):
+    def setUp(self) -> None:
+        # Make sure any initial output is emitted (for example toolkit warnings).
+        self.execute_helper(self.code_hello_world)
+
     kernel_name = "octave"
 
     language_name = "octave"
@@ -17,7 +21,7 @@ class OctaveKernelTests(jkt.KernelTests):
             {"code": "%plot -f png\nplot([1,2,3])", "mime": "image/png"},
             {"code": "%plot -f svg\nplot([1,2,3])", "mime": "image/svg+xml"},
         ]
-        if sys.platform == "darwin"
+        if sys.platform == "linux"
         else []
     )
 
@@ -29,6 +33,8 @@ class OctaveKernelTests(jkt.KernelTests):
     ]
 
     code_page_something = "ones?"
+
+    code_inspect_sample = "ones"
 
 
 if __name__ == "__main__":

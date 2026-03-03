@@ -18,6 +18,7 @@ docker-run:
 
 test:
     uv sync --extra test
+    uv run python -m unittest -v test_octave_kernel.py
     uv run python -m octave_kernel.check
     uv run python test_octave_kernel.py
     uv run jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null

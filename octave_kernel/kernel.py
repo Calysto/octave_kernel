@@ -445,6 +445,9 @@ class OctaveEngine(object):
         orig_prompt = u("octave.*>")
         change_prompt = u("PS1('{0}'); PS2('{1}')")
 
+        # Disaable ansi escape characters.
+        os.environ["TERM"] = "dumb"
+
         repl = REPLWrapper(
             cmd,
             orig_prompt,
