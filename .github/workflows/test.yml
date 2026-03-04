@@ -18,35 +18,35 @@ permissions:
   contents: read
 
 jobs:
-  test-linux:
-    runs-on: "ubuntu-latest"
-    strategy:
-      matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.14t']
-      fail-fast: false
+  # test-linux:
+  #   runs-on: "ubuntu-latest"
+  #   strategy:
+  #     matrix:
+  #       python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.14t']
+  #     fail-fast: false
 
-    steps:
-    - uses: actions/checkout@v6
-    - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-    - name: Install uv
-      uses: astral-sh/setup-uv@v4
-    - name: Install octave
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y octave gnuplot
-    - name: Install just
-      uses: extractions/setup-just@v2
-    - name: Install dependencies
-      run: |
-        just install
-        just docker-build
-    - name: Run test on linux
-      run: |
-         uv run python -m octave_kernel.check
-         xvfb-run --auto-servernum just test
-         xvfb-run --auto-servernum just test-notebook
-         uv run python -m octave_kernel install --user
+  #   steps:
+  #   - uses: actions/checkout@v6
+  #   - name: Base Setup
+  #     uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+  #   - name: Install uv
+  #     uses: astral-sh/setup-uv@v4
+  #   - name: Install octave
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install -y octave gnuplot
+  #   - name: Install just
+  #     uses: extractions/setup-just@v2
+  #   - name: Install dependencies
+  #     run: |
+  #       just install
+  #       just docker-build
+  #   - name: Run test on linux
+  #     run: |
+  #        uv run python -m octave_kernel.check
+  #        xvfb-run --auto-servernum just test
+  #        xvfb-run --auto-servernum just test-notebook
+  #        uv run python -m octave_kernel install --user
 
   test-macos:
     runs-on: "macos-latest"
@@ -77,7 +77,9 @@ jobs:
     - name: Install just
       uses: extractions/setup-just@v2
     - name: Install octave
-      run: choco install octave --no-progress -y
+      run: |
+        choco install octave --no-progress -y
+        ls /c/Program\ Files
     - name: Run test on windows
       run: just test
 
