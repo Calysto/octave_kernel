@@ -162,21 +162,21 @@ jobs:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - uses: jupyterlab/maintainer-tools/.github/actions/check-links@v1
 
-  tests_check: # This job does nothing and is only used for the branch protection
-    if: always()
-    needs:
-      - test-linux
-      - test-macos
-      - test-windows
-      - test-flatpak
-      - make_sdist
-      - test_sdist
-      - static
-      - check_release
-      - link_check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Decide whether the needed jobs succeeded or failed
-        uses: re-actors/alls-green@release/v1
-        with:
-          jobs: ${{ toJSON(needs) }}
+  # tests_check: # This job does nothing and is only used for the branch protection
+  #   if: always()
+  #   needs:
+  #     - test-linux
+  #     - test-macos
+  #     - test-windows
+  #     - test-flatpak
+  #     - make_sdist
+  #     - test_sdist
+  #     - static
+  #     - check_release
+  #     - link_check
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Decide whether the needed jobs succeeded or failed
+  #       uses: re-actors/alls-green@release/v1
+  #       with:
+  #         jobs: ${{ toJSON(needs) }}
