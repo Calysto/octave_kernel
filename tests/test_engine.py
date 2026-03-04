@@ -283,16 +283,13 @@ class TestExtractFigures:
             "plot_dir": None,
         }
         with tempfile.TemporaryDirectory() as tmp_dir:
-            # Create a file that will fail when PDF tries to read it.
             fname = os.path.join(tmp_dir, "Figure0.pdf")
             with open(fname, "w") as f:
                 f.write("placeholder")
-            os.chmod(fname, 0o000)
-            try:
+            # Use patch to simulate PDF raising an error (os.chmod is unreliable on Windows).
+            with patch("octave_kernel.kernel.PDF", side_effect=Exception("unreadable")):
                 eng.extract_figures(tmp_dir)
-                error_handler.assert_called_once()
-            finally:
-                os.chmod(fname, 0o644)
+        error_handler.assert_called_once()
 
 
 # ---------------------------------------------------------------------------
