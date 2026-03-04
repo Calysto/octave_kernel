@@ -77,9 +77,16 @@ jobs:
     - name: Install just
       uses: extractions/setup-just@v2
     - name: Install octave
+      run: choco install octave --no-progress -y
+    - name: Add octave to PATH
+      shell: bash
       run: |
-        choco install octave --no-progress -y
-        ls /c/Program\ Files
+        ls "/c/Program Files/"
+        octave_bin=$(ls -d "/c/Program Files/GNU Octave"*/mingw64/bin)
+        echo "$octave_bin" >> "$GITHUB_PATH"
+    - name: Verify octave
+      shell: bash
+      run: octave --version
     - name: Run test on windows
       run: just test
 
