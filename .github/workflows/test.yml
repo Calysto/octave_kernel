@@ -79,8 +79,9 @@ jobs:
     - name: Install octave
       run: choco install octave --no-progress -y
     - name: Add octave to PATH
-      shell: bash -leu {0}
+      shell: bash
       run: |
+        set -eux
         ls "/c/Program Files/GNU Octave/"
         octave_bin=$(find "/c/Program Files/GNU Octave" -type d -name "bin" | head -1)
         echo "$octave_bin" >> "$GITHUB_PATH"
