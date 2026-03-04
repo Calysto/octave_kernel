@@ -44,7 +44,8 @@ jobs:
     - name: Run test on linux
       run: |
          uv run python -m octave_kernel.check
-         xvfb-run --auto-servernum just test
+         xvfb-run --auto-servernum just cover
+         xvfb-run --auto-servernum just test-kernel
          xvfb-run --auto-servernum just test-notebook
          uv run python -m octave_kernel install --user
 
@@ -62,8 +63,10 @@ jobs:
       uses: ./
       with:
         install-type: macos
-    - name: Run test on macos
+    - name: Run unit tests on macos
       run: just test
+    - name: Run kernel tests on macos
+      run: just test-kernel
 
   test-windows:
     runs-on: "windows-latest"
@@ -79,8 +82,10 @@ jobs:
       uses: ./
       with:
         install-type: windows
-    - name: Run test on windows
+    - name: Run unit tests on windows
       run: just test
+    - name: Run kernel tests on windows
+      run: just test-kernel
 
   test-flatpak:
     runs-on: "ubuntu-latest"
@@ -98,10 +103,10 @@ jobs:
         install-type: ubuntu-flatpak
     - name: Install dependencies
       run: just install
-    - name: Run test with flatpak octave
+    - name: Run tests with flatpak octave
       run: |
-        uv run python -m octave_kernel.check
         dbus-run-session -- xvfb-run --auto-servernum just test
+        dbus-run-session -- xvfb-run --auto-servernum just test-kernel
 
   make_sdist:
     name: Make SDist
