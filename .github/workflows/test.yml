@@ -18,35 +18,35 @@ permissions:
   contents: read
 
 jobs:
-  # test-linux:
-  #   runs-on: "ubuntu-latest"
-  #   strategy:
-  #     matrix:
-  #       python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.14t']
-  #     fail-fast: false
+  test-linux:
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.14t']
+      fail-fast: false
 
-  #   steps:
-  #   - uses: actions/checkout@v6
-  #   - name: Base Setup
-  #     uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-  #   - name: Install uv
-  #     uses: astral-sh/setup-uv@v4
-  #   - name: Install octave
-  #     run: |
-  #       sudo apt-get update
-  #       sudo apt-get install -y octave gnuplot
-  #   - name: Install just
-  #     uses: extractions/setup-just@v2
-  #   - name: Install dependencies
-  #     run: |
-  #       just install
-  #       just docker-build
-  #   - name: Run test on linux
-  #     run: |
-  #        uv run python -m octave_kernel.check
-  #        xvfb-run --auto-servernum just test
-  #        xvfb-run --auto-servernum just test-notebook
-  #        uv run python -m octave_kernel install --user
+    steps:
+    - uses: actions/checkout@v6
+    - name: Base Setup
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+    - name: Install octave
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y octave gnuplot
+    - name: Install just
+      uses: extractions/setup-just@v2
+    - name: Install dependencies
+      run: |
+        just install
+        just docker-build
+    - name: Run test on linux
+      run: |
+         uv run python -m octave_kernel.check
+         xvfb-run --auto-servernum just test
+         xvfb-run --auto-servernum just test-notebook
+         uv run python -m octave_kernel install --user
 
   test-macos:
     runs-on: "macos-latest"
@@ -163,21 +163,21 @@ jobs:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - uses: jupyterlab/maintainer-tools/.github/actions/check-links@v1
 
-  # tests_check: # This job does nothing and is only used for the branch protection
-  #   if: always()
-  #   needs:
-  #     - test-linux
-  #     - test-macos
-  #     - test-windows
-  #     - test-flatpak
-  #     - make_sdist
-  #     - test_sdist
-  #     - static
-  #     - check_release
-  #     - link_check
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Decide whether the needed jobs succeeded or failed
-  #       uses: re-actors/alls-green@release/v1
-  #       with:
-  #         jobs: ${{ toJSON(needs) }}
+  tests_check: # This job does nothing and is only used for the branch protection
+    if: always()
+    needs:
+      - test-linux
+      - test-macos
+      - test-windows
+      - test-flatpak
+      - make_sdist
+      - test_sdist
+      - static
+      - check_release
+      - link_check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
