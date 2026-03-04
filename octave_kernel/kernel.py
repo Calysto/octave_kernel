@@ -4,7 +4,6 @@ from __future__ import annotations, print_function
 
 import atexit
 import base64
-import codecs
 import glob
 import json
 import logging
@@ -398,7 +397,7 @@ class OctaveEngine(object):
         Handle special considerations for SVG images.
         """
         # Gnuplot can create invalid characters in SVG files.
-        with codecs.open(filename, "r", encoding="utf-8", errors="replace") as fid:
+        with open(filename, encoding="utf-8", errors="replace") as fid:
             data = fid.read()
         im = SVG(data=data)  # type: ignore[no-untyped-call]
         try:
@@ -477,7 +476,7 @@ class OctaveEngine(object):
             if self.stream_handler:
                 self.stream_handler(msg)
             elif self.logger:
-                self.logger.warn(msg)
+                self.logger.warning(msg)
             return self._interrupt_expect(silent)
 
         return REPLWrapper.interrupt(self.repl, continuation=continuation)  # type: ignore[no-any-return]

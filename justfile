@@ -16,7 +16,10 @@ docker-build:
 docker-run:
     docker run -it --rm -p {{PORT}}:8888 calysto/octave-notebook
 
-test:
+test *args="":
+    uv run --group test pytest {{args}}
+
+test-kernel:
     uv sync --group test
     uv run python -m unittest -v test_octave_kernel.py
     uv run python -m octave_kernel.check
@@ -24,6 +27,10 @@ test:
 
 test-notebook:
     uv run --group test jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null
+
+cover *args="":
+    uv run --group coverage pytest --cov=octave_kernel --cov-report=term-missing --cov-fail-under=90 {{args}}
+    uv run --with coverage coverage html
 
 typing:
     uv run --group typing mypy . --install-types --non-interactive

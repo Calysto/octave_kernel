@@ -34,6 +34,7 @@ content-type = "text/x-rst"
 [dependency-groups]
 test = ["pytest", "nbconvert", "jupyter_kernel_test"]
 typing = ["pip", "mypy>=1.0"]
+coverage = ["pytest", "pytest-cov"]
 
 # Used to call hatch_build.py
 [tool.hatch.build.hooks.custom]
@@ -54,6 +55,16 @@ include = [
 [tool.hatch.version]
 path = "octave_kernel/_version.py"
 validate-bump = false
+
+[tool.pytest]
+minversion = "9.0"
+addopts = ["-ra", "--showlocals"]
+strict = true
+filterwarnings = ["error"]
+log_level = "INFO"
+testpaths = [
+  "tests",
+]
 
 [tool.interrogate]
 ignore-init-module=true
