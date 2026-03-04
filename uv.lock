@@ -776,7 +776,7 @@ dependencies = [
     { name = "metakernel" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 test = [
     { name = "jupyter-kernel-test" },
     { name = "nbconvert" },
@@ -793,12 +793,15 @@ typing = [
 requires-dist = [
     { name = "ipykernel" },
     { name = "jupyter-client", specifier = ">=4.3.0" },
-    { name = "jupyter-kernel-test", marker = "extra == 'test'" },
     { name = "metakernel", specifier = ">=0.24.0" },
-    { name = "nbconvert", marker = "extra == 'test'" },
-    { name = "pytest", marker = "extra == 'test'" },
 ]
-provides-extras = ["test"]
+
+[package.metadata.requires-dev]
+test = [
+    { name = "jupyter-kernel-test" },
+    { name = "nbconvert" },
+    { name = "pytest" },
+]
 
 [package.metadata.requires-dev]
 typing = [
