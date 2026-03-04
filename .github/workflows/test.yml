@@ -81,8 +81,8 @@ jobs:
     - name: Add octave to PATH
       shell: bash
       run: |
-        ls "/c/Program Files/"
-        octave_bin=$(ls -d "/c/Program Files/GNU Octave"*/mingw64/bin)
+        ls "/c/Program Files/GNU Octave/"
+        octave_bin=$(find "/c/Program Files/GNU Octave" -type d -name "bin" | head -1)
         echo "$octave_bin" >> "$GITHUB_PATH"
     - name: Verify octave
       shell: bash
