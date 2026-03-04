@@ -431,8 +431,8 @@ class OctaveEngine:
                 width = width * settings["height"] / height
             height = settings["height"]
 
-        svg.setAttribute("width", f"{width}px")
-        svg.setAttribute("height", f"{height}px")
+        svg.setAttribute("width", f"{int(width)}px")
+        svg.setAttribute("height", f"{int(height)}px")
         return svg.toxml()
 
     def _create_repl(self) -> REPLWrapper:
