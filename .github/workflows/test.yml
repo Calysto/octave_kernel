@@ -83,9 +83,9 @@ jobs:
       run: |
         set -eux
         ls "/c/Program Files/GNU Octave/"
-        octave_bin=$(find "/c/Program Files/GNU Octave" -type d -name "bin" | head -1)
+        octave_bin=$(find "/c/Program Files/GNU Octave" -type f -name "octave.exe" | head -1)
+        octave_bin=$(dirname "$octave_bin")
         echo "$octave_bin" >> "$GITHUB_PATH"
-        ls "$octave_bin"
     - name: Verify octave
       shell: bash
       run: octave --version
