@@ -63,6 +63,27 @@ jobs:
     - name: Run test on macos
       run: just test
 
+  test-windows:
+    runs-on: "windows-latest"
+    steps:
+    - uses: actions/checkout@v6
+    - name: Base Setup
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+    - name: Install just
+      uses: extractions/setup-just@v2
+    - name: Install octave
+      run: choco install octave --no-progress -y
+    - name: Add octave to PATH
+      shell: bash
+      run: |
+        octave_bin=$(find "/c/Program Files/GNU Octave" -type f -name "octave.exe" | head -1)
+        octave_bin=$(dirname "$octave_bin")
+        echo "$octave_bin" >> "$GITHUB_PATH"
+    - name: Run test on windows
+      run: just test
+
   test-flatpak:
     runs-on: "ubuntu-latest"
     steps:
@@ -147,6 +168,7 @@ jobs:
     needs:
       - test-linux
       - test-macos
+      - test-windows
       - test-flatpak
       - make_sdist
       - test_sdist

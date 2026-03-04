@@ -33,8 +33,6 @@ content-type = "text/x-rst"
 
 [dependency-groups]
 test = ["pytest", "nbconvert", "jupyter_kernel_test"]
-
-[dependency-groups]
 typing = ["pip", "mypy>=1.0"]
 
 # Used to call hatch_build.py
