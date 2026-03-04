@@ -65,9 +65,6 @@ jobs:
 
   test-windows:
     runs-on: "windows-latest"
-    defaults:
-      run:
-        shell: pwsh
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
@@ -81,14 +78,9 @@ jobs:
     - name: Add octave to PATH
       shell: bash
       run: |
-        set -eux
-        ls "/c/Program Files/GNU Octave/"
         octave_bin=$(find "/c/Program Files/GNU Octave" -type f -name "octave.exe" | head -1)
         octave_bin=$(dirname "$octave_bin")
         echo "$octave_bin" >> "$GITHUB_PATH"
-    - name: Verify octave
-      shell: bash
-      run: octave --version
     - name: Run test on windows
       run: just test
 
