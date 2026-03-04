@@ -1,6 +1,8 @@
 """Example use of jupyter_kernel_test, with tests for IPython."""
 
 import unittest
+from typing import ClassVar
+
 import jupyter_kernel_test as jkt
 
 
@@ -25,7 +27,7 @@ class OctaveKernelTests(jkt.KernelTests):  # type:ignore[misc]
     #     else []
     # )
 
-    completion_samples = [
+    completion_samples: ClassVar = [
         {
             "text": "acos",
             "matches": {"acos", "acosd", "acosh"},

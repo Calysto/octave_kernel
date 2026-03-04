@@ -15,10 +15,9 @@ import sys
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from metakernel import __version__ as mversion
-from octave_kernel import __version__
 
+from octave_kernel import __version__
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -82,7 +81,7 @@ class TestStaticOutput:
         assert mversion in success_out
 
     def test_prints_python_version(self, success_out):
-        ver = "%d.%d" % (sys.version_info.major, sys.version_info.minor)
+        ver = f"{sys.version_info.major}.{sys.version_info.minor}"
         assert ver in success_out
 
     def test_prints_python_executable_path(self, success_out):
@@ -136,7 +135,7 @@ class TestSuccessOutput:
 
     def test_eval_result_sliced_into_toolkits(self):
         # eval returns "ans = {gnuplot}"; [8:] strips the first 8 chars.
-        mock_cls, inst = _make_success_kernel(eval_result="12345678rest")
+        mock_cls, _inst = _make_success_kernel(eval_result="12345678rest")
         out = _run_check(mock_cls)
         assert "rest" in out
 

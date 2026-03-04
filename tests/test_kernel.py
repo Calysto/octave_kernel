@@ -7,8 +7,8 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from metakernel import ProcessMetaKernel
+
 from octave_kernel._version import __version__
 from octave_kernel.kernel import HELP_LINKS, STDIN_PROMPT, OctaveKernel
 
@@ -150,26 +150,26 @@ class TestOctaveEngineProperty:
     def test_stores_created_engine(self, kernel):
         kernel._octave_engine = None
         with patch("octave_kernel.kernel.OctaveEngine") as MockEngine:
-            kernel.octave_engine
+            _ = kernel.octave_engine
         assert kernel._octave_engine is MockEngine.return_value
 
     def test_new_engine_uses_plot_settings(self, kernel):
         kernel._octave_engine = None
         with patch("octave_kernel.kernel.OctaveEngine") as MockEngine:
-            kernel.octave_engine
+            _ = kernel.octave_engine
         assert MockEngine.call_args.kwargs["plot_settings"] == _DEFAULT_PLOT_SETTINGS
 
     def test_new_engine_uses_defer_startup(self, kernel):
         kernel._octave_engine = None
         with patch("octave_kernel.kernel.OctaveEngine") as MockEngine:
-            kernel.octave_engine
+            _ = kernel.octave_engine
         assert MockEngine.call_args.kwargs["defer_startup"] is True
 
     def test_new_engine_uses_cli_options(self, kernel):
         kernel._octave_engine = None
         kernel._trait_values["cli_options"] = "--no-gui"
         with patch("octave_kernel.kernel.OctaveEngine") as MockEngine:
-            kernel.octave_engine
+            _ = kernel.octave_engine
         assert MockEngine.call_args.kwargs["cli_options"] == "--no-gui"
 
 

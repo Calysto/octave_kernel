@@ -206,7 +206,7 @@ class TestMakeFigures:
             "plot_dir": None,
         }
         with patch.object(eng, "eval", return_value="error: make_figures failed"):
-            with pytest.raises(Exception):
+            with pytest.raises(Exception, match="Inline plot failed"):
                 eng.make_figures()
 
 
@@ -237,7 +237,7 @@ class TestExtractFigures:
         engine.plot_settings = {"backend": "inline"}
         with tempfile.TemporaryDirectory() as tmp_dir:
             for i in range(3):
-                fname = os.path.join(tmp_dir, "Figure%d.png" % i)
+                fname = os.path.join(tmp_dir, f"Figure{i}.png")
                 with open(fname, "wb") as f:
                     f.write(b"\x89PNG\r\n\x1a\n" + b"\x00" * 16)
             result = engine.extract_figures(tmp_dir)
@@ -707,7 +707,7 @@ class TestInterruptExpect:
         with patch("octave_kernel.kernel.uuid.uuid4") as mu:
             mu.return_value.hex = self._TOKEN
             mock_engine._interrupt_expect(silent=True)
-        mock_engine.repl.sendline.assert_called_once_with('disp("%s");' % self._TOKEN)
+        mock_engine.repl.sendline.assert_called_once_with(f'disp("{self._TOKEN}");')
 
 
 # ---------------------------------------------------------------------------

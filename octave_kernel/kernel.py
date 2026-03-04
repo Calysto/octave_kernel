@@ -1,6 +1,6 @@
 """Main kernel implementation"""
 
-from __future__ import annotations, print_function
+from __future__ import annotations
 
 import atexit
 import base64
@@ -17,16 +17,15 @@ import uuid
 from typing import Any
 from xml.dom import minidom
 
-from traitlets import Dict, Unicode
+from IPython.display import SVG, Image
 from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
 from metakernel.pexpect import which
-from IPython.display import Image, SVG
+from traitlets import Dict, Unicode
 
 from ._version import __version__
 
-
 STDIN_PROMPT = "__stdin_prompt>"
-STDIN_PROMPT_REGEX = re.compile(r"\A.+?%s|debug> " % STDIN_PROMPT)
+STDIN_PROMPT_REGEX = re.compile(rf"\A.+?{STDIN_PROMPT}|debug> ")
 HELP_LINKS = [
     {
         "text": "GNU Octave",
@@ -36,10 +35,11 @@ HELP_LINKS = [
         "text": "Octave Kernel",
         "url": "https://github.com/Calysto/octave_kernel",
     },
-] + MetaKernel.help_links
+    *MetaKernel.help_links,
+]
 
 
-class PDF(object):
+class PDF:
     """Wrapper for PDF object for display."""
 
     def __init__(self, filename: str) -> None:
@@ -148,7 +148,7 @@ class OctaveKernel(ProcessMetaKernel):
                 return None
             else:
                 return ""
-        return self.octave_engine.eval("help %s" % obj, silent=True)
+        return self.octave_engine.eval(f"help {obj}", silent=True)
 
     def Print(self, *args: str, **kwargs: Any) -> None:
         """Print to octave."""
@@ -160,19 +160,19 @@ class OctaveKernel(ProcessMetaKernel):
             if arg.strip().startswith(STDIN_PROMPT):
                 arg = arg.replace(STDIN_PROMPT, "")
             out.append(arg)
-        super(OctaveKernel, self).Print(*out, **kwargs)
+        super().Print(*out, **kwargs)
 
     def raw_input(self, text: str) -> str:  # type: ignore[override]
         """Receive raw input"""
         # Remove the stdin prompt to restore the original prompt.
         text = text.replace(STDIN_PROMPT, "")
-        return super(OctaveKernel, self).raw_input(text)  # type: ignore[no-untyped-call, no-any-return]
+        return super().raw_input(text)  # type: ignore[no-untyped-call, no-any-return]
 
     def get_completions(self, info: dict[str, Any]) -> list[str]:
         """
         Get completions from kernel based on info dict.
         """
-        cmd = 'completion_matches("%s")' % info["obj"]
+        cmd = f'completion_matches("{info["obj"]}")'
         val = self.octave_engine.eval(cmd, silent=True)
         return val.splitlines() if val else []
 
@@ -181,7 +181,7 @@ class OctaveKernel(ProcessMetaKernel):
         self.octave_engine.plot_settings = self.plot_settings
 
 
-class OctaveEngine(object):
+class OctaveEngine:
     """Interaction layer for octave."""
 
     def __init__(
@@ -257,18 +257,18 @@ class OctaveEngine(object):
         default_inline_toolkit = self.inline_toolkit or self._default_toolkit
 
         if settings["backend"] == "inline":
-            cmds.append("graphics_toolkit('%s')" % default_inline_toolkit)
+            cmds.append(f"graphics_toolkit('{default_inline_toolkit}')")
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
         elif settings["backend"].startswith("inline:"):
             backend = settings["backend"].replace("inline:", "")
-            cmds.append("graphics_toolkit('%s')" % backend)
+            cmds.append(f"graphics_toolkit('{backend}')")
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
         else:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             if settings["backend"] != "default":
-                cmds.append("graphics_toolkit('%s');" % settings["backend"])
+                cmds.append(f"graphics_toolkit('{settings['backend']}');")
             else:
-                cmds.append("graphics_toolkit('%s');" % self._default_toolkit)
+                cmds.append(f"graphics_toolkit('{self._default_toolkit}');")
         self.eval("\n".join(cmds))
 
     def eval(
@@ -332,11 +332,10 @@ class OctaveEngine(object):
         plot_dir = plot_dir.replace(os.path.sep, "/")
 
         # Do not overwrite any existing plot files.
-        spec = os.path.join(plot_dir, "%s*" % name)
+        spec = os.path.join(plot_dir, f"{name}*")
         start = len(glob.glob(spec))
 
-        make_figs = '_make_figures("%s", "%s", "%s", %d, %d, %d, %d)'
-        make_figs = make_figs % (plot_dir, fmt, name, wid, hgt, res, start)
+        make_figs = f'_make_figures("{plot_dir}", "{fmt}", "{name}", {wid}, {hgt}, {res}, {start})'
         resp = self.eval(make_figs, silent=True)
         msg = "Inline plot failed, consider trying another graphics toolkit\n"
         if resp and "error:" in resp:
@@ -362,7 +361,7 @@ class OctaveEngine(object):
         A list of figures.
         """
         images: list[Any] = []
-        spec = os.path.join(plot_dir, "%s*" % self.plot_settings["name"])
+        spec = os.path.join(plot_dir, f"{self.plot_settings['name']}*")
         for fname in reversed(glob.glob(spec)):
             filename = os.path.join(plot_dir, fname)
             try:
@@ -385,11 +384,11 @@ class OctaveEngine(object):
     def _startup(self) -> None:
         self._has_startup = True
         cwd = os.getcwd().replace(os.path.sep, "/")
-        cmd = 'more off; source ~/.octaverc; cd("%s");%s'
-        self.eval(cmd % (cwd, self.repl.prompt_change_cmd), silent=True)
+        cmd = f'more off; source ~/.octaverc; cd("{cwd}");{self.repl.prompt_change_cmd}'
+        self.eval(cmd, silent=True)
         self._default_toolkit = self.eval("graphics_toolkit", silent=True).split()[-1]
-        here = os.path.realpath(os.path.dirname(__file__))
-        self.eval('addpath("%s")' % here.replace(os.path.sep, "/"))
+        here = os.path.realpath(os.path.dirname(__file__)).replace(os.path.sep, "/")
+        self.eval(f'addpath("{here}")')
         self.plot_settings = self._plot_settings
 
     def _handle_svg(self, filename: str) -> Any:
@@ -432,8 +431,8 @@ class OctaveEngine(object):
                 width = width * settings["height"] / height
             height = settings["height"]
 
-        svg.setAttribute("width", "%dpx" % width)
-        svg.setAttribute("height", "%dpx" % height)
+        svg.setAttribute("width", f"{int(width)}px")
+        svg.setAttribute("height", f"{int(height)}px")
         return svg.toxml()
 
     def _create_repl(self) -> REPLWrapper:
@@ -486,7 +485,7 @@ class OctaveEngine(object):
         child = repl.child
         expects = [repl.prompt_regex, child.linesep]
         expected = uuid.uuid4().hex
-        repl.sendline('disp("%s");' % expected)
+        repl.sendline(f'disp("{expected}");')
         if repl.prompt_emit_cmd:
             repl.sendline(repl.prompt_emit_cmd)
         lines = []
@@ -542,7 +541,7 @@ class OctaveEngine(object):
                     )
                     executable = "flatpak run org.octave.Octave --no-gui"
                 except (subprocess.CalledProcessError, FileNotFoundError):
-                    raise OSError("octave not found, please see README")
+                    raise OSError("octave not found, please see README") from None
         if executable is None:
             raise OSError("octave not found, please see README")
         return executable.replace(os.path.sep, "/")
