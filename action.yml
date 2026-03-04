@@ -46,7 +46,7 @@ runs:
     - name: Verify octave install
       shell: bash
       run: |
-        if "${{ inputs.install-type }}" == "ubuntu-flatpak"
+        if "${{ inputs.install-type }}" == "ubuntu-flatpak"; then
           flatpak run org.octave.Octave --version
         else
           octave --version
