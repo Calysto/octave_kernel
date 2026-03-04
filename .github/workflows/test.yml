@@ -14,6 +14,10 @@ defaults:
   run:
     shell: bash -leu {0}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 

@@ -104,5 +104,13 @@ allow-init-docstring = true
 skip-checking-raises = true
 native-mode-noqa-location = "docstring"
 
+[tool.ruff.lint]
+extend-select = [
+  "B",      # flake8-bugbear
+  "I",      # isort
+  "RUF",    # Ruff-specific
+  "UP",     # pyupgrade
+]
+
 [tool.check-wheel-contents]
 ignore = ["W002"]
