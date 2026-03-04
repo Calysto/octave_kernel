@@ -33,7 +33,7 @@ content-type = "text/x-rst"
 
 [dependency-groups]
 test = ["pytest", "nbconvert", "jupyter_kernel_test"]
-typing = ["pip", "mypy>=1.0"]
+typing = [{ include-group = "test" }, "pip", "mypy>=1.0"]
 coverage = ["pytest", "pytest-cov"]
 
 # Used to call hatch_build.py

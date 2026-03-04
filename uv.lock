@@ -905,8 +905,11 @@ test = [
     { name = "pytest" },
 ]
 typing = [
+    { name = "jupyter-kernel-test" },
     { name = "mypy" },
+    { name = "nbconvert" },
     { name = "pip" },
+    { name = "pytest" },
 ]
 
 [package.metadata]
@@ -927,8 +930,11 @@ test = [
     { name = "pytest" },
 ]
 typing = [
+    { name = "jupyter-kernel-test" },
     { name = "mypy", specifier = ">=1.0" },
+    { name = "nbconvert" },
     { name = "pip" },
+    { name = "pytest" },
 ]
 
 [[package]]
