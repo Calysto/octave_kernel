@@ -1,0 +1,44 @@
+name: Install Octave
+description: Installs Octave for the given platform type.
+
+inputs:
+  install-type:
+    description: 'Platform install type: ubuntu, macos, windows, or ubuntu-flatpak'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install octave (ubuntu)
+      if: inputs.install-type == 'ubuntu'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y octave gnuplot
+
+    - name: Install octave (macos)
+      if: inputs.install-type == 'macos'
+      shell: bash
+      run: brew install octave
+
+    - name: Install octave (windows)
+      if: inputs.install-type == 'windows'
+      shell: bash
+      run: choco install octave --no-progress -y
+
+    - name: Add octave to PATH (windows)
+      if: inputs.install-type == 'windows'
+      shell: bash
+      run: |
+        octave_bin=$(find "/c/Program Files/GNU Octave" -type f -name "octave.exe" | head -1)
+        octave_bin=$(dirname "$octave_bin")
+        echo "$octave_bin" >> "$GITHUB_PATH"
+
+    - name: Install flatpak and octave via flatpak (ubuntu-flatpak)
+      if: inputs.install-type == 'ubuntu-flatpak'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y flatpak dbus-x11
+        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        sudo flatpak install -y --noninteractive flathub org.octave.Octave
