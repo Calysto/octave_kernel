@@ -26,7 +26,7 @@ runs:
       shell: bash
       run: |
         for i in 1 2 3; do
-          choco install -y --no-progress octave && break
+          choco install octave --no-progress -y && break
           echo "Attempt $i failed, retrying in 2s..."
           sleep 2
         done
