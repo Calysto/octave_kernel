@@ -30,7 +30,7 @@ runs:
           "octave-installer.exe"
         )
         Start-Process -FilePath "octave-installer.exe" -Args "/S /D=C:\Octave" -Wait
-        echo "C:\Octave\bin" >> $env:GITHUB_PATHß
+        echo "C:\Octave\bin" >> $env:GITHUB_PATH
 
     - name: Add octave to PATH (windows)
       if: inputs.install-type == 'windows'
