@@ -25,14 +25,12 @@ runs:
       if: inputs.install-type == 'windows'
       shell: pwsh
       run: |
-        Invoke-WebRequest -Uri "https://ftpmirror.gnu.org/octave/windows/octave-9.2.0-w64-mingw64.zip" -OutFile "octave.zip"
-        Expand-Archive -Path "octave.zip" -DestinationPath "C:\Octave"
-
-    - name: Add Octave to bash PATH
-      if: inputs.install-type == 'windows'
-      shell: bash
-      run: |
-        echo "C:/Octave/octave-9.2.0-w64-mingw64/bin" >> $GITHUB_PATH
+        (New-Object Net.WebClient).DownloadFile(
+          "https://ftp.gnu.org/gnu/octave/windows/octave-9.2.0-w64-installer.exe",
+          "octave-installer.exe"
+        )
+        Start-Process -FilePath "octave-installer.exe" -Args "/S /D=C:\Octave" -Wait
+        echo "C:\Octave\bin" >> $env:GITHUB_PATHß
 
     - name: Add octave to PATH (windows)
       if: inputs.install-type == 'windows'
