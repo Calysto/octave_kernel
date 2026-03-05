@@ -26,10 +26,14 @@ runs:
       shell: pwsh
       run: |
         winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
-        Write-Host "=== C:\Program Files\GNU Octave ==="
+        Write-Host "=== GNU Octave folder ==="
         Get-ChildItem "C:\Program Files\GNU Octave" -ErrorAction SilentlyContinue
-        Write-Host "=== Searching all drives for octave-cli.exe ==="
-        Get-ChildItem "C:\", "D:\" -Filter "octave-cli.exe" -Recurse -Depth 6 -ErrorAction SilentlyContinue
+        Write-Host "=== winget install location ==="
+        winget show GNU.Octave | Select-String -Pattern "install|location|path" -CaseSensitive:$false
+        Write-Host "=== checking common locations ==="
+        @("C:\Octave", "C:\Program Files\Octave", "D:\Octave", "$env:LOCALAPPDATA\Programs\GNU Octave") | ForEach-Object {
+          if (Test-Path $_) { Write-Host "FOUND: $_"; Get-ChildItem $_ }
+        }
         # echo "Octave found at: $octaveBin"
         # echo "$octaveBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         # $bashPath = $octaveBin -replace '\\', '/' -replace '^C:', '/c'
