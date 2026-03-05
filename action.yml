@@ -24,7 +24,16 @@ runs:
     - name: Install octave (windows)
       if: inputs.install-type == 'windows'
       shell: bash
-      run: choco install octave --no-progress -y
+      run: |
+        for attempt in 1 2 3; do
+          choco install octave --no-progress -y && break
+          echo "choco install failed (attempt $attempt/3), retrying in $((attempt * 15))s..."
+          sleep $((attempt * 15))
+          if [ "$attempt" -eq 3 ]; then
+            echo "All attempts failed"
+            exit 1
+          fi
+        done
 
     - name: Add octave to PATH (windows)
       if: inputs.install-type == 'windows'

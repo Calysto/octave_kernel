@@ -167,6 +167,8 @@ jobs:
       - uses: actions/checkout@v6
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
       - uses: jupyterlab/maintainer-tools/.github/actions/check-links@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+        with:
+          ignore_links: "http://nbviewer.ipython.org/*"
 
   tests_check: # This job does nothing and is only used for the branch protection
     if: always()
