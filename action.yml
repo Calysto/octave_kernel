@@ -21,24 +21,15 @@ runs:
       shell: bash
       run: brew install octave
 
-    - name: Install octave (windows)
+    - name: Install Octave (windows)
       if: inputs.install-type == 'windows'
       shell: pwsh
-      run: |
-        (New-Object Net.WebClient).DownloadFile(
-          "https://ftp.gnu.org/gnu/octave/windows/octave-9.2.0-w64-installer.exe",
-          "octave-installer.exe"
-        )
-        Start-Process -FilePath "octave-installer.exe" -Args "/S /D=C:\Octave" -Wait
-        echo "C:\Octave\bin" >> $env:GITHUB_PATH
+      run: winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
 
-    - name: Add octave to PATH (windows)
+    - name: Add Octave to bash PATH (windows)
       if: inputs.install-type == 'windows'
       shell: bash
-      run: |
-        octave_bin=$(find "/c/Program Files/GNU Octave" -type f -name "octave.exe" | head -1)
-        octave_bin=$(dirname "$octave_bin")
-        echo "$octave_bin" >> "$GITHUB_PATH"
+      run: echo "C:/Program Files/GNU Octave/Octave-10.3.0/mingw64/bin" >> $GITHUB_PATH
 
     - name: Install flatpak and octave via flatpak (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
