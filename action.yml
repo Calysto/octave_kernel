@@ -21,18 +21,17 @@ runs:
       shell: bash
       run: brew install octave
 
-    - name: Install octave (windows)
+    - name: Install Octave (windows)
       if: inputs.install-type == 'windows'
-      shell: bash
-      run: choco install octave --no-progress -y
-
-    - name: Add octave to PATH (windows)
-      if: inputs.install-type == 'windows'
-      shell: bash
+      shell: pwsh
       run: |
-        octave_bin=$(find "/c/Program Files/GNU Octave" -type f -name "octave.exe" | head -1)
-        octave_bin=$(dirname "$octave_bin")
-        echo "$octave_bin" >> "$GITHUB_PATH"
+        winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
+        $octaveRoot = Get-ChildItem "$env:LOCALAPPDATA\Programs\GNU Octave" -Directory | Select-Object -First 1 -ExpandProperty FullName
+        $octaveBin = "$octaveRoot\mingw64\bin"
+        echo "Octave bin: $octaveBin"
+        echo "$octaveBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        $bashPath = $octaveBin -replace '\\', '/' -replace '^C:', '/c'
+        echo "$bashPath" >> $env:GITHUB_PATH
 
     - name: Install flatpak and octave via flatpak (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
