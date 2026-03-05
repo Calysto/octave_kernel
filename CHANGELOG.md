@@ -2,6 +2,48 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.37.0
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.36.0...1f6f5b774b1afdf43f6a7080887dbf512f589b41))
+
+### Enhancements made
+
+- Add composite GitHub Action for Octave installation [#259](https://github.com/Calysto/octave_kernel/pull/259) ([@blink1073](https://github.com/blink1073))
+- Add typing support with mypy strict mode [#256](https://github.com/Calysto/octave_kernel/pull/256) ([@blink1073](https://github.com/blink1073))
+- Add flatpak support for Octave auto-detection [#254](https://github.com/Calysto/octave_kernel/pull/254) ([@blink1073](https://github.com/blink1073))
+- Add macOS runner to CI test matrix [#253](https://github.com/Calysto/octave_kernel/pull/253) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Clean up Windows Octave install [#264](https://github.com/Calysto/octave_kernel/pull/264) ([@blink1073](https://github.com/blink1073), [@claude](https://github.com/claude))
+- Adopt zizmor for GitHub Actions static analysis [#263](https://github.com/Calysto/octave_kernel/pull/263) ([@blink1073](https://github.com/blink1073))
+- Extend ruff linting and fix all violations [#262](https://github.com/Calysto/octave_kernel/pull/262) ([@blink1073](https://github.com/blink1073))
+- Add a step to the GitHub Action to verify octave install [#261](https://github.com/Calysto/octave_kernel/pull/261) ([@blink1073](https://github.com/blink1073))
+- Add unit tests for OctaveEngine, OctaveKernel, and check module [#260](https://github.com/Calysto/octave_kernel/pull/260) ([@blink1073](https://github.com/blink1073))
+- Add Windows CI test job [#258](https://github.com/Calysto/octave_kernel/pull/258) ([@blink1073](https://github.com/blink1073))
+- Move test dependencies to dependency-groups [#257](https://github.com/Calysto/octave_kernel/pull/257) ([@blink1073](https://github.com/blink1073))
+- Add tests_check job for branch protection [#255](https://github.com/Calysto/octave_kernel/pull/255) ([@blink1073](https://github.com/blink1073), [@claude](https://github.com/claude))
+- Bump the actions group with 3 updates [#252](https://github.com/Calysto/octave_kernel/pull/252) ([@blink1073](https://github.com/blink1073))
+- Add dependabot config [#251](https://github.com/Calysto/octave_kernel/pull/251) ([@blink1073](https://github.com/blink1073))
+- Add pre-commit hooks and apply code quality fixes [#250](https://github.com/Calysto/octave_kernel/pull/250) ([@blink1073](https://github.com/blink1073))
+- Replace Makefile with justfile and migrate to uv [#249](https://github.com/Calysto/octave_kernel/pull/249) ([@blink1073](https://github.com/blink1073))
+- Add CodeQL analysis workflow configuration [#248](https://github.com/Calysto/octave_kernel/pull/248) ([@blink1073](https://github.com/blink1073))
+- Fix CI install of octave [#247](https://github.com/Calysto/octave_kernel/pull/247) ([@blink1073](https://github.com/blink1073))
+- Update ci again [#246](https://github.com/Calysto/octave_kernel/pull/246) ([@blink1073](https://github.com/blink1073))
+- Fix octave install in CI and update supported Python versions [#245](https://github.com/Calysto/octave_kernel/pull/245) ([@blink1073](https://github.com/blink1073))
+- Update supported pythons [#243](https://github.com/Calysto/octave_kernel/pull/243) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2024-04-15&to=2026-03-05&type=c))
+
+@blink1073 ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2024-04-15..2026-03-05&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Aclaude+updated%3A2024-04-15..2026-03-05&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.36.0
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.35.1...79d09bfd8f9e6ef05516a2263453f257e15e90be))
@@ -24,8 +66,6 @@
 ([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2022-11-29&to=2024-04-15&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2022-11-29..2024-04-15&type=Issues) | [@goyalyashpal](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Agoyalyashpal+updated%3A2022-11-29..2024-04-15&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.35.1
 
