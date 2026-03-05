@@ -23,7 +23,7 @@ runs:
 
     - name: Install octave (windows)
       if: inputs.install-type == 'windows'
-      shell: bash
+      shell: pwsh
       run: |
         Invoke-WebRequest -Uri "https://ftpmirror.gnu.org/octave/windows/octave-9.2.0-w64-mingw64.zip" -OutFile "octave.zip"
         Expand-Archive -Path "octave.zip" -DestinationPath "C:\Octave"
