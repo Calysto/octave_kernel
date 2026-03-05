@@ -32,15 +32,15 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
     - name: Install uv
-      uses: astral-sh/setup-uv@v4
+      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
     - name: Install octave
       uses: ./
       with:
         install-type: ubuntu
     - name: Install just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3
     - name: Install dependencies
       run: |
         just install
@@ -58,11 +58,11 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
     - name: Install uv
-      uses: astral-sh/setup-uv@v4
+      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
     - name: Install just
-      uses: extractions/setup-just@v2
+      uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
     - name: Install octave
       uses: ./
       with:
@@ -77,11 +77,11 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
     - name: Install uv
-      uses: astral-sh/setup-uv@v4
+      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
     - name: Install just
-      uses: extractions/setup-just@v2
+      uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
     - name: Install octave
       uses: ./
       with:
@@ -96,11 +96,11 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
     - name: Install uv
-      uses: astral-sh/setup-uv@v4
+      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
     - name: Install just
-      uses: extractions/setup-just@v2
+      uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
     - name: Install octave
       uses: ./
       with:
@@ -118,9 +118,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - uses: extractions/setup-just@v3
-      - uses: jupyterlab/maintainer-tools/.github/actions/make-sdist@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+      - uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3
+      - uses: jupyterlab/maintainer-tools/.github/actions/make-sdist@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
 
   test_sdist:
     runs-on: ubuntu-latest
@@ -128,8 +128,8 @@ jobs:
     name: Install from SDist and Test
     timeout-minutes: 20
     steps:
-      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - uses: jupyterlab/maintainer-tools/.github/actions/test-sdist@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/test-sdist@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
         with:
           test_command: "jupyter kernelspec list | grep octave"
 
@@ -137,11 +137,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
       - name: Install just
-        uses: extractions/setup-just@v3
+        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3
       - name: Run pre-commit
         run: just pre-commit
       - name: Run typing check
@@ -153,11 +153,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Base Setup
-        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
       - name: Check Release
-        uses: jupyter-server/jupyter_releaser/.github/actions/check-release@v2
+        uses: jupyter-server/jupyter_releaser/.github/actions/check-release@3e74486d1011d24cd5e9977202fd349dece0db9c # v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -165,8 +165,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - uses: jupyterlab/maintainer-tools/.github/actions/check-links@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/check-links@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
 
   tests_check: # This job does nothing and is only used for the branch protection
     if: always()
@@ -183,6 +183,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed
-        uses: re-actors/alls-green@release/v1
+        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # release/v1
         with:
           jobs: ${{ toJSON(needs) }}

@@ -8,4 +8,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: enforce-triage-label
-        uses: jupyterlab/maintainer-tools/.github/actions/enforce-label@v1
+        uses: jupyterlab/maintainer-tools/.github/actions/enforce-label@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
