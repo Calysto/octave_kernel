@@ -25,11 +25,14 @@ runs:
       if: inputs.install-type == 'windows'
       shell: bash
       run: |
-        for i in 1 2 3; do
-          choco install octave --no-progress -y --version 8.3.0 && break
-          echo "Attempt $i failed, retrying in 2s..."
-          sleep 2
-        done
+        Invoke-WebRequest -Uri "https://ftpmirror.gnu.org/octave/windows/octave-9.2.0-w64-mingw64.zip" -OutFile "octave.zip"
+        Expand-Archive -Path "octave.zip" -DestinationPath "C:\Octave"
+
+    - name: Add Octave to bash PATH
+      if: inputs.install-type == 'windows'
+      shell: bash
+      run: |
+        echo "C:/Octave/octave-9.2.0-w64-mingw64/bin" >> $GITHUB_PATH
 
     - name: Add octave to PATH (windows)
       if: inputs.install-type == 'windows'
