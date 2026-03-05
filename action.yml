@@ -24,12 +24,15 @@ runs:
     - name: Install Octave (windows)
       if: inputs.install-type == 'windows'
       shell: pwsh
-      run: winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
-
-    - name: Add Octave to bash PATH (windows)
-      if: inputs.install-type == 'windows'
-      shell: bash
-      run: echo "C:/Program Files/GNU Octave/Octave-10.3.0/mingw64/bin" >> $GITHUB_PATH
+      run: |
+        winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
+        $octaveBin = Get-ChildItem "C:\Program Files\GNU Octave" -Recurse -Filter "octave-cli.exe" | Select-Object -First 1 -ExpandProperty DirectoryName
+        echo "Octave found at: $octaveBin"
+        echo "$octaveBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        # Also add for bash
+        $bashPath = $octaveBin -replace '\\', '/'
+        $bashPath = $bashPath -replace 'C:', '/c'
+        echo "$bashPath" >> $env:GITHUB_PATH
 
     - name: Install flatpak and octave via flatpak (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
