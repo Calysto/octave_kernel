@@ -26,11 +26,14 @@ runs:
       shell: pwsh
       run: |
         winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
-        $octaveBin = Get-ChildItem "C:\Program Files\GNU Octave" -Depth 4 -Filter "octave-cli.exe" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty DirectoryName
-        echo "Octave found at: $octaveBin"
-        echo "$octaveBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        $bashPath = $octaveBin -replace '\\', '/' -replace '^C:', '/c'
-        echo "$bashPath" >> $env:GITHUB_PATH
+        Write-Host "=== C:\Program Files\GNU Octave ==="
+        Get-ChildItem "C:\Program Files\GNU Octave" -ErrorAction SilentlyContinue
+        Write-Host "=== Searching all drives for octave-cli.exe ==="
+        Get-ChildItem "C:\", "D:\" -Filter "octave-cli.exe" -Recurse -Depth 6 -ErrorAction SilentlyContinue
+        # echo "Octave found at: $octaveBin"
+        # echo "$octaveBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        # $bashPath = $octaveBin -replace '\\', '/' -replace '^C:', '/c'
+        # echo "$bashPath" >> $env:GITHUB_PATH
 
     - name: Install flatpak and octave via flatpak (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
