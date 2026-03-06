@@ -53,8 +53,17 @@ jobs:
          xvfb-run --auto-servernum just test-notebook
          uv run python -m octave_kernel install --user
 
-  test-macos:
-    runs-on: "macos-latest"
+  test-other-systems:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+        include:
+          - os: macos-latest
+            install-type: macos
+          - os: windows-latest
+            install-type: windows
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
@@ -66,14 +75,18 @@ jobs:
     - name: Install octave
       uses: ./
       with:
-        install-type: macos
-    - name: Run unit tests on macos
-      run: just test
-    - name: Run kernel tests on macos
-      run: just test-kernel
+        install-type: ${{ matrix.install-type }}
+    - name: Run tests
+      run: |
+        just test
+        just test-kernel
 
-  test-windows:
-    runs-on: "windows-latest"
+  test-other-ubuntu:
+    strategy:
+      matrix:
+        install-type: [ubuntu-flatpak, ubuntu-snap]
+      fail-fast: false
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
@@ -85,32 +98,13 @@ jobs:
     - name: Install octave
       uses: ./
       with:
-        install-type: windows
-    - name: Run unit tests on windows
-      run: just test
-    - name: Run kernel tests on windows
-      run: just test-kernel
-
-  test-flatpak:
-    runs-on: "ubuntu-latest"
-    steps:
-    - uses: actions/checkout@v6
-    - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-    - name: Install uv
-      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
-    - name: Install just
-      uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
-    - name: Install octave
-      uses: ./
-      with:
-        install-type: ubuntu-flatpak
+        install-type: ${{ matrix.install-type }}
     - name: Install dependencies
       run: just install
-    - name: Run tests with flatpak octave
+    - name: Run tests
       run: |
-        dbus-run-session -- xvfb-run --auto-servernum just test
-        dbus-run-session -- xvfb-run --auto-servernum just test-kernel
+        xvfb-run --auto-servernum just test
+        xvfb-run --auto-servernum just test-kernel
 
   make_sdist:
     name: Make SDist
@@ -174,9 +168,8 @@ jobs:
     if: always()
     needs:
       - test-linux
-      - test-macos
-      - test-windows
-      - test-flatpak
+      - test-other-systems
+      - test-other-ubuntu
       - make_sdist
       - test_sdist
       - static

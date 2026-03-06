@@ -3,7 +3,7 @@ description: Installs Octave for the given platform type.
 
 inputs:
   install-type:
-    description: 'Platform install type: ubuntu, macos, windows, or ubuntu-flatpak'
+    description: 'Platform install type: ubuntu, macos, windows, ubuntu-flatpak, or ubuntu-snap'
     required: true
 
 runs:
@@ -41,6 +41,12 @@ runs:
         sudo apt-get install -y flatpak dbus-x11
         sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         sudo flatpak install -y --noninteractive flathub org.octave.Octave
+
+    - name: Install octave via snap (ubuntu-snap)
+      if: inputs.install-type == 'ubuntu-snap'
+      shell: bash
+      run: |
+        sudo snap install octave --edge
 
     - name: Verify octave install
       shell: bash
