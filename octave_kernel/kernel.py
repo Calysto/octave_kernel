@@ -542,7 +542,7 @@ class OctaveEngine:
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL,
                     )
-                    executable = "flatpak run org.octave.Octave --no-gui"
+                    executable = "flatpak run org.octave.Octave"
                 except (subprocess.CalledProcessError, FileNotFoundError):
                     raise OSError("octave not found, please see README") from None
         if not executable:
