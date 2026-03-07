@@ -36,6 +36,7 @@ def kernel():
         "plot_settings": _DEFAULT_PLOT_SETTINGS.copy(),
         "cli_options": "",
         "inline_toolkit": "",
+        "executable": "",
     }
     k._trait_notifiers = {}
     k._trait_validators = {}
@@ -171,6 +172,13 @@ class TestOctaveEngineProperty:
         with patch("octave_kernel.kernel.OctaveEngine") as MockEngine:
             _ = kernel.octave_engine
         assert MockEngine.call_args.kwargs["cli_options"] == "--no-gui"
+
+    def test_new_engine_uses_executable_config(self, kernel):
+        kernel._octave_engine = None
+        kernel._trait_values["executable"] = "octave"
+        with patch("octave_kernel.kernel.OctaveEngine") as MockEngine:
+            _ = kernel.octave_engine
+        assert MockEngine.call_args.kwargs["executable"] == "octave"
 
 
 # ---------------------------------------------------------------------------
