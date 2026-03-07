@@ -543,6 +543,9 @@ class OctaveEngine:
                         stderr=subprocess.DEVNULL,
                     )
                     executable = "flatpak run org.octave.Octave"
+                    # If running in CI, use a virtual frame buffer if available.
+                    if "CI" in os.environ and which("xfvb"):
+                        executable = f"xvfb-run -a {executable}"
                 except (subprocess.CalledProcessError, FileNotFoundError):
                     raise OSError("octave not found, please see README") from None
         if not executable:
