@@ -76,6 +76,10 @@ The inline toolkit is the ``graphics_toolkit`` used to generate plots for the in
 backend.  It defaults to ``qt``.  The different backend can be used for inline
 plotting either by using this configuration or by using the plot magic and putting the backend name after ``inline:``, e.g. ``plot -b inline:fltk``.
 
+Supported Platforms
+-------------------
+The ``octave_kernel`` supports running on Linux, MacOS, or Windows.  On Linux, it supports Octave installed
+using ``apt-get``, ``flatpak``, or ``snap``.  There is no additional configuration required to use ``flatpak`` or ``snap``.
 
 Troubleshooting
 ---------------
@@ -107,37 +111,6 @@ version of python:
 
     which python  # use "where" if using cmd.exe
     which jupyter
-
-Octave-Snap (Linux)
-~~~~~~~~~~~~~~~~~~~
-You can check if you are using a snap version on Linux by checking the path to your Octave
-installation.
-
-.. code:: shell
-
-    which octave
-
-If the returned path has ``snap`` in it, then Octave is running in a container and you will need to configure the kernel appropriately.
-
-1) Set the environment variable ``OCTAVE_EXECUTABLE="octave"``
-
-.. code:: shell
-
-    echo export OCTAVE_EXECUTABLE=\"octave\" >> ~/.bashrc
-
-2) Make a directory for the temporary plot directories that the kernel uses. This *cannot* be a hidden directory.
-
-.. code:: shell
-
-    mkdir ~/octavePlots
-
-3) Set ``plot_dir`` to point to your plot directory in ``octave_kernel_config.py``.
-
-.. code:: shell
-
-    c.OctaveKernel.plot_settings = dict(plot_dir='<home>/octavePlots')
-
-where ``<home>`` is the absolute path to your home directory. Do not use ``~`` as this resolves to a different location for Octave-Snap.
 
 Qt Backend for Inline Plots
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

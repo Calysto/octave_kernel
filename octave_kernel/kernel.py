@@ -204,6 +204,7 @@ class OctaveEngine:
             logging.basicConfig()
         self.logger = logger
         self.executable = self._get_executable(executable)
+        self.tmp_dir = self._get_temp_dir()
         self.cli_options = cli_options
         self.inline_toolkit = inline_toolkit
         self.repl = self._create_repl()
@@ -331,7 +332,8 @@ class OctaveEngine:
         wid = settings["width"]
         hgt = settings["height"]
         name = settings["name"]
-        plot_dir = plot_dir or tempfile.mkdtemp(dir=settings["plot_dir"])
+        tmp_dir = settings["plot_dir"] or os.join(self.tmp_dir, "plots")
+        plot_dir = plot_dir or tempfile.mkdtemp(dir=tmp_dir)
         plot_dir = plot_dir.replace(os.path.sep, "/")
 
         # Do not overwrite any existing plot files.
@@ -521,16 +523,14 @@ class OctaveEngine:
     def _get_executable(self, executable: str = "") -> str:
         """Find the best octave executable."""
         # Attempt to get the octave executable
-        executable = executable or os.environ.get("OCTAVE_EXECUTABLE", "")
-        if executable:
-            fullpath = which(executable)
-            if fullpath and "snap" not in fullpath:
-                executable = fullpath
-            if "octave" not in executable:
+        if not executable:
+            executable = os.environ.get("OCTAVE_EXECUTABLE", "")
+            if executable and "octave" not in executable:
                 raise OSError(
                     "OCTAVE_EXECUTABLE does not point to an octave file, please see README"
                 )
-        else:
+
+        if not executable:
             executable = which("octave-cli") or ""
             if not executable:
                 executable = which("octave") or ""
@@ -547,7 +547,23 @@ class OctaveEngine:
                     raise OSError("octave not found, please see README") from None
         if not executable:
             raise OSError("octave not found, please see README")
+
         return executable.replace(os.path.sep, "/")
+
+    def _get_temp_dir(self) -> str:
+        executable = self.executable
+        base_dir = None
+        if "snap" in executable:
+            base_dir = os.path.expanduser("~/snap/octave/current/octave_kernel")
+            os.makedirs(base_dir, exist_ok=True)
+        elif "flatpak" in executable:
+            cache_dir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
+            base_dir = os.path.join(cache_dir, "oct2py")
+            os.makedirs(base_dir, exist_ok=True)
+
+        temp_dir = tempfile.mkdtemp(dir=base_dir)
+        atexit.register(shutil.rmtree, temp_dir)
+        return temp_dir
 
     def _cleanup(self) -> None:
         """Clean up resources used by the session."""
