@@ -105,6 +105,9 @@ jobs:
       run: |
         xvfb-run --auto-servernum just test
         xvfb-run --auto-servernum just test-kernel
+    - name: Test notebook
+      if: ${{ matrix.install-type != 'ubuntu-flatpak' }}
+      run: xvfb-run --auto-servernum just test-notebook
 
   make_sdist:
     name: Make SDist
