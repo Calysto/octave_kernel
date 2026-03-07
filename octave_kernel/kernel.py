@@ -531,9 +531,9 @@ class OctaveEngine:
                     "OCTAVE_EXECUTABLE does not point to an octave file, please see README"
                 )
         else:
-            executable = which("octave-cli")
+            executable = which("octave-cli") or ""
             if not executable:
-                executable = which("octave")
+                executable = which("octave") or ""
             if not executable:
                 # Try flatpak as a fallback.
                 try:
@@ -545,7 +545,7 @@ class OctaveEngine:
                     executable = "flatpak run org.octave.Octave --no-gui"
                 except (subprocess.CalledProcessError, FileNotFoundError):
                     raise OSError("octave not found, please see README") from None
-        if executable is None:
+        if not executable:
             raise OSError("octave not found, please see README")
         return executable.replace(os.path.sep, "/")
 
