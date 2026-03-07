@@ -2,6 +2,26 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.38.0
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.37.1...9feccd1dc747d1287c3fa920b95078abc45a0a9a))
+
+### Enhancements made
+
+- Improve snap support and update supported platforms [#267](https://github.com/Calysto/octave_kernel/pull/267) ([@blink1073](https://github.com/blink1073))
+- Document qt backend and expose executable as configurable trait [#266](https://github.com/Calysto/octave_kernel/pull/266) ([@blink1073](https://github.com/blink1073), [@claude](https://github.com/claude))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2026-03-06&to=2026-03-07&type=c))
+
+@blink1073 ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2026-03-06..2026-03-07&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Aclaude+updated%3A2026-03-06..2026-03-07&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.37.1
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.37.0...03f3ecbf733f7850bc6b9d03a37721ad965abb09))
@@ -18,8 +38,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2026-03-05&to=2026-03-06&type=c))
 
 @blink1073 ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2026-03-05..2026-03-06&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Aclaude+updated%3A2026-03-05..2026-03-06&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.37.0
 
