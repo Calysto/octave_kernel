@@ -70,6 +70,7 @@ class OctaveKernel(ProcessMetaKernel):
     kernel_json = Dict(get_kernel_json()).tag(config=True)
     cli_options = Unicode("").tag(config=True)
     inline_toolkit = Unicode("").tag(config=True)
+    executable = Unicode("").tag(config=True)
 
     _octave_engine: OctaveEngine | None = None
     _language_version: str | None = None
@@ -110,6 +111,7 @@ class OctaveKernel(ProcessMetaKernel):
             cli_options=self.cli_options,
             inline_toolkit=self.inline_toolkit,
             logger=self.log,
+            executable=self.executable,
         )
         return self._octave_engine
 
@@ -194,13 +196,14 @@ class OctaveEngine:
         inline_toolkit: str | None = None,
         defer_startup: bool = False,
         cli_options: str = "",
+        executable: str = "",
         logger: Any = None,
     ) -> None:
         if not logger:
             logger = logging.getLogger(__name__)
             logging.basicConfig()
         self.logger = logger
-        self.executable = self._get_executable()
+        self.executable = self._get_executable(executable)
         self.cli_options = cli_options
         self.inline_toolkit = inline_toolkit
         self.repl = self._create_repl()
@@ -515,10 +518,10 @@ class OctaveEngine:
                         self.stream_handler(line)
         return "\n".join(lines)
 
-    def _get_executable(self) -> str:
+    def _get_executable(self, executable: str = "") -> str:
         """Find the best octave executable."""
         # Attempt to get the octave executable
-        executable: str | None = os.environ.get("OCTAVE_EXECUTABLE", None)
+        executable = executable or os.environ.get("OCTAVE_EXECUTABLE", "")
         if executable:
             fullpath = which(executable)
             if fullpath and "snap" not in fullpath:

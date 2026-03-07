@@ -14,8 +14,6 @@ To install using pip::
 
     pip install octave_kernel
 
-Add ``--user`` to install in the user-level environment instead of the system environment.
-
 To install using conda::
 
     conda config --add channels conda-forge
@@ -110,13 +108,6 @@ version of python:
     which python  # use "where" if using cmd.exe
     which jupyter
 
-
-Gnuplot Error
-~~~~~~~~~~~~~
-An error that starts with ``gnuplot> set terminal aqua enhanced title`` can be fixed by
-adding ``setenv("GNUTERM","qt");`` to ``~/.octaverc`` on MacOS or by installing
-``gunplot-x11`` and using ``setenv("GNUTERM", "X11")``.
-
 Octave-Snap (Linux)
 ~~~~~~~~~~~~~~~~~~~
 You can check if you are using a snap version on Linux by checking the path to your Octave
@@ -147,6 +138,38 @@ If the returned path has ``snap`` in it, then Octave is running in a container a
     c.OctaveKernel.plot_settings = dict(plot_dir='<home>/octavePlots')
 
 where ``<home>`` is the absolute path to your home directory. Do not use ``~`` as this resolves to a different location for Octave-Snap.
+
+Qt Backend for Inline Plots
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On newer versions of Octave, the ``qt`` graphics toolkit is only available when running with a
+display enabled.  By default, this kernel launches ``octave-cli``, which supports only ``gnuplot``
+(or ``fltk`` in some cases) and has limited inline plotting support.
+
+To use the ``qt`` backend for inline plots, you must run the full ``octave`` executable instead.
+Set the ``OCTAVE_EXECUTABLE`` environment variable (assuming ``octave`` is on the PATH, otherwise use
+the full path to the executable):
+
+.. code:: shell
+
+    export OCTAVE_EXECUTABLE=octave
+
+Or configure it permanently in ``~/.jupyter/octave_kernel_config.py``:
+
+.. code:: python
+
+    c.OctaveKernel.executable = "octave"
+
+On a remote system without a display, you can use ``xvfb-run`` to provide a virtual framebuffer:
+
+.. code:: shell
+
+    export OCTAVE_EXECUTABLE="xvfb-run octave"
+
+Or in the config file:
+
+.. code:: python
+
+    c.OctaveKernel.executable = "xvfb-run octave"
 
 
 Blank Plot
