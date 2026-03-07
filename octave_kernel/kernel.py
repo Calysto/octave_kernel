@@ -562,6 +562,7 @@ class OctaveEngine:
             os.makedirs(base_dir, exist_ok=True)
 
         temp_dir = tempfile.mkdtemp(dir=base_dir)
+        os.mkdir(os.path.join(temp_dir, "plots"))
         atexit.register(shutil.rmtree, temp_dir)
         return temp_dir
 
