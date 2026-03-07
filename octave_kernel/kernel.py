@@ -332,7 +332,7 @@ class OctaveEngine:
         wid = settings["width"]
         hgt = settings["height"]
         name = settings["name"]
-        tmp_dir = settings["plot_dir"] or os.join(self.tmp_dir, "plots")
+        tmp_dir = settings["plot_dir"] or os.path.join(self.tmp_dir, "plots")
         plot_dir = plot_dir or tempfile.mkdtemp(dir=tmp_dir)
         plot_dir = plot_dir.replace(os.path.sep, "/")
 
