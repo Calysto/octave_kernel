@@ -553,12 +553,13 @@ class TestGetExecutable:
         )
         assert result == "/usr/bin/octave"
 
-    def test_raises_when_env_var_does_not_point_to_octave(self):
-        with pytest.raises(OSError, match="OCTAVE_EXECUTABLE"):
-            self._call(
-                env={"OCTAVE_EXECUTABLE": "/usr/bin/python"},
-                which_map={"/usr/bin/python": "/usr/bin/python"},
-            )
+    def test_uses_env_var_regardless_of_name(self):
+        # The name check was removed; any OCTAVE_EXECUTABLE value is accepted.
+        result = self._call(
+            env={"OCTAVE_EXECUTABLE": "/usr/bin/python"},
+            which_map={"/usr/bin/python": "/usr/bin/python"},
+        )
+        assert result == "/usr/bin/python"
 
     def test_finds_octave_first(self):
         result = self._call(

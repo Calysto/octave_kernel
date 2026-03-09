@@ -43,7 +43,7 @@ def kernel():
     k._cross_validation_lock = False
     # Kernel state
     k._octave_engine = MagicMock()
-    k._language_version = "9.1.0"
+    k._octave_engine.version = "9.1.0"
     k.log = logging.getLogger(__name__)
     k.Error = MagicMock()  # type: ignore[method-assign]
     k.Display = MagicMock()  # type: ignore[method-assign]
@@ -58,29 +58,16 @@ def kernel():
 class TestLanguageVersion:
     """Tests for OctaveKernel.language_version."""
 
-    def test_returns_cached_value(self, kernel):
-        kernel._language_version = "9.1.0"
+    def test_delegates_to_engine_version(self, kernel):
         assert kernel.language_version == "9.1.0"
-        kernel._octave_engine.eval.assert_not_called()
 
-    def test_queries_octave_when_uncached(self, kernel):
-        kernel._language_version = None
-        kernel._octave_engine.eval.return_value = "ans = 9.1.0"
-        result = kernel.language_version
-        assert result == "9.1.0"
-        kernel._octave_engine.eval.assert_called_once_with("version", silent=True)
-
-    def test_parses_last_word_from_output(self, kernel):
-        kernel._language_version = None
-        kernel._octave_engine.eval.return_value = "ans = 8.4.0"
+    def test_reflects_engine_version_value(self, kernel):
+        kernel._octave_engine.version = "8.4.0"
         assert kernel.language_version == "8.4.0"
 
-    def test_caches_result_after_first_query(self, kernel):
-        kernel._language_version = None
-        kernel._octave_engine.eval.return_value = "9.1.0"
+    def test_does_not_call_eval(self, kernel):
         _ = kernel.language_version
-        _ = kernel.language_version
-        kernel._octave_engine.eval.assert_called_once()
+        kernel._octave_engine.eval.assert_not_called()
 
 
 # ---------------------------------------------------------------------------
