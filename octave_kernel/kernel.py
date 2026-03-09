@@ -534,7 +534,7 @@ class OctaveEngine:
         return executable
 
     def _validate_executable(self, executable: str) -> str:
-        cmd = shlex.split(f"{executable} -e 'disp(version)'")
+        cmd = shlex.split(f"{executable} --eval 'disp(version)'")
         try:
             return subprocess.check_output(cmd, text=True).strip()
         except subprocess.CalledProcessError as e:
