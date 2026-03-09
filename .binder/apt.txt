@@ -1,2 +1,3 @@
 libglu1
 xvfb
+octave
