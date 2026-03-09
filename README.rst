@@ -131,6 +131,30 @@ Or in the config file:
     c.OctaveKernel.executable = "xvfb-run octave"
 
 
+JupyterHub with Qt Support
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+To enable Octave's Qt graphics toolkit in a JupyterHub environment (or any headless server), you need a virtual display.  Install the required system packages:
+
+.. code:: shell
+
+    apt-get install -y octave libglu1 xvfb texinfo fonts-freefont-otf ghostscript
+
+Start ``Xvfb`` before launching JupyterHub (or in a server startup script):
+
+.. code:: shell
+
+    Xvfb :99 -screen 0 1024x768x24 &
+    export DISPLAY=:99
+
+Then configure the kernel to use the Qt backend:
+
+.. code:: python
+
+    # ~/.jupyter/octave_kernel_config.py
+    c.OctaveKernel.plot_settings = dict(backend="qt")
+
+For `Binder <https://mybinder.org>`_-based deployments, place a ``start`` script in the ``binder/`` directory to launch ``Xvfb`` and export ``DISPLAY`` before the server starts, and list the required packages in ``binder/apt.txt``.
+
 Blank Plot
 ~~~~~~~~~~
 Specify a different format using the ``%plot -f <backend>`` magic or using a configuration setting.
