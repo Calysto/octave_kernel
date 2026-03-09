@@ -257,8 +257,9 @@ class OctaveEngine:
 
         cmds = []
 
-        if settings["backend"] == "inline" and self.inline_toolkit:
-            cmds.append(f"graphics_toolkit('{self.inline_toolkit}')")
+        if settings["backend"] == "inline":
+            if self.inline_toolkit:
+                cmds.append(f"graphics_toolkit('{self.inline_toolkit}')")
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
         elif settings["backend"].startswith("inline:"):
             backend = settings["backend"].replace("inline:", "")

@@ -1,11 +1,5 @@
-name: octave-kernel
+name: octave-kernel-environment
 channels:
-- conda-forge
+  - conda-forge
 dependencies:
-- gnuplot
-- jupyterlab=2
-- nodejs
-- octave
-- octave_kernel
-- texinfo
-
+  - python=3.11

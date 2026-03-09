@@ -1,0 +1,18 @@
+#!/bin/bash
+# Start Xvfb as a background process and export DISPLAY
+Xvfb :99 -screen 0 1024x768x24 &
+
+# Wait until Xvfb is ready before proceeding
+for i in $(seq 1 10); do
+    if xdpyinfo -display :99 >/dev/null 2>&1; then
+        echo "Xvfb is ready on display :99"
+        break
+    fi
+    echo "Waiting for Xvfb... ($i)"
+    sleep 1
+done
+
+export DISPLAY=:99
+
+# This line is required by binder.
+exec "$@"

@@ -1,1 +1,6 @@
 libglu1
+xvfb
+octave
+texinfo
+fonts-freefont-otf
+ghostscript
