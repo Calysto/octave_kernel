@@ -2,6 +2,32 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.39.0
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.38.0...42ddad5cafa20b0ec91251fd58591ccdd3d2a884))
+
+### Enhancements made
+
+- Validate Octave executable on engine init and clean up diagnostics [#273](https://github.com/Calysto/octave_kernel/pull/273) ([@blink1073](https://github.com/blink1073))
+- Add Binder support with Qt/Xvfb and document JupyterHub setup [#271](https://github.com/Calysto/octave_kernel/pull/271) ([@blink1073](https://github.com/blink1073))
+- Change default executable to octave and always pass --no-gui [#270](https://github.com/Calysto/octave_kernel/pull/270) ([@blink1073](https://github.com/blink1073))
+- Start Xvfb globally in action instead of per-command [#269](https://github.com/Calysto/octave_kernel/pull/269) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Test Python 3.10 on ubuntu-22.04 in test-linux matrix [#272](https://github.com/Calysto/octave_kernel/pull/272) ([@blink1073](https://github.com/blink1073), [@claude](https://github.com/claude))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2026-03-07&to=2026-03-09&type=c))
+
+@blink1073 ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2026-03-07..2026-03-09&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Aclaude+updated%3A2026-03-07..2026-03-09&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.38.0
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.37.1...9feccd1dc747d1287c3fa920b95078abc45a0a9a))
@@ -19,8 +45,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2026-03-06&to=2026-03-07&type=c))
 
 @blink1073 ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2026-03-06..2026-03-07&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Aclaude+updated%3A2026-03-06..2026-03-07&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.37.1
 
