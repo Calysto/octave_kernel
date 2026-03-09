@@ -29,7 +29,33 @@ runs:
       shell: pwsh
       run: |
         $ErrorActionPreference = "Stop"
-        winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
+        $maxRetries = 3
+        $retryDelay = 5
+        $attempt = 0
+        $success = $false
+
+        while ($attempt -lt $maxRetries -and -not $success) {
+            $attempt++
+            Write-Host "Attempt $attempt of $maxRetries: Installing GNU Octave..."
+
+            winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
+
+            if ($LASTEXITCODE -eq 0) {
+                $success = $true
+                Write-Host "Installation succeeded on attempt $attempt."
+            } else {
+                Write-Host "Attempt $attempt failed (exit code: $LASTEXITCODE)."
+                if ($attempt -lt $maxRetries) {
+                    Write-Host "Retrying in $retryDelay seconds..."
+                    Start-Sleep -Seconds $retryDelay
+                }
+            }
+        }
+
+        if (-not $success) {
+            throw "GNU Octave installation failed after $maxRetries attempts."
+        }
+
         $octaveRoot = Get-ChildItem "$env:LOCALAPPDATA\Programs\GNU Octave" -Directory | Select-Object -First 1 -ExpandProperty FullName
         $octaveBin = "$octaveRoot\mingw64\bin"
         echo "Octave bin: $octaveBin"
