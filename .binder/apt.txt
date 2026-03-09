@@ -1,5 +1,6 @@
 libglu1
 xvfb
 octave
-gnuplot
 texinfo
+fonts-freefont-otf
+ghostscript
