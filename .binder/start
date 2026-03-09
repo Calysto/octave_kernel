@@ -13,3 +13,6 @@ for i in $(seq 1 10); do
 done
 
 export DISPLAY=:99
+
+# This line is required by binder.
+exec "$@"
