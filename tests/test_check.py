@@ -39,14 +39,14 @@ def _run_check(mock_kernel_cls=None) -> str:
 def _make_success_kernel(
     banner: str = "Octave Kernel v1.0 running GNU Octave v9.1.0",
     toolkit: str = "gnuplot",
-    eval_result: str = "ans = {gnuplot}",
+    eval_result: str = "gnuplot fltk qt",
 ):
     """Return a mock OctaveKernel class whose instance simulates success."""
     inst = MagicMock()
     inst.banner = banner
 
     def fake_eval(cmd, silent=True):
-        if cmd == "graphics_toolkit":
+        if cmd == "disp(graphics_toolkit)":
             return toolkit
         return eval_result
 
@@ -115,7 +115,7 @@ class TestSuccessOutput:
         assert "connection established" in success_out.lower()
 
     def test_prints_banner(self, success_out):
-        assert "Octave Kernel v1.0 running GNU Octave v9.1.0" in success_out
+        assert "Banner: Octave Kernel v1.0 running GNU Octave v9.1.0" in success_out
 
     def test_prints_graphics_toolkit_label(self, success_out):
         assert "Graphics toolkit:" in success_out
@@ -126,33 +126,32 @@ class TestSuccessOutput:
     def test_prints_available_toolkits_label(self, success_out):
         assert "Available toolkits:" in success_out
 
-    def test_calls_startup_on_engine(self):
+    def test_does_not_call_startup_on_engine(self):
         mock_cls, inst = _make_success_kernel()
         _run_check(mock_cls)
-        inst.octave_engine._startup.assert_called_once()
+        inst.octave_engine._startup.assert_not_called()
 
     def test_calls_eval_for_available_toolkits(self):
         mock_cls, inst = _make_success_kernel()
         _run_check(mock_cls)
         calls = [c.args[0] for c in inst.octave_engine.eval.call_args_list]
-        assert "available_graphics_toolkits" in calls
+        assert "disp(available_graphics_toolkits)" in calls
 
     def test_calls_eval_for_graphics_toolkit(self):
         mock_cls, inst = _make_success_kernel()
         _run_check(mock_cls)
         calls = [c.args[0] for c in inst.octave_engine.eval.call_args_list]
-        assert "graphics_toolkit" in calls
+        assert "disp(graphics_toolkit)" in calls
 
-    def test_eval_result_sliced_into_toolkits(self):
-        # eval returns "ans = {gnuplot}"; [8:] strips the first 8 chars.
-        mock_cls, _inst = _make_success_kernel(eval_result="12345678rest")
+    def test_eval_result_stripped_into_toolkits(self):
+        mock_cls, _inst = _make_success_kernel(eval_result="  gnuplot fltk  ")
         out = _run_check(mock_cls)
-        assert "rest" in out
+        assert "gnuplot fltk" in out
 
     def test_custom_banner_appears_in_output(self):
         mock_cls, _ = _make_success_kernel(banner="Custom Banner String")
         out = _run_check(mock_cls)
-        assert "Custom Banner String" in out
+        assert "Banner: Custom Banner String" in out
 
 
 # ---------------------------------------------------------------------------

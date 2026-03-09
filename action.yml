@@ -13,18 +13,22 @@ runs:
       if: inputs.install-type == 'ubuntu'
       shell: bash
       run: |
+        set -eu
         sudo apt-get update
         sudo apt-get install -y octave gnuplot
 
     - name: Install octave (macos)
       if: inputs.install-type == 'macos'
       shell: bash
-      run: brew install octave
+      run: |
+        set -eu
+        brew install octave
 
     - name: Install Octave (windows)
       if: inputs.install-type == 'windows'
       shell: pwsh
       run: |
+        $ErrorActionPreference = "Stop"
         winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
         $octaveRoot = Get-ChildItem "$env:LOCALAPPDATA\Programs\GNU Octave" -Directory | Select-Object -First 1 -ExpandProperty FullName
         $octaveBin = "$octaveRoot\mingw64\bin"
@@ -37,6 +41,7 @@ runs:
       if: inputs.install-type == 'ubuntu-flatpak'
       shell: bash
       run: |
+        set -eu
         sudo apt-get update
         sudo apt-get install -y flatpak dbus-x11
         sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -46,18 +51,21 @@ runs:
       if: inputs.install-type == 'ubuntu-snap'
       shell: bash
       run: |
+        set -eu
         sudo snap install octave --edge
 
     - name: Start Xvfb on linux
       shell: bash
       if: ${{ startsWith('ubuntu', inputs.install-type) }}
       run: |
+        set -eu
         Xvfb :99 -screen 0 1024x768x24 &
         echo "DISPLAY=:99" >> $GITHUB_ENV
 
     - name: Verify octave install
       shell: bash
       run: |
+        set -eu
         export EXE="octave"
         if [ "${{ inputs.install-type }}" == "ubuntu-flatpak" ]; then
           export EXE="flatpak run org.octave.Octave"

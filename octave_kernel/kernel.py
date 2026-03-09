@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -77,11 +78,7 @@ class OctaveKernel(ProcessMetaKernel):
 
     @property
     def language_version(self) -> str:
-        if self._language_version is not None:
-            return self._language_version
-        ver = self.octave_engine.eval("version", silent=True)
-        ver = self._language_version = ver.split()[-1]
-        return ver
+        return self.octave_engine.version
 
     @property
     def language_info(self) -> dict[str, Any]:  # type: ignore[override]
@@ -204,6 +201,7 @@ class OctaveEngine:
             logging.basicConfig()
         self.logger = logger
         self.executable = self._get_executable(executable)
+        self.version = self._validate_executable(self.executable)
         self.tmp_dir = self._get_temp_dir()
         self.cli_options = cli_options
         self.inline_toolkit = inline_toolkit
@@ -513,13 +511,7 @@ class OctaveEngine:
     def _get_executable(self, executable: str = "") -> str:
         """Find the best octave executable."""
         # Attempt to get the octave executable
-        if not executable:
-            executable = os.environ.get("OCTAVE_EXECUTABLE", "")
-            if executable and "octave" not in executable:
-                raise OSError(
-                    "OCTAVE_EXECUTABLE does not point to an octave file, please see README"
-                )
-
+        executable = executable or os.environ.get("OCTAVE_EXECUTABLE", "")
         if not executable:
             executable = which("octave") or ""
             if not executable:
@@ -538,7 +530,20 @@ class OctaveEngine:
         if not executable:
             raise OSError("octave not found, please see README")
 
-        return executable.replace(os.path.sep, "/")
+        executable = executable.replace(os.path.sep, "/")
+        return executable
+
+    def _validate_executable(self, executable: str) -> str:
+        cmd = shlex.split(f"{executable} -e 'disp(version)'")
+        try:
+            return subprocess.check_output(cmd, text=True).strip()
+        except subprocess.CalledProcessError as e:
+            if "OCTAVE_EXECUTABLE" in os.environ:
+                prefix = f"OCTAVE_EXECUTABLE ({executable})"
+            else:
+                prefix = f"Octave executable {executable}"
+            msg = f"{prefix} does not point to a valid octave, please see README"
+            raise OSError(msg) from e
 
     def _get_temp_dir(self) -> str:
         executable = self.executable
