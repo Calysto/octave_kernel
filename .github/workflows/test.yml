@@ -35,7 +35,7 @@ jobs:
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
     - name: Install uv
       uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
-    - name: Install octave
+    - name: Setup octave
       uses: ./
       with:
         install-type: ubuntu
@@ -48,9 +48,9 @@ jobs:
     - name: Run test on linux
       run: |
          uv run python -m octave_kernel.check
-         xvfb-run --auto-servernum just cover
-         xvfb-run --auto-servernum just test-kernel
-         xvfb-run --auto-servernum just test-notebook
+         just cover
+         just test-kernel
+         just test-notebook
          uv run python -m octave_kernel install --user
 
   test-other-systems:
@@ -72,7 +72,7 @@ jobs:
       uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
     - name: Install just
       uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
-    - name: Install octave
+    - name: Setup octave
       uses: ./
       with:
         install-type: ${{ matrix.install-type }}
@@ -95,7 +95,7 @@ jobs:
       uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
     - name: Install just
       uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
-    - name: Install octave
+    - name: Setup octave
       uses: ./
       with:
         install-type: ${{ matrix.install-type }}
@@ -103,11 +103,9 @@ jobs:
       run: just install
     - name: Run tests
       run: |
-        xvfb-run --auto-servernum just test
-        xvfb-run --auto-servernum just test-kernel
-    - name: Test notebook
-      if: ${{ matrix.install-type != 'ubuntu-flatpak' }}
-      run: xvfb-run --auto-servernum just test-notebook
+        just test
+        just test-kernel
+        just test-notebook
 
   make_sdist:
     name: Make SDist

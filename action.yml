@@ -48,11 +48,20 @@ runs:
       run: |
         sudo snap install octave --edge
 
+    - name: Start Xvfb on linux
+      shell: bash
+      if: ${{ startsWith('ubuntu', inputs.install-type) }}
+      run: |
+        Xvfb :99 -screen 0 1024x768x24 &
+        echo "DISPLAY=:99" >> $GITHUB_ENV
+
     - name: Verify octave install
       shell: bash
       run: |
         if [ "${{ inputs.install-type }}" == "ubuntu-flatpak" ]; then
           flatpak run org.octave.Octave --version
+          flatpak run org.octave.Octave -e "available_graphics_toolkits"
         else
           octave --version
+          octave -e "available_graphics_toolkits"
         fi
