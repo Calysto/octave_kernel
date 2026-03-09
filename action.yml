@@ -58,10 +58,10 @@ runs:
     - name: Verify octave install
       shell: bash
       run: |
+        export EXE="octave"
         if [ "${{ inputs.install-type }}" == "ubuntu-flatpak" ]; then
-          flatpak run org.octave.Octave --version
-          flatpak run org.octave.Octave --eval "available_graphics_toolkits"
-        else
-          octave --version
-          octave --eval "available_graphics_toolkits"
+          export EXE="flatpak run org.octave.Octave"
         fi
+        $EXE --version
+        $EXE --eval "available_graphics_toolkits"
+        $EXE --eval "graphics_toolkit"
