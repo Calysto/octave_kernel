@@ -60,8 +60,8 @@ runs:
       run: |
         if [ "${{ inputs.install-type }}" == "ubuntu-flatpak" ]; then
           flatpak run org.octave.Octave --version
-          flatpak run org.octave.Octave -e "available_graphics_toolkits"
+          flatpak run org.octave.Octave --eval "available_graphics_toolkits"
         else
           octave --version
-          octave -e "available_graphics_toolkits"
+          octave --eval "available_graphics_toolkits"
         fi
