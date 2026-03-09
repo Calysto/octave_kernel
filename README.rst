@@ -82,6 +82,63 @@ Supported Platforms
 The ``octave_kernel`` supports running on Linux, MacOS, or Windows.  On Linux, it supports Octave installed
 using ``apt-get``, ``flatpak``, or ``snap``.  There is no additional configuration required to use ``flatpak`` or ``snap``.
 
+Managing the Octave Executable
+------------------------------
+
+The kernel resolves the Octave executable in this order:
+
+1. The ``executable`` trait set in ``octave_kernel_config.py``
+2. The ``OCTAVE_EXECUTABLE`` environment variable
+3. ``octave`` on ``PATH``
+4. ``octave-cli`` on ``PATH``
+5. ``flatpak run org.octave.Octave`` (if Flatpak is installed)
+
+If none of the above resolves to a valid Octave installation, the kernel will
+fail to start with an error.
+
+**Using a custom executable path**
+
+Set the ``OCTAVE_EXECUTABLE`` environment variable before launching Jupyter:
+
+.. code:: shell
+
+    export OCTAVE_EXECUTABLE=/opt/octave-9.3/bin/octave
+    jupyter lab
+
+Or configure it persistently in ``~/.jupyter/octave_kernel_config.py``:
+
+.. code:: python
+
+    c.OctaveKernel.executable = "/opt/octave-9.3/bin/octave"
+
+**Windows**
+
+On Windows with Octave 5+, the executable lives under
+``Octave-x.x.x.x\mingw64\bin\``.  Either add that directory to ``PATH`` or
+point ``OCTAVE_EXECUTABLE`` directly at ``octave.exe``:
+
+.. code:: bat
+
+    set OCTAVE_EXECUTABLE=C:\Octave\Octave-9.3.0\mingw64\bin\octave.exe
+
+**Flatpak and Snap**
+
+Flatpak and Snap installations are detected automatically — no additional
+configuration is needed.  When a Snap installation is detected, the kernel
+uses a Snap-writable temp directory (``~/snap/octave/current/octave_kernel``)
+for figures.
+
+**Validating the executable**
+
+The kernel validates the configured executable at startup by running
+``octave --eval 'disp(version)'``.  If validation fails, the kernel reports
+which executable was tried and exits with a clear error message.  To
+diagnose the issue manually:
+
+.. code:: shell
+
+    python -m octave_kernel.check
+
 Troubleshooting
 ---------------
 
