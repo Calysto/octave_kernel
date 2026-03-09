@@ -1,3 +1,5 @@
 libglu1
 xvfb
 octave
+gnuplot
+texinfo
