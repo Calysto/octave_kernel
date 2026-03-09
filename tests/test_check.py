@@ -44,8 +44,13 @@ def _make_success_kernel(
     """Return a mock OctaveKernel class whose instance simulates success."""
     inst = MagicMock()
     inst.banner = banner
-    inst.octave_engine._default_toolkit = toolkit
-    inst.octave_engine.eval.return_value = eval_result
+
+    def fake_eval(cmd, silent=True):
+        if cmd == "graphics_toolkit":
+            return toolkit
+        return eval_result
+
+    inst.octave_engine.eval.side_effect = fake_eval
     return MagicMock(return_value=inst), inst
 
 
@@ -129,9 +134,14 @@ class TestSuccessOutput:
     def test_calls_eval_for_available_toolkits(self):
         mock_cls, inst = _make_success_kernel()
         _run_check(mock_cls)
-        inst.octave_engine.eval.assert_called_once_with(
-            "available_graphics_toolkits", silent=True
-        )
+        calls = [c.args[0] for c in inst.octave_engine.eval.call_args_list]
+        assert "available_graphics_toolkits" in calls
+
+    def test_calls_eval_for_graphics_toolkit(self):
+        mock_cls, inst = _make_success_kernel()
+        _run_check(mock_cls)
+        calls = [c.args[0] for c in inst.octave_engine.eval.call_args_list]
+        assert "graphics_toolkit" in calls
 
     def test_eval_result_sliced_into_toolkits(self):
         # eval returns "ans = {gnuplot}"; [8:] strips the first 8 chars.
