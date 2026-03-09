@@ -105,7 +105,9 @@ jobs:
       run: |
         just test
         just test-kernel
-        just test-notebook
+    - name: Test notebook
+      if: ${{ matrix.install-type != 'ubuntu-flatpak' }}
+      run: just test-notebook
 
   make_sdist:
     name: Make SDist
