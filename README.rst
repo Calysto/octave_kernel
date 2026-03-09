@@ -73,8 +73,9 @@ init file is explicitly called after the kernel has set ``more off`` to prevent
 a lockup when the pager is invoked in ``~/.octaverc``.
 
 The inline toolkit is the ``graphics_toolkit`` used to generate plots for the inline
-backend.  It defaults to ``qt``.  The different backend can be used for inline
-plotting either by using this configuration or by using the plot magic and putting the backend name after ``inline:``, e.g. ``plot -b inline:fltk``.
+backend.  It will default to whatever backend ``octave`` defaults to.
+The different backend can be used for inline plotting either by using this configuration
+or by using the plot magic and putting the backend name after ``inline:``, e.g. ``plot -b inline:fltk``.
 
 Supported Platforms
 -------------------
@@ -112,27 +113,12 @@ version of python:
     which python  # use "where" if using cmd.exe
     which jupyter
 
-Qt Backend for Inline Plots
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-On newer versions of Octave, the ``qt`` graphics toolkit is only available when running with a
-display enabled.  By default, this kernel launches ``octave-cli``, which supports only ``gnuplot``
-(or ``fltk`` in some cases) and has limited inline plotting support.
+Qt Backend Availability
+~~~~~~~~~~~~~~~~~~~~~~~
+In some cases, the ``qt`` graphics toolkit is only available when running with a
+display enabled.
 
-To use the ``qt`` backend for inline plots, you must run the full ``octave`` executable instead.
-Set the ``OCTAVE_EXECUTABLE`` environment variable (assuming ``octave`` is on the PATH, otherwise use
-the full path to the executable):
-
-.. code:: shell
-
-    export OCTAVE_EXECUTABLE=octave
-
-Or configure it permanently in ``~/.jupyter/octave_kernel_config.py``:
-
-.. code:: python
-
-    c.OctaveKernel.executable = "octave"
-
-On a remote system without a display, you can use ``xvfb-run`` to provide a virtual framebuffer:
+On a remote system without a display, you can use ``xvfb-run`` to provide a virtual framebuffer.  For example:
 
 .. code:: shell
 
