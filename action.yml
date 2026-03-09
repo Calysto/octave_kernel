@@ -13,19 +13,48 @@ runs:
       if: inputs.install-type == 'ubuntu'
       shell: bash
       run: |
+        set -eu
         sudo apt-get update
         sudo apt-get install -y octave gnuplot
 
     - name: Install octave (macos)
       if: inputs.install-type == 'macos'
       shell: bash
-      run: brew install octave
+      run: |
+        set -eu
+        brew install octave
 
     - name: Install Octave (windows)
       if: inputs.install-type == 'windows'
       shell: pwsh
       run: |
-        winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
+        $maxRetries = 3
+        $retryDelay = 10
+        $attempt = 0
+        $success = $false
+
+        while ($attempt -lt $maxRetries -and -not $success) {
+            $attempt++
+            Write-Host "Attempt ${attempt} of ${maxRetries}: Installing GNU Octave..."
+
+            winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
+
+            if ($LASTEXITCODE -eq 0) {
+                $success = $true
+                Write-Host "Installation succeeded on attempt ${attempt}."
+            } else {
+                Write-Host "Attempt ${attempt} failed (exit code: ${LASTEXITCODE})."
+                if ($attempt -lt $maxRetries) {
+                    Write-Host "Retrying in ${retryDelay} seconds..."
+                    Start-Sleep -Seconds $retryDelay
+                }
+            }
+        }
+
+        if (-not $success) {
+            throw "GNU Octave installation failed after ${maxRetries} attempts."
+        }
+
         $octaveRoot = Get-ChildItem "$env:LOCALAPPDATA\Programs\GNU Octave" -Directory | Select-Object -First 1 -ExpandProperty FullName
         $octaveBin = "$octaveRoot\mingw64\bin"
         echo "Octave bin: $octaveBin"
@@ -37,6 +66,7 @@ runs:
       if: inputs.install-type == 'ubuntu-flatpak'
       shell: bash
       run: |
+        set -eu
         sudo apt-get update
         sudo apt-get install -y flatpak dbus-x11
         sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -46,18 +76,21 @@ runs:
       if: inputs.install-type == 'ubuntu-snap'
       shell: bash
       run: |
+        set -eu
         sudo snap install octave --edge
 
     - name: Start Xvfb on linux
       shell: bash
       if: ${{ startsWith('ubuntu', inputs.install-type) }}
       run: |
+        set -eu
         Xvfb :99 -screen 0 1024x768x24 &
         echo "DISPLAY=:99" >> $GITHUB_ENV
 
     - name: Verify octave install
       shell: bash
       run: |
+        set -eu
         export EXE="octave"
         if [ "${{ inputs.install-type }}" == "ubuntu-flatpak" ]; then
           export EXE="flatpak run org.octave.Octave"

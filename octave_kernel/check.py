@@ -16,11 +16,10 @@ if __name__ == "__main__":
     try:
         o = OctaveKernel()
         print("Octave connection established")
-        print(o.banner)
+        print(f"Banner: {o.banner}")
         e = o.octave_engine
-        e._startup()
-        toolkits = e.eval("available_graphics_toolkits", silent=True)[8:]
-        toolkit = e.eval("graphics_toolkit", silent=True).strip()
+        toolkits = e.eval("disp(available_graphics_toolkits)", silent=True).strip()
+        toolkit = e.eval("disp(graphics_toolkit)", silent=True).strip()
         print(f"Graphics toolkit: {toolkit}")
         print(f"Available toolkits: {toolkits}")
     except Exception as e:
