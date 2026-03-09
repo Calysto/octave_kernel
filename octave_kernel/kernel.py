@@ -214,7 +214,6 @@ class OctaveEngine:
         self.line_handler = line_handler
         self._has_startup = False
         self._plot_settings = plot_settings
-        self._default_toolkit: str = ""
         if not defer_startup:
             self._startup()
         atexit.register(self._cleanup)
@@ -226,9 +225,9 @@ class OctaveEngine:
     @plot_settings.setter
     def plot_settings(self, settings: dict[str, Any] | None) -> None:
         if not self._has_startup:
-            self._default_toolkit = self.eval("graphics_toolkit", silent=True).split()[
-                -1
-            ]
+            # This will set plot_settings again.
+            self._startup()
+            return
 
         settings = settings or dict(backend="inline")
         self._plot_settings = settings
@@ -258,10 +257,8 @@ class OctaveEngine:
 
         cmds = []
 
-        default_inline_toolkit = self.inline_toolkit or self._default_toolkit
-
-        if settings["backend"] == "inline":
-            cmds.append(f"graphics_toolkit('{default_inline_toolkit}')")
+        if settings["backend"] == "inline" and self.inline_toolkit:
+            cmds.append(f"graphics_toolkit('{self.inline_toolkit}')")
             cmds.append("set(0, 'defaultfigurevisible', 'off');")
         elif settings["backend"].startswith("inline:"):
             backend = settings["backend"].replace("inline:", "")
@@ -271,8 +268,6 @@ class OctaveEngine:
             cmds.append("set(0, 'defaultfigurevisible', 'on');")
             if settings["backend"] != "default":
                 cmds.append(f"graphics_toolkit('{settings['backend']}');")
-            else:
-                cmds.append(f"graphics_toolkit('{self._default_toolkit}');")
         self.eval("\n".join(cmds))
 
     def eval(
@@ -391,7 +386,6 @@ class OctaveEngine:
         cwd = os.getcwd().replace(os.path.sep, "/")
         cmd = f'more off; source ~/.octaverc; cd("{cwd}");{self.repl.prompt_change_cmd}'
         self.eval(cmd, silent=True)
-        self._default_toolkit = self.eval("graphics_toolkit", silent=True).split()[-1]
         here = os.path.realpath(os.path.dirname(__file__)).replace(os.path.sep, "/")
         self.eval(f'addpath("{here}")')
         self.plot_settings = self._plot_settings
@@ -442,14 +436,9 @@ class OctaveEngine:
 
     def _create_repl(self) -> REPLWrapper:
         cmd = self.executable
-        if "octave" not in cmd:
-            version_cmd = [self.executable, "--version"]
-            version = subprocess.check_output(version_cmd).decode("utf-8")
-            if "version 4" in version:
-                cmd += " --no-gui"
         # Interactive mode prevents crashing on Windows on syntax errors.
         # Delay sourcing the "~/.octaverc" file in case it displays a pager.
-        cmd += " --interactive --quiet --no-init-file "
+        cmd += " --no-gui --interactive --quiet --no-init-file "
 
         # Add cli options provided by the user.
         cmd += os.environ.get("OCTAVE_CLI_OPTIONS", self.cli_options)
@@ -531,9 +520,9 @@ class OctaveEngine:
                 )
 
         if not executable:
-            executable = which("octave-cli") or ""
+            executable = which("octave") or ""
             if not executable:
-                executable = which("octave") or ""
+                executable = which("octave-cli") or ""
             if not executable:
                 # Try flatpak as a fallback.
                 try:

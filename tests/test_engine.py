@@ -346,10 +346,6 @@ class TestStartup:
         expected_cwd = os.getcwd().replace(os.path.sep, "/")
         assert expected_cwd in first_call_code
 
-    def test_sets_default_toolkit_from_graphics_toolkit(self, mock_engine):
-        self._run_startup(mock_engine)
-        assert mock_engine._default_toolkit == "gnuplot"
-
     def test_calls_addpath_with_package_directory(self, mock_engine):
         mock_eval = self._run_startup(mock_engine)
         all_code = " ".join(c[0][0] for c in mock_eval.call_args_list)
@@ -485,6 +481,9 @@ class TestCreateRepl:
                 eng._create_repl()
         return MockRepl.call_args[0][0]
 
+    def test_includes_no_gui_flag(self, mock_engine):
+        assert "--no-gui" in self._repl_cmd(mock_engine)
+
     def test_includes_interactive_flag(self, mock_engine):
         assert "--interactive" in self._repl_cmd(mock_engine)
 
@@ -561,15 +560,15 @@ class TestGetExecutable:
                 which_map={"/usr/bin/python": "/usr/bin/python"},
             )
 
-    def test_finds_octave_cli_first(self):
+    def test_finds_octave_first(self):
         result = self._call(
             which_map={"octave-cli": "/usr/bin/octave-cli", "octave": "/usr/bin/octave"}
         )
-        assert result == "/usr/bin/octave-cli"
-
-    def test_falls_back_to_octave_when_no_cli(self):
-        result = self._call(which_map={"octave": "/usr/bin/octave"})
         assert result == "/usr/bin/octave"
+
+    def test_falls_back_to_octave_cli_when_no_octave(self):
+        result = self._call(which_map={"octave-cli": "/usr/bin/octave-cli"})
+        assert result == "/usr/bin/octave-cli"
 
     def test_raises_when_nothing_found_and_no_flatpak(self):
         with pytest.raises(OSError, match="octave not found"):
@@ -585,7 +584,7 @@ class TestGetExecutable:
         assert "flatpak" in result
 
     def test_returns_forward_slashes(self):
-        result = self._call(which_map={"octave-cli": "/usr/bin/octave-cli"})
+        result = self._call(which_map={"octave": "/usr/bin/octave"})
         assert "\\" not in result
 
 
