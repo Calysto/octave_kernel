@@ -20,7 +20,8 @@ if __name__ == "__main__":
         e = o.octave_engine
         e._startup()
         toolkits = e.eval("available_graphics_toolkits", silent=True)[8:]
-        print(f"Graphics toolkit: {e._default_toolkit}")
+        toolkit = e.eval("graphics_toolkit", silent=True).strip()
+        print(f"Graphics toolkit: {toolkit}")
         print(f"Available toolkits: {toolkits}")
     except Exception as e:
         print(e)
