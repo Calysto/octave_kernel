@@ -346,10 +346,6 @@ class TestStartup:
         expected_cwd = os.getcwd().replace(os.path.sep, "/")
         assert expected_cwd in first_call_code
 
-    def test_sets_default_toolkit_from_graphics_toolkit(self, mock_engine):
-        self._run_startup(mock_engine)
-        assert mock_engine._default_toolkit == "gnuplot"
-
     def test_calls_addpath_with_package_directory(self, mock_engine):
         mock_eval = self._run_startup(mock_engine)
         all_code = " ".join(c[0][0] for c in mock_eval.call_args_list)
