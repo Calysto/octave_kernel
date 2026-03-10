@@ -7,3 +7,4 @@ octave-workspace
 *.egg-info/
 *.pyc
 jupyter-data
+site/

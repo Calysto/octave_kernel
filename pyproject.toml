@@ -28,13 +28,14 @@ dependencies = [
 dynamic = ["version"]
 
 [project.readme]
-file = "README.rst"
-content-type = "text/x-rst"
+file = "README.md"
+content-type = "text/markdown"
 
 [dependency-groups]
 test = ["pytest", "nbconvert", "jupyter_kernel_test"]
 typing = [{ include-group = "test" }, "pip", "mypy>=1.0"]
 coverage = ["pytest", "pytest-cov"]
+docs = ["mkdocs>=1.5", "mkdocs-material>=9.0", "mkdocstrings[python]>=0.24", "mkdocs-jupyter>=0.24"]
 
 # Used to call hatch_build.py
 [tool.hatch.build.hooks.custom]
@@ -47,9 +48,11 @@ artifacts = ["jupyter-data"]
 include = [
     "/jupyter-data",
     "/octave_kernel",
+    "/docs",
     "/*.md",
     "/*.ipynb",
-    "/*.py"
+    "/*.py",
+    "/mkdocs.yml",
 ]
 
 [tool.hatch.version]
