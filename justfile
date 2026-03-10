@@ -35,5 +35,8 @@ cover *args="":
 typing:
     uv run --group typing mypy . --install-types --non-interactive
 
+run-notebook:
+    uv run --with notebook jupyter notebook octave_kernel.ipynb
+
 pre-commit *args="":
     uv tool run prek --all-files {{args}}
