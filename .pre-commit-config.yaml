@@ -32,6 +32,7 @@ repos:
     hooks:
       - id: mdformat
         verbose: true
+        exclude: ^docs/index\.md$
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.24.3

@@ -19,6 +19,7 @@ plugins:
   - mkdocs-jupyter:
       include: ["*.ipynb"]
       execute: false
+      ignore_h1_titles: true
   - mkdocstrings:
       handlers:
         python:
@@ -31,9 +32,10 @@ plugins:
             show_signature_annotations: true
 
 markdown_extensions:
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      base_path: ["."]
 
 nav:
   - Home: index.md
-  - Example Notebook: notebook.ipynb
+  - Notebook Example: notebook.ipynb
   - API Reference: api.md
