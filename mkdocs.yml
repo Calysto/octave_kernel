@@ -1,0 +1,39 @@
+site_name: Octave Kernel
+site_description: A Jupyter kernel for Octave
+repo_url: https://github.com/Calysto/octave_kernel
+repo_name: Calysto/octave_kernel
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.top
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+
+plugins:
+  - search
+  - mkdocs-jupyter:
+      include: ["*.ipynb"]
+      execute: false
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_source: true
+            members_order: source
+            show_root_heading: true
+            show_category_heading: true
+            show_signature_annotations: true
+
+markdown_extensions:
+  - pymdownx.snippets
+
+nav:
+  - Home: index.md
+  - Example Notebook: notebook.ipynb
+  - API Reference: api.md

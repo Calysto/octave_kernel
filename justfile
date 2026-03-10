@@ -37,3 +37,9 @@ typing:
 
 pre-commit *args="":
     uv tool run prek --all-files {{args}}
+
+docs:
+    uv run --group docs mkdocs build
+
+docs-serve:
+    uv run --group docs mkdocs serve

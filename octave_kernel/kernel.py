@@ -61,7 +61,15 @@ def get_kernel_json() -> dict[str, Any]:
 
 
 class OctaveKernel(ProcessMetaKernel):
-    """Octave kernel for jupyter."""
+    """Jupyter kernel for GNU Octave.
+
+    Extends :class:`metakernel.ProcessMetaKernel` to provide Octave execution,
+    tab completion, inline help, and inline plot rendering.
+
+    Configuration is done via ``octave_kernel_config.py`` in the Jupyter config
+    path. Configurable traits: ``plot_settings``, ``inline_toolkit``,
+    ``kernel_json``, ``cli_options``, and ``executable``.
+    """
 
     app_name = "octave_kernel"
     implementation = "Octave Kernel"
@@ -117,7 +125,20 @@ class OctaveKernel(ProcessMetaKernel):
         return self.octave_engine.repl
 
     def do_execute_direct(self, code: str, silent: bool = False) -> Any:
-        """Execute code in octave."""
+        """Execute code in Octave and display any resulting inline figures.
+
+        Parameters
+        ----------
+        code
+            Octave source code to execute.
+        silent
+            If True, suppress output and skip figure rendering.
+
+        Returns
+        -------
+        Any
+            Result from the parent kernel's execute method.
+        """
         if code.strip() in ["quit", "quit()", "exit", "exit()"]:
             self._octave_engine = None
             self.do_shutdown(True)  # type: ignore[unused-coroutine]
@@ -140,7 +161,22 @@ class OctaveKernel(ProcessMetaKernel):
     def get_kernel_help_on(
         self, info: dict[str, Any], level: int = 0, none_on_fail: bool = False
     ) -> str | None:
-        """Get help on object from octave."""
+        """Return Octave help text for an object.
+
+        Parameters
+        ----------
+        info
+            Dict with at least a ``help_obj`` key naming the object.
+        level
+            Help detail level (reserved for API compatibility).
+        none_on_fail
+            If True, return ``None`` instead of ``""`` on failure.
+
+        Returns
+        -------
+        str or None
+            The Octave help string, or ``None``/``""`` on failure.
+        """
         obj = info.get("help_obj", "")
         if not obj or len(obj.split()) > 1:
             if none_on_fail:
@@ -150,7 +186,7 @@ class OctaveKernel(ProcessMetaKernel):
         return self.octave_engine.eval(f"help {obj}", silent=True)
 
     def Print(self, *args: str, **kwargs: Any) -> None:
-        """Print to octave."""
+        """Write output, filtering out raw stdin-prompt markers."""
         # Ignore standalone input hook displays.
         out = []
         for arg in args:
@@ -162,7 +198,18 @@ class OctaveKernel(ProcessMetaKernel):
         super().Print(*out, **kwargs)
 
     def raw_input(self, text: str) -> str:  # type: ignore[override]
-        """Receive raw input"""
+        """Read a line of user input, stripping the stdin-prompt prefix.
+
+        Parameters
+        ----------
+        text
+            Prompt text shown to the user.
+
+        Returns
+        -------
+        str
+            The user's input string.
+        """
         # Remove the stdin prompt to restore the original prompt.
         text = text.replace(STDIN_PROMPT, "")
         return super().raw_input(text)  # type: ignore[no-untyped-call, no-any-return]
@@ -181,7 +228,11 @@ class OctaveKernel(ProcessMetaKernel):
 
 
 class OctaveEngine:
-    """Interaction layer for octave."""
+    """Low-level interface to a GNU Octave subprocess.
+
+    Manages an Octave REPL subprocess via :class:`metakernel.REPLWrapper`,
+    handling startup, code evaluation, figure generation, and cleanup.
+    """
 
     def __init__(
         self,
@@ -196,6 +247,35 @@ class OctaveEngine:
         executable: str = "",
         logger: Any = None,
     ) -> None:
+        """Initialize the Octave engine.
+
+        Parameters
+        ----------
+        error_handler
+            Callback invoked with error messages or exceptions.
+        stream_handler
+            Callback invoked with streamed output text.
+        line_handler
+            Callback invoked for each output line.
+        stdin_handler
+            Callback invoked when Octave requests user input.
+        plot_settings
+            Dict controlling figure format and dimensions. Keys: ``format``,
+            ``backend``, ``width``, ``height``, ``resolution``, ``name``,
+            ``plot_dir``.
+        inline_toolkit
+            Octave graphics toolkit for inline plots (e.g. ``"gnuplot"``).
+        defer_startup
+            If True, delay startup commands until the first :meth:`eval` call.
+        cli_options
+            Extra command-line options appended to the Octave invocation.
+        executable
+            Path to the Octave executable. Resolved in order: this argument,
+            ``OCTAVE_EXECUTABLE`` env var, ``octave``/``octave-cli`` on
+            ``PATH``, then Flatpak.
+        logger
+            Logger instance; defaults to the module-level logger.
+        """
         if not logger:
             logger = logging.getLogger(__name__)
             logging.basicConfig()
@@ -272,7 +352,22 @@ class OctaveEngine:
     def eval(
         self, code: str, timeout: float | None = None, silent: bool = False
     ) -> str:
-        """Evaluate code using the engine."""
+        """Evaluate code in the Octave subprocess.
+
+        Parameters
+        ----------
+        code
+            Octave source code to run.
+        timeout
+            Seconds to wait for a response; ``None`` uses the default.
+        silent
+            If True, suppress stream and line callbacks.
+
+        Returns
+        -------
+        str
+            Text output from Octave.
+        """
         stream_handler = None if silent else self.stream_handler
         line_handler = None if silent else self.line_handler
 
