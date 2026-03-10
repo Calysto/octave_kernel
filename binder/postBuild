@@ -3,3 +3,8 @@
 set -e
 
 pip install -e .
+
+# Cleanup
+pip cache purge
+conda clean -afy
+rm -rf ~/.cache
