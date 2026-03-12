@@ -110,6 +110,17 @@ python -m octave_kernel.check
 
 ## Troubleshooting
 
+### Debugging the Kernel
+
+To see detailed Jupyter protocol messages and kernel log output, launch an interactive console session with debug logging:
+
+```shell
+pip install jupyter-console
+jupyter console --log-level=debug --kernel=octave
+```
+
+`jupyter-console` is not installed by default and must be installed separately. This is useful for diagnosing communication issues between Jupyter and the kernel.
+
 ### Kernel Times Out While Starting
 
 If the kernel does not start, run the following command from a terminal:
