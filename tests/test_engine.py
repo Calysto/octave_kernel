@@ -11,7 +11,7 @@ import pytest
 from IPython.display import SVG
 from metakernel import REPLWrapper
 
-from octave_kernel.kernel import OctaveEngine
+from octave_kernel.kernel import STDIN_PROMPT_REGEX, OctaveEngine
 
 
 @pytest.fixture(scope="module")
@@ -742,3 +742,89 @@ class TestCleanup:
         workspace = os.path.join(os.getcwd(), "octave-workspace")
         assert not os.path.exists(workspace)
         mock_engine._cleanup()  # must not raise
+
+
+# ---------------------------------------------------------------------------
+# Issue #194 — pause() called from a function shows no prompt
+# ---------------------------------------------------------------------------
+
+
+def _is_sandboxed_octave() -> bool:
+    """Return True when Octave runs inside Flatpak or Ubuntu Snap."""
+    import subprocess
+
+    from metakernel.pexpect import which
+
+    exe = which("octave") or which("octave-cli") or ""
+    if "snap" in exe:
+        return True
+    try:
+        subprocess.check_call(
+            ["flatpak", "info", "org.octave.Octave"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+
+
+_skip_if_sandboxed = pytest.mark.skipif(
+    _is_sandboxed_octave(),
+    reason="pause() stdin prompt unreliable inside Flatpak/Snap sandboxes",
+)
+
+
+class TestPauseFromFunction:
+    """Regression tests for issue #194.
+
+    When pause() is called from within a user-defined function, the stdin
+    prompt marker arrives in pexpect's buffer preceded by a newline (left
+    over after \r is consumed from prior output).  The STDIN_PROMPT_REGEX
+    must use re.DOTALL so that the leading \\n does not prevent a match.
+    """
+
+    def test_stdin_prompt_regex_matches_with_leading_newline(self):
+        """STDIN_PROMPT_REGEX must match when the buffer starts with \\n."""
+        # This is the exact pattern that causes issue #194: after pexpect
+        # processes the \r in "before pause\r\n", the buffer left behind is
+        # "\nPaused, enter any value to continue__stdin_prompt>".  Without
+        # re.DOTALL the leading \n prevents . from matching, so the regex
+        # never fires and the REPL times out.
+        buf = "\nPaused, enter any value to continue__stdin_prompt>"
+        assert STDIN_PROMPT_REGEX.search(buf) is not None
+
+    @_skip_if_sandboxed
+    def test_pause_from_function_triggers_stdin_handler(self, engine):
+        """pause() inside a function must invoke the stdin handler (issue #194)."""
+        tmpdir = tempfile.mkdtemp()
+        basename = "test_pause_from_fn_194"
+        fname = os.path.join(tmpdir, f"{basename}.m")
+        with open(fname, "w") as f:
+            f.write(
+                f"function {basename}()\n"
+                "  disp('before pause')\n"
+                "  pause()\n"
+                "  disp('after pause')\n"
+                "end\n"
+            )
+
+        stdin_calls: list[str] = []
+
+        def fake_stdin(prompt: str) -> str:
+            stdin_calls.append(prompt)
+            return ""
+
+        old_stdin = engine.stdin_handler
+        engine.stdin_handler = fake_stdin
+        try:
+            engine.eval(f"addpath('{tmpdir}')", silent=True)
+            engine.eval(f"{basename}()", timeout=15)
+        finally:
+            engine.stdin_handler = old_stdin
+            shutil.rmtree(tmpdir, True)
+
+        assert len(stdin_calls) == 1, (
+            "stdin_handler was not called — pause() from a function did not "
+            "produce a visible prompt (issue #194)"
+        )
