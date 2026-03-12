@@ -26,7 +26,7 @@ from traitlets import Dict, Unicode
 from ._version import __version__
 
 STDIN_PROMPT = "__stdin_prompt>"
-STDIN_PROMPT_REGEX = re.compile(rf"\A.+?{STDIN_PROMPT}|debug> ")
+STDIN_PROMPT_REGEX = re.compile(rf"\A.+?{STDIN_PROMPT}|debug> ", re.DOTALL)
 HELP_LINKS = [
     {
         "text": "GNU Octave",
