@@ -749,6 +749,32 @@ class TestCleanup:
 # ---------------------------------------------------------------------------
 
 
+def _is_sandboxed_octave() -> bool:
+    """Return True when Octave runs inside Flatpak or Ubuntu Snap."""
+    import subprocess
+
+    from metakernel.pexpect import which
+
+    exe = which("octave") or which("octave-cli") or ""
+    if "snap" in exe:
+        return True
+    try:
+        subprocess.check_call(
+            ["flatpak", "info", "org.octave.Octave"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+
+
+_skip_if_sandboxed = pytest.mark.skipif(
+    _is_sandboxed_octave(),
+    reason="pause() stdin prompt unreliable inside Flatpak/Snap sandboxes",
+)
+
+
 class TestPauseFromFunction:
     """Regression tests for issue #194.
 
@@ -768,6 +794,7 @@ class TestPauseFromFunction:
         buf = "\nPaused, enter any value to continue__stdin_prompt>"
         assert STDIN_PROMPT_REGEX.search(buf) is not None
 
+    @_skip_if_sandboxed
     def test_pause_from_function_triggers_stdin_handler(self, engine):
         """pause() inside a function must invoke the stdin handler (issue #194)."""
         tmpdir = tempfile.mkdtemp()
