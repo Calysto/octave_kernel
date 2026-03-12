@@ -17,15 +17,23 @@ class OctaveKernelTests(jkt.KernelTests):  # type:ignore[misc]
 
     code_hello_world = "disp('hello, world')"
 
-    # TODO
-    # code_display_data = (
-    #     [
-    #         {"code": "%plot -f png\nplot([1,2,3])", "mime": "image/png"},
-    #         {"code": "%plot -f svg\nplot([1,2,3])", "mime": "image/svg+xml"},
-    #     ]
-    #     if sys.platform == "linux"
-    #     else []
-    # )
+    code_display_data: ClassVar = [
+        {"code": "%plot -f png\nplot([1,2,3])", "mime": "image/png"},
+        {"code": "%plot -f svg\nplot([1,2,3])", "mime": "image/svg+xml"},
+    ]
+
+    complete_code_samples: ClassVar = [
+        "disp('hello')",
+        "x = 1 + 1",
+        "exit",
+    ]
+
+    incomplete_code_samples: ClassVar = [
+        "if true",
+        "for i = 1:10",
+        "while true",
+        "function y = f(x)",
+    ]
 
     completion_samples: ClassVar = [
         {
