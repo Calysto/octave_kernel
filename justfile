@@ -29,7 +29,7 @@ test-notebook:
     uv run --group test jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null
 
 cover *args="":
-    uv run --group coverage pytest --cov=octave_kernel --cov-report=term-missing --cov-fail-under=90 {{args}}
+    uv run --group coverage pytest --cov=octave_kernel --cov-report=term-missing --cov-report=xml --cov-fail-under=90 {{args}}
     uv run --with coverage coverage html
 
 typing:
