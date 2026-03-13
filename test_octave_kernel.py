@@ -1,24 +1,12 @@
 """Example use of jupyter_kernel_test, with tests for IPython."""
 
-import os
-import subprocess
 import sys
 import unittest
 from typing import ClassVar
 
 import jupyter_kernel_test as jkt
 
-
-def _is_sandboxed_octave() -> bool:
-    """Return True if Octave is running via flatpak or snap."""
-    exe = os.environ.get("OCTAVE_EXECUTABLE", "")
-    if not exe:
-        try:
-            result = subprocess.run(["which", "octave"], capture_output=True, text=True)
-            exe = result.stdout.strip()
-        except Exception:
-            pass
-    return "flatpak" in exe or "snap" in exe
+from octave_kernel._utils import is_sandboxed_octave
 
 
 class OctaveKernelTests(jkt.KernelTests):  # type:ignore[misc]
@@ -34,16 +22,10 @@ class OctaveKernelTests(jkt.KernelTests):  # type:ignore[misc]
 
     code_display_data: ClassVar = (
         []
-        if sys.platform == "win32" or _is_sandboxed_octave()
+        if sys.platform == "win32" or is_sandboxed_octave()
         else [
-            {
-                "code": "%plot -f png -b inline:gnuplot\nplot([1,2,3])",
-                "mime": "image/png",
-            },
-            {
-                "code": "%plot -f svg -b inline:gnuplot\nplot([1,2,3])",
-                "mime": "image/svg+xml",
-            },
+            {"code": "%plot -f png\nplot([1,2,3])", "mime": "image/png"},
+            {"code": "%plot -f svg\nplot([1,2,3])", "mime": "image/svg+xml"},
         ]
     )
 

@@ -20,9 +20,9 @@ from xml.dom import minidom
 
 from IPython.display import SVG, Image
 from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
-from metakernel.pexpect import which
 from traitlets import Dict, Unicode
 
+from ._utils import get_octave_executable, is_sandboxed_octave
 from ._version import __version__
 
 STDIN_PROMPT = "__stdin_prompt>"
@@ -636,28 +636,7 @@ class OctaveEngine:
 
     def _get_executable(self, executable: str = "") -> str:
         """Find the best octave executable."""
-        # Attempt to get the octave executable
-        executable = executable or os.environ.get("OCTAVE_EXECUTABLE", "")
-        if not executable:
-            executable = which("octave") or ""
-            if not executable:
-                executable = which("octave-cli") or ""
-            if not executable:
-                # Try flatpak as a fallback.
-                try:
-                    subprocess.check_call(
-                        ["flatpak", "info", "org.octave.Octave"],
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL,
-                    )
-                    executable = "flatpak run org.octave.Octave"
-                except (subprocess.CalledProcessError, FileNotFoundError):
-                    raise OSError("octave not found, please see README") from None
-        if not executable:
-            raise OSError("octave not found, please see README")
-
-        executable = executable.replace(os.path.sep, "/")
-        return executable
+        return get_octave_executable(executable)
 
     def _validate_executable(self, executable: str) -> str:
         cmd = shlex.split(f"{executable} --eval 'disp(version)'")
@@ -677,7 +656,7 @@ class OctaveEngine:
         if "snap" in executable:
             base_dir = os.path.expanduser("~/snap/octave/current/octave_kernel")
             os.makedirs(base_dir, exist_ok=True)
-        elif "flatpak" in executable:
+        elif is_sandboxed_octave(executable):
             cache_dir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
             base_dir = os.path.join(cache_dir, "oct2py")
             os.makedirs(base_dir, exist_ok=True)
