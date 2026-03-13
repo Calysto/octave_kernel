@@ -1,5 +1,6 @@
 """Example use of jupyter_kernel_test, with tests for IPython."""
 
+import queue
 import sys
 import unittest
 from typing import ClassVar
@@ -65,6 +66,22 @@ class OctaveKernelTests(jkt.KernelTests):  # type:ignore[misc]
     code_page_something = "ones?"
 
     code_inspect_sample = "ones"
+
+    def test_doc_does_not_hang(self) -> None:
+        """Test that doc command completes without hanging (issue #184)."""
+        try:
+            replies, _ = self.execute_helper("doc disp", timeout=10)
+        except queue.Empty:
+            self.fail("'doc' command timed out — kernel hung (issue #184)")
+        self.assertEqual(replies["content"]["status"], "ok")
+
+    def test_open_does_not_hang(self) -> None:
+        """Test that open command completes without hanging (issue #184)."""
+        try:
+            replies, _ = self.execute_helper("open disp", timeout=10)
+        except queue.Empty:
+            self.fail("'open' command timed out — kernel hung (issue #184)")
+        self.assertEqual(replies["content"]["status"], "ok")
 
 
 if __name__ == "__main__":
