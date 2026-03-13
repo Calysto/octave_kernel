@@ -205,15 +205,32 @@ class OctaveKernel(ProcessMetaKernel):
         Parameters
         ----------
         text
-            Prompt text shown to the user.
+            Prompt text shown to the user, as received from pexpect.  When
+            ``input()`` is called inside a loop, pexpect may bundle output
+            from the previous iteration together with the next prompt in a
+            single string.  This method extracts and streams any such
+            preceding output so it appears in the cell, then forwards only
+            the actual prompt text to the Jupyter client (issue #179).
 
         Returns
         -------
         str
             The user's input string.
         """
-        # Remove the stdin prompt to restore the original prompt.
+        # Remove the stdin prompt marker to restore the original prompt.
         text = text.replace(STDIN_PROMPT, "")
+
+        # When input() is called in a loop, pexpect may deliver output from the
+        # previous iteration concatenated before the next prompt.  Split it off,
+        # stream it so it appears in the cell output, and keep only the prompt.
+        for sep in ("\r\n", "\n", "\r"):
+            if sep in text:
+                preceding, text = text.rsplit(sep, 1)
+                preceding = preceding.rstrip("\r")
+                if preceding:
+                    self.Print(preceding)
+                break
+
         return super().raw_input(text)  # type: ignore[no-untyped-call, no-any-return]
 
     def get_completions(self, info: dict[str, Any]) -> list[str]:
