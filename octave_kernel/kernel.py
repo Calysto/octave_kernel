@@ -20,9 +20,9 @@ from xml.dom import minidom
 
 from IPython.display import SVG, Image
 from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
-from metakernel.pexpect import which
 from traitlets import Dict, Unicode
 
+from ._utils import get_octave_executable, is_sandboxed_octave
 from ._version import __version__
 
 STDIN_PROMPT = "__stdin_prompt>"
@@ -140,8 +140,10 @@ class OctaveKernel(ProcessMetaKernel):
             Result from the parent kernel's execute method.
         """
         if code.strip() in ["quit", "quit()", "exit", "exit()"]:
-            self._octave_engine = None
-            self.do_shutdown(True)  # type: ignore[unused-coroutine]
+            if self._octave_engine is not None:
+                self._octave_engine._cleanup()
+                self._octave_engine = None
+            self.payload = [{"source": "ask_exit", "keepkernel": False}]
             return None
         if not self.octave_engine._has_startup:
             self.octave_engine._startup()
@@ -221,6 +223,35 @@ class OctaveKernel(ProcessMetaKernel):
         cmd = f'completion_matches("{info["obj"]}")'
         val = self.octave_engine.eval(cmd, silent=True)
         return val.splitlines() if val else []
+
+    async def do_is_complete(self, code: str) -> dict[str, str]:
+        """Check whether the code is complete and ready to execute.
+
+        Parameters
+        ----------
+        code
+            Source code to check for completeness.
+
+        Returns
+        -------
+        dict[str, str]
+            A dict with ``status`` of ``"complete"``, ``"incomplete"``, or
+            ``"unknown"``, and optionally ``"indent"`` when incomplete.
+        """
+        openers = re.compile(
+            r"^\s*(?:if|for|while|do|parfor|function|switch|try|unwind_protect)"
+            r"(?:\s|$|\()",
+            re.MULTILINE,
+        )
+        closers = re.compile(
+            r"^\s*(?:end(?:if|for|while|function|switch|_try_catch|_unwind_protect)?|until)"
+            r"(?:\s|;|$)",
+            re.MULTILINE,
+        )
+        depth = len(openers.findall(code)) - len(closers.findall(code))
+        if depth > 0:
+            return {"status": "incomplete", "indent": "  "}
+        return {"status": "complete"}
 
     def handle_plot_settings(self) -> None:
         """Handle the current plot settings"""
@@ -605,28 +636,7 @@ class OctaveEngine:
 
     def _get_executable(self, executable: str = "") -> str:
         """Find the best octave executable."""
-        # Attempt to get the octave executable
-        executable = executable or os.environ.get("OCTAVE_EXECUTABLE", "")
-        if not executable:
-            executable = which("octave") or ""
-            if not executable:
-                executable = which("octave-cli") or ""
-            if not executable:
-                # Try flatpak as a fallback.
-                try:
-                    subprocess.check_call(
-                        ["flatpak", "info", "org.octave.Octave"],
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL,
-                    )
-                    executable = "flatpak run org.octave.Octave"
-                except (subprocess.CalledProcessError, FileNotFoundError):
-                    raise OSError("octave not found, please see README") from None
-        if not executable:
-            raise OSError("octave not found, please see README")
-
-        executable = executable.replace(os.path.sep, "/")
-        return executable
+        return get_octave_executable(executable)
 
     def _validate_executable(self, executable: str) -> str:
         cmd = shlex.split(f"{executable} --eval 'disp(version)'")
@@ -646,7 +656,7 @@ class OctaveEngine:
         if "snap" in executable:
             base_dir = os.path.expanduser("~/snap/octave/current/octave_kernel")
             os.makedirs(base_dir, exist_ok=True)
-        elif "flatpak" in executable:
+        elif is_sandboxed_octave(executable):
             cache_dir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
             base_dir = os.path.join(cache_dir, "oct2py")
             os.makedirs(base_dir, exist_ok=True)
