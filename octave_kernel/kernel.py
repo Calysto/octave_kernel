@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import uuid
+from importlib.resources import files
 from typing import Any
 from xml.dom import minidom
 
@@ -51,11 +52,12 @@ class PDF:
 
 def get_kernel_json() -> dict[str, Any]:
     """Get the kernel json for the kernel."""
-    here = os.path.dirname(__file__)
-    default_json_file = os.path.join(here, "kernel.json")
-    json_file = os.environ.get("OCTAVE_KERNEL_JSON", default_json_file)
-    with open(json_file) as fid:
-        data = json.load(fid)
+    json_file = os.environ.get("OCTAVE_KERNEL_JSON")
+    if json_file:
+        with open(json_file) as fid:
+            data = json.load(fid)
+    else:
+        data = json.loads(files("octave_kernel").joinpath("kernel.json").read_text())
     data["argv"][0] = sys.executable
     return data  # type: ignore[no-any-return]
 
