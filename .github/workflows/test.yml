@@ -171,6 +171,29 @@ jobs:
         with:
           ignore_links: "http://nbviewer.ipython.org/*"
 
+  benchmark:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - name: Base Setup
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v2
+    - name: Install uv
+      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+    - name: Install just
+      uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
+    - name: Setup octave
+      uses: ./
+      with:
+        install-type: ubuntu
+    - name: Install dependencies
+      run: just install
+    - name: Run benchmark comparison
+      run: just benchmark-compare
+
   tests_check: # This job does nothing and is only used for the branch protection
     if: always()
     needs:
@@ -182,6 +205,7 @@ jobs:
       - static
       - check_release
       - link_check
+      - benchmark
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed

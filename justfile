@@ -41,6 +41,15 @@ run-notebook:
 pre-commit *args="":
     uv tool run prek --all-files {{args}}
 
+_asv-setup:
+    uv run --group benchmark asv machine --yes
+
+benchmark *args="": _asv-setup
+    uv run --group benchmark asv run HEAD^! {{args}}
+
+benchmark-compare: _asv-setup
+    uv run --group benchmark asv continuous $(git merge-base HEAD origin/main) HEAD --split
+
 docs:
     uv run --group docs mkdocs build
 
