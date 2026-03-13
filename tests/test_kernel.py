@@ -195,10 +195,9 @@ class TestDoExecuteDirect:
         kernel.do_execute_direct("quit")
         assert kernel._octave_engine is None
 
-    def test_quit_calls_do_shutdown(self, kernel):
-        kernel.do_shutdown = MagicMock()
+    def test_quit_sets_ask_exit_payload(self, kernel):
         kernel.do_execute_direct("quit")
-        kernel.do_shutdown.assert_called_once_with(True)
+        assert kernel.payload == [{"source": "ask_exit", "keepkernel": False}]
 
     def test_quit_with_parens(self, kernel):
         kernel.do_shutdown = MagicMock()
