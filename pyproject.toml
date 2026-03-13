@@ -96,6 +96,10 @@ disallow_untyped_defs = false
 disable_error_code = ["no-untyped-def", "no-untyped-call"]
 
 [[tool.mypy.overrides]]
+module = "benchmarks.*"
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
 module = ["jupyter_kernel_test.*"]
 ignore_missing_imports = true
 
