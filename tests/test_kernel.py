@@ -411,6 +411,37 @@ class TestRawInput:
             result = kernel.raw_input("Enter: ")
         assert result == "42"
 
+    def test_strips_preceding_output_from_prompt_in_loop(self, kernel):
+        """raw_input strips preceding output when input() is called in a loop (issue #179).
+
+        When input() is used in a for-loop, pexpect may deliver output from
+        the previous iteration concatenated with the next prompt as a single
+        string.  raw_input must strip that leading output so the Jupyter client
+        sees only the intended prompt text.
+        """
+        received: list[Any] = []
+
+        def capture(self, text):
+            received.append(text)
+            return "user_input"
+
+        kernel.Print = MagicMock()
+        with patch.object(ProcessMetaKernel, "raw_input", capture):
+            kernel.raw_input("1\r\nEnter: " + STDIN_PROMPT)
+        assert received == ["Enter: "]
+
+    def test_preceding_output_is_streamed_not_lost(self, kernel):
+        """raw_input streams preceding output so it appears in the cell (issue #179)."""
+        printed: list[Any] = []
+
+        def capture_print(*args: Any, **kwargs: Any) -> None:
+            printed.extend(args)
+
+        kernel.Print = capture_print
+        with patch.object(ProcessMetaKernel, "raw_input", lambda self, t: "x"):
+            kernel.raw_input("1\r\nEnter: " + STDIN_PROMPT)
+        assert any("1" in str(s) for s in printed)
+
 
 # ---------------------------------------------------------------------------
 # get_completions

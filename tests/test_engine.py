@@ -828,3 +828,44 @@ class TestPauseFromFunction:
             "stdin_handler was not called — pause() from a function did not "
             "produce a visible prompt (issue #194)"
         )
+
+
+# ---------------------------------------------------------------------------
+# Issue #179 — input() in a for-loop only prompts on the first iteration
+# ---------------------------------------------------------------------------
+
+
+class TestInputInLoop:
+    """Regression tests for issue #179.
+
+    When ``input()`` is called inside a for-loop, the pexpect buffer may
+    deliver output from the previous iteration concatenated with the next
+    prompt as a single string.  The kernel must call stdin_handler on every
+    iteration, not just the first one.
+    """
+
+    @_skip_if_sandboxed
+    def test_input_in_loop_calls_stdin_handler_each_iteration(self, engine):
+        """input() in a for-loop must invoke stdin_handler on every iteration (issue #179)."""
+        iterations = 3
+        stdin_calls: list[str] = []
+
+        def fake_stdin(prompt: str) -> str:
+            stdin_calls.append(prompt)
+            return str(len(stdin_calls))
+
+        old_stdin = engine.stdin_handler
+        engine.stdin_handler = fake_stdin
+        try:
+            engine.eval(
+                f"for i=1:{iterations}\n  s = input('Enter: ', 's');\n  disp(s);\nend",
+                timeout=15,
+            )
+        finally:
+            engine.stdin_handler = old_stdin
+
+        assert len(stdin_calls) == iterations, (
+            f"stdin_handler was called {len(stdin_calls)} time(s), expected "
+            f"{iterations}.  input() in a for-loop did not prompt on every "
+            "iteration (issue #179)."
+        )
