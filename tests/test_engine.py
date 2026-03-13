@@ -543,7 +543,7 @@ class TestGetExecutable:
             # Remove OCTAVE_EXECUTABLE from env unless explicitly set.
             if "OCTAVE_EXECUTABLE" not in env:
                 os.environ.pop("OCTAVE_EXECUTABLE", None)
-            with patch("octave_kernel.kernel.which", side_effect=fake_which):
+            with patch("octave_kernel._utils.which", side_effect=fake_which):
                 return OctaveEngine._get_executable(MagicMock())
 
     def test_uses_octave_executable_env_var(self):
@@ -574,13 +574,13 @@ class TestGetExecutable:
     def test_raises_when_nothing_found_and_no_flatpak(self):
         with pytest.raises(OSError, match="octave not found"):
             with patch(
-                "octave_kernel.kernel.subprocess.check_call",
+                "octave_kernel._utils.subprocess.check_call",
                 side_effect=FileNotFoundError,
             ):
                 self._call(which_map={})
 
     def test_uses_flatpak_as_last_resort(self):
-        with patch("octave_kernel.kernel.subprocess.check_call", return_value=0):
+        with patch("octave_kernel._utils.subprocess.check_call", return_value=0):
             result = self._call(which_map={})
         assert "flatpak" in result
 
