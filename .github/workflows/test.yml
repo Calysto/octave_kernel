@@ -56,6 +56,14 @@ jobs:
          just test-kernel
          just test-notebook
          uv run python -m octave_kernel install --user
+    - name: Upload coverage to Codecov
+      if: always()
+      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: coverage.xml
+        flags: linux-py${{ matrix.python-version }}
+        fail_ci_if_error: false
 
   test-other-systems:
     strategy:
@@ -82,8 +90,16 @@ jobs:
         install-type: ${{ matrix.install-type }}
     - name: Run tests
       run: |
-        just test
+        uv run --group coverage pytest --cov=octave_kernel --cov-report=xml
         just test-kernel
+    - name: Upload coverage to Codecov
+      if: always()
+      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: coverage.xml
+        flags: ${{ matrix.os }}
+        fail_ci_if_error: false
 
   test-other-ubuntu:
     strategy:
@@ -107,11 +123,19 @@ jobs:
       run: just install
     - name: Run tests
       run: |
-        just test
+        uv run --group coverage pytest --cov=octave_kernel --cov-report=xml
         just test-kernel
     - name: Test notebook
       if: ${{ matrix.install-type != 'ubuntu-flatpak' }}
       run: just test-notebook
+    - name: Upload coverage to Codecov
+      if: always()
+      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: coverage.xml
+        flags: ${{ matrix.install-type }}
+        fail_ci_if_error: false
 
   make_sdist:
     name: Make SDist
