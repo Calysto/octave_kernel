@@ -10,11 +10,24 @@ from octave_kernel._utils import is_sandboxed_octave
 
 
 class OctaveKernelTests(jkt.KernelTests):  # type:ignore[misc]
+    kernel_name = "octave"
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        pass  # Kernel is started per-test in setUp instead.
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        pass  # Kernel is stopped per-test in tearDown instead.
+
     def setUp(self) -> None:
+        self.km, self.kc = jkt.start_new_kernel(kernel_name=self.kernel_name)
         # Make sure any initial output is emitted (for example toolkit warnings).
         self.execute_helper(self.code_hello_world)
 
-    kernel_name = "octave"
+    def tearDown(self) -> None:
+        self.kc.stop_channels()
+        self.km.shutdown_kernel()
 
     language_name = "octave"
 
