@@ -224,7 +224,7 @@ class OctaveKernel(ProcessMetaKernel):
         val = self.octave_engine.eval(cmd, silent=True)
         return val.splitlines() if val else []
 
-    def do_is_complete(self, code: str) -> dict[str, str]:
+    async def do_is_complete(self, code: str) -> dict[str, str]:
         """Check whether the code is complete and ready to execute.
 
         Parameters
