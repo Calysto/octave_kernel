@@ -60,6 +60,9 @@ include = [
 path = "octave_kernel/_version.py"
 validate-bump = false
 
+[tool.coverage.run]
+relative_files = true
+
 [tool.pytest]
 minversion = "9.0"
 addopts = ["-ra", "--showlocals"]
