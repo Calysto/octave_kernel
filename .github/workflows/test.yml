@@ -52,18 +52,10 @@ jobs:
     - name: Run test on linux
       run: |
          uv run python -m octave_kernel.check
-         just cover
+         just test
          just test-kernel
          just test-notebook
          uv run python -m octave_kernel install --user
-    - name: Upload coverage to Codecov
-      if: always()
-      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: coverage.xml
-        flags: linux-py${{ matrix.python-version }}
-        fail_ci_if_error: false
 
   test-other-systems:
     strategy:
@@ -90,16 +82,14 @@ jobs:
         install-type: ${{ matrix.install-type }}
     - name: Run tests
       run: |
-        uv run --group coverage pytest --cov=octave_kernel --cov-report=xml
+        just cover
         just test-kernel
-    - name: Upload coverage to Codecov
+    - name: Upload coverage artifact
       if: always()
-      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+      uses: actions/upload-artifact@v4
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: coverage.xml
-        flags: ${{ matrix.os }}
-        fail_ci_if_error: false
+        name: coverage-${{ matrix.os }}
+        path: coverage.xml
 
   test-other-ubuntu:
     strategy:
@@ -123,18 +113,54 @@ jobs:
       run: just install
     - name: Run tests
       run: |
-        uv run --group coverage pytest --cov=octave_kernel --cov-report=xml
+        just test
         just test-kernel
     - name: Test notebook
       if: ${{ matrix.install-type != 'ubuntu-flatpak' }}
       run: just test-notebook
-    - name: Upload coverage to Codecov
+
+  cover-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Base Setup
+      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+      with:
+        python-version: '3.10'
+    - name: Install uv
+      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+    - name: Setup octave
+      uses: ./
+      with:
+        install-type: ubuntu
+    - name: Install just
+      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3
+    - name: Install dependencies
+      run: just install
+    - name: Run coverage
+      run: just cover
+    - name: Upload coverage artifact
       if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-linux
+        path: coverage.xml
+
+  codecov:
+    needs: [test-other-systems, cover-linux]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: Download coverage artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: coverage-*
+        path: coverage-reports
+    - name: Upload combined coverage to Codecov
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        files: coverage.xml
-        flags: ${{ matrix.install-type }}
+        search_dir: coverage-reports
         fail_ci_if_error: false
 
   make_sdist:
@@ -224,6 +250,7 @@ jobs:
       - test-linux
       - test-other-systems
       - test-other-ubuntu
+      - cover-linux
       - make_sdist
       - test_sdist
       - static

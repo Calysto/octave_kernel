@@ -9,14 +9,6 @@ coverage:
         target: 95%
         threshold: 0%
 
-codecov:
-  notify:
-    # Wait for all 10 coverage uploads before reporting:
-    # 6 test-linux (5x ubuntu-latest + 1x ubuntu-22.04) +
-    # 2 test-other-systems (macos + windows) +
-    # 2 test-other-ubuntu (flatpak + snap)
-    after_n_builds: 10
-
 comment:
   layout: "reach,diff,flags,files"
   behavior: default
