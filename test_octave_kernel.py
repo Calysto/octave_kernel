@@ -6,6 +6,7 @@ import unittest
 from typing import ClassVar
 
 import jupyter_kernel_test as jkt
+import pytest
 
 from octave_kernel._utils import is_sandboxed_octave
 
@@ -67,6 +68,7 @@ class OctaveKernelTests(jkt.KernelTests):  # type:ignore[misc]
 
     code_inspect_sample = "ones"
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="Test does not work on windows")
     def test_doc_does_not_hang(self) -> None:
         """Test that doc command completes without hanging (issue #184)."""
         try:

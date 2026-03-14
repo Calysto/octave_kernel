@@ -11,11 +11,10 @@ coverage:
 
 codecov:
   notify:
-    # Wait for all 10 coverage uploads before reporting:
-    # 6 test-linux (5x ubuntu-latest + 1x ubuntu-22.04) +
-    # 2 test-other-systems (macos + windows) +
-    # 2 test-other-ubuntu (flatpak + snap)
-    after_n_builds: 10
+    # Wait for both coverage uploads before reporting:
+    # 1 cover-linux (ubuntu-latest, Python 3.10) +
+    # 1 test-other-systems (windows-latest)
+    after_n_builds: 2
 
 comment:
   layout: "reach,diff,flags,files"
