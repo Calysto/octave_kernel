@@ -365,6 +365,17 @@ class TestStartup:
         assert mock_engine._plot_settings is not None
         assert "backend" in mock_engine._plot_settings
 
+    def test_sources_octaverc_by_default(self, mock_engine):
+        mock_eval = self._run_startup(mock_engine)
+        first_call_code = mock_eval.call_args_list[0][0][0]
+        assert "source ~/.octaverc" in first_call_code
+
+    def test_skips_octaverc_when_load_octaverc_false(self, mock_engine):
+        mock_engine.load_octaverc = False
+        mock_eval = self._run_startup(mock_engine)
+        first_call_code = mock_eval.call_args_list[0][0][0]
+        assert "source ~/.octaverc" not in first_call_code
+
 
 # ---------------------------------------------------------------------------
 # _handle_svg
