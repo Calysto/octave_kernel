@@ -74,7 +74,6 @@ testpaths = [
 ignore-init-module=true
 ignore-init-method = true
 ignore-private=true
-ignore-semiprivate=true
 ignore-property-decorators=true
 ignore-nested-functions=true
 ignore-nested-classes=true
