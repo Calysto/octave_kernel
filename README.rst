@@ -53,8 +53,8 @@ Configuration
 -------------
 The kernel can be configured by adding an ``octave_kernel_config.py`` file to the
 ``jupyter`` config path.  The ``OctaveKernel`` class offers ``plot_settings``, ``inline_toolkit``,
-``kernel_json``, and ``cli_options`` as configurable traits.  The available plot settings are:
-'format', 'backend', 'width', 'height', 'resolution', and 'plot_dir'.
+``kernel_json``, ``cli_options``, and ``load_octaverc`` as configurable traits.  The available plot
+settings are: 'format', 'backend', 'width', 'height', 'resolution', and 'plot_dir'.
 
 .. code:: bash
 
@@ -76,6 +76,17 @@ The inline toolkit is the ``graphics_toolkit`` used to generate plots for the in
 backend.  It will default to whatever backend ``octave`` defaults to.
 The different backend can be used for inline plotting either by using this configuration
 or by using the plot magic and putting the backend name after ``inline:``, e.g. ``plot -b inline:fltk``.
+
+By default the kernel sources ``~/.octaverc`` at startup (after disabling the pager with
+``more off``).  Set ``load_octaverc = False`` to skip this step.  This is useful in
+reproducible or sandboxed environments—such as CI pipelines or shared JupyterHub
+deployments—where the user's init file may modify the path, set conflicting options, print
+output that confuses the kernel, or simply does not exist.
+
+.. code:: python
+
+    # ~/.jupyter/octave_kernel_config.py
+    c.OctaveKernel.load_octaverc = False
 
 Supported Platforms
 -------------------

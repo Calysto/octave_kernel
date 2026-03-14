@@ -21,7 +21,7 @@ from xml.dom import minidom
 
 from IPython.display import SVG, Image
 from metakernel import MetaKernel, ProcessMetaKernel, REPLWrapper, u
-from traitlets import Dict, Unicode
+from traitlets import Bool, Dict, Unicode
 
 from ._utils import get_octave_executable, is_sandboxed_octave
 from ._version import __version__
@@ -70,7 +70,7 @@ class OctaveKernel(ProcessMetaKernel):
 
     Configuration is done via ``octave_kernel_config.py`` in the Jupyter config
     path. Configurable traits: ``plot_settings``, ``inline_toolkit``,
-    ``kernel_json``, ``cli_options``, and ``executable``.
+    ``kernel_json``, ``cli_options``, ``executable``, and ``load_octaverc``.
     """
 
     app_name = "octave_kernel"
@@ -82,6 +82,7 @@ class OctaveKernel(ProcessMetaKernel):
     cli_options = Unicode("").tag(config=True)
     inline_toolkit = Unicode("").tag(config=True)
     executable = Unicode("").tag(config=True)
+    load_octaverc = Bool(True).tag(config=True)
 
     _octave_engine: OctaveEngine | None = None
     _language_version: str | None = None
@@ -117,6 +118,7 @@ class OctaveKernel(ProcessMetaKernel):
             stream_handler=self.Print,
             cli_options=self.cli_options,
             inline_toolkit=self.inline_toolkit,
+            load_octaverc=self.load_octaverc,
             logger=self.log,
             executable=self.executable,
         )
@@ -295,6 +297,7 @@ class OctaveEngine:
         defer_startup: bool = False,
         cli_options: str = "",
         executable: str = "",
+        load_octaverc: bool = True,
         logger: Any = None,
     ) -> None:
         """Initialize the Octave engine.
@@ -323,6 +326,11 @@ class OctaveEngine:
             Path to the Octave executable. Resolved in order: this argument,
             ``OCTAVE_EXECUTABLE`` env var, ``octave``/``octave-cli`` on
             ``PATH``, then Flatpak.
+        load_octaverc
+            If True (default), source ``~/.octaverc`` during startup.  Set to
+            False to skip loading the user init file, which is useful in
+            reproducible or sandboxed environments where the init file may
+            alter the path, set conflicting options, or is simply unavailable.
         logger
             Logger instance; defaults to the module-level logger.
         """
@@ -335,6 +343,7 @@ class OctaveEngine:
         self.tmp_dir = self._get_temp_dir()
         self.cli_options = cli_options
         self.inline_toolkit = inline_toolkit
+        self.load_octaverc = load_octaverc
         self.repl = self._create_repl()
         self.error_handler = error_handler
         self.stream_handler = stream_handler
@@ -529,7 +538,8 @@ class OctaveEngine:
         """Start up the Octave process."""
         self._has_startup = True
         cwd = os.getcwd().replace(os.path.sep, "/")
-        cmd = f'more off; source ~/.octaverc; cd("{cwd}");{self.repl.prompt_change_cmd}'
+        octaverc = "source ~/.octaverc; " if self.load_octaverc else ""
+        cmd = f'more off; {octaverc}cd("{cwd}");{self.repl.prompt_change_cmd}'
         self.eval(cmd, silent=True)
         here = os.path.realpath(os.path.dirname(__file__)).replace(os.path.sep, "/")
         self.eval(f'addpath("{here}")')
