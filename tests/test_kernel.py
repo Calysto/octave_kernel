@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import base64
+import json
 import logging
+import sys
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -10,7 +13,13 @@ import pytest
 from metakernel import ProcessMetaKernel
 
 from octave_kernel._version import __version__
-from octave_kernel.kernel import HELP_LINKS, STDIN_PROMPT, OctaveKernel
+from octave_kernel.kernel import (
+    HELP_LINKS,
+    PDF,
+    STDIN_PROMPT,
+    OctaveKernel,
+    get_kernel_json,
+)
 
 _DEFAULT_PLOT_SETTINGS: dict[str, Any] = {
     "backend": "inline",
@@ -488,3 +497,59 @@ class TestHandlePlotSettings:
         kernel._trait_values["plot_settings"] = new_settings
         kernel.handle_plot_settings()
         assert kernel._octave_engine.plot_settings == new_settings
+
+
+# ---------------------------------------------------------------------------
+# PDF
+# ---------------------------------------------------------------------------
+
+
+class TestPDF:
+    """Tests for the PDF display wrapper."""
+
+    def test_reads_file_contents(self, tmp_path):
+        pdf_file = tmp_path / "test.pdf"
+        pdf_file.write_bytes(b"%PDF-1.4 test content")
+        obj = PDF(str(pdf_file))
+        assert obj._repr_pdf_ == base64.b64encode(b"%PDF-1.4 test content")
+
+    def test_empty_file(self, tmp_path):
+        pdf_file = tmp_path / "empty.pdf"
+        pdf_file.write_bytes(b"")
+        obj = PDF(str(pdf_file))
+        assert obj._repr_pdf_ == base64.b64encode(b"")
+
+    def test_missing_file_raises(self, tmp_path):
+        with pytest.raises(FileNotFoundError):
+            PDF(str(tmp_path / "missing.pdf"))
+
+
+# ---------------------------------------------------------------------------
+# get_kernel_json
+# ---------------------------------------------------------------------------
+
+
+class TestGetKernelJson:
+    """Tests for get_kernel_json()."""
+
+    def test_env_var_loads_custom_json(self, tmp_path, monkeypatch):
+        custom = {
+            "argv": ["/usr/bin/python", "-m", "octave_kernel"],
+            "display_name": "Custom",
+        }
+        json_file = tmp_path / "kernel.json"
+        json_file.write_text(json.dumps(custom))
+        monkeypatch.setenv("OCTAVE_KERNEL_JSON", str(json_file))
+        result = get_kernel_json()
+        assert result["display_name"] == "Custom"
+
+    def test_env_var_argv_replaced_with_sys_executable(self, tmp_path, monkeypatch):
+        custom = {
+            "argv": ["/usr/bin/python", "-m", "octave_kernel"],
+            "display_name": "Custom",
+        }
+        json_file = tmp_path / "kernel.json"
+        json_file.write_text(json.dumps(custom))
+        monkeypatch.setenv("OCTAVE_KERNEL_JSON", str(json_file))
+        result = get_kernel_json()
+        assert result["argv"][0] == sys.executable
