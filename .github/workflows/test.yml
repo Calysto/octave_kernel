@@ -84,12 +84,15 @@ jobs:
       run: |
         just cover
         just test-kernel
+    - name: Rename coverage report
+      if: always()
+      run: mv coverage.xml coverage-${{ matrix.os }}.xml
     - name: Upload coverage artifact
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: coverage-${{ matrix.os }}
-        path: coverage.xml
+        path: coverage-${{ matrix.os }}.xml
 
   test-other-ubuntu:
     strategy:
@@ -139,12 +142,15 @@ jobs:
       run: just install
     - name: Run coverage
       run: just cover
+    - name: Rename coverage report
+      if: always()
+      run: mv coverage.xml coverage-linux.xml
     - name: Upload coverage artifact
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: coverage-linux
-        path: coverage.xml
+        path: coverage-linux.xml
 
   codecov:
     needs: [test-other-systems, cover-linux]
@@ -156,11 +162,12 @@ jobs:
       with:
         pattern: coverage-*
         path: coverage-reports
+        merge-multiple: true
     - name: Upload combined coverage to Codecov
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        directory: coverage-reports
+        files: coverage-reports/coverage-linux.xml,coverage-reports/coverage-macos-latest.xml,coverage-reports/coverage-windows-latest.xml
         fail_ci_if_error: false
 
   make_sdist:
