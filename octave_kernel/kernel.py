@@ -526,6 +526,7 @@ class OctaveEngine:
         return images
 
     def _startup(self) -> None:
+        """Start up the Octave process."""
         self._has_startup = True
         cwd = os.getcwd().replace(os.path.sep, "/")
         cmd = f'more off; source ~/.octaverc; cd("{cwd}");{self.repl.prompt_change_cmd}'
@@ -579,6 +580,7 @@ class OctaveEngine:
         return svg.toxml()
 
     def _create_repl(self) -> REPLWrapper:
+        """Create the REPLWrapper for Octave."""
         cmd = self.executable
         # Interactive mode prevents crashing on Windows on syntax errors.
         # Delay sourcing the "~/.octaverc" file in case it displays a pager.
@@ -608,6 +610,7 @@ class OctaveEngine:
         return repl
 
     def _interrupt(self, continuation: bool = False, silent: bool = False) -> str:
+        """Interrupt the Octave process."""
         if os.name == "nt":
             msg = "** Warning: Cannot interrupt Octave on Windows"
             if self.stream_handler:
@@ -619,6 +622,7 @@ class OctaveEngine:
         return REPLWrapper.interrupt(self.repl, continuation=continuation)  # type: ignore[no-any-return]
 
     def _interrupt_expect(self, silent: bool) -> str:
+        """Interrupt the Octave process with expected results."""
         repl = self.repl
         child = repl.child
         expects = [repl.prompt_regex, child.linesep]
@@ -658,6 +662,7 @@ class OctaveEngine:
         return get_octave_executable(executable)
 
     def _validate_executable(self, executable: str) -> str:
+        """Validate the Octave executable."""
         cmd = shlex.split(f"{executable} --eval 'disp(version)'")
         try:
             return subprocess.check_output(cmd, text=True).strip()
@@ -670,6 +675,7 @@ class OctaveEngine:
             raise OSError(msg) from e
 
     def _get_temp_dir(self) -> str:
+        """Get an appropriate default temp dir."""
         executable = self.executable
         base_dir = None
         if "snap" in executable:
