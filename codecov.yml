@@ -9,6 +9,13 @@ coverage:
         target: 95%
         threshold: 0%
 
+codecov:
+  notify:
+    # Wait for both coverage uploads before reporting:
+    # 1 cover-linux (ubuntu-latest, Python 3.10) +
+    # 1 test-other-systems (windows-latest)
+    after_n_builds: 2
+
 comment:
   layout: "reach,diff,flags,files"
   behavior: default
