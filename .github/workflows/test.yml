@@ -160,7 +160,7 @@ jobs:
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        search_dir: coverage-reports
+        directory: coverage-reports
         fail_ci_if_error: false
 
   make_sdist:
