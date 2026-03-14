@@ -546,9 +546,7 @@ class OctaveEngine:
         self.plot_settings = self._plot_settings
 
     def _handle_svg(self, filename: str) -> Any:
-        """
-        Handle special considerations for SVG images.
-        """
+        """Handle special considerations for SVG images."""
         # Gnuplot can create invalid characters in SVG files.
         with open(filename, encoding="utf-8", errors="replace") as fid:
             data = fid.read()
