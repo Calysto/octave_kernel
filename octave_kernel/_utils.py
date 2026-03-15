@@ -37,7 +37,7 @@ def get_octave_executable(executable: str = "") -> str:
             # Try flatpak as a fallback.
             try:
                 subprocess.check_call(
-                    ["flatpak", "info", "org.octave.Octave"],
+                    ["flatpak", "info", "org.octave.Octave"],  # noqa: S607
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
                 )
