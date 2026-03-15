@@ -2,8 +2,8 @@
 
 import platform
 import sys
+from importlib.metadata import version
 
-import jupyter_client
 from metakernel import __version__ as mversion
 
 from . import __version__
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     print(f"Python path: {sys.executable}")
     print(f"Octave kernel v{__version__}")
     print(f"Metakernel v{mversion}")
-    print(f"Jupyter client v{jupyter_client.__version__}")
+    print(f"Jupyter client v{version('jupyter_client')}")
     print("\nConnecting to Octave...")
     try:
         o = OctaveKernel()
