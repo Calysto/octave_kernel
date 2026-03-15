@@ -468,7 +468,7 @@ class OctaveEngine:
             The plot directory containing the files.
         """
         settings = self._plot_settings
-        assert settings is not None
+        assert settings is not None  # noqa: S101
         if not settings["backend"].startswith("inline"):
             self.eval('drawnow("expose");')
             if not plot_dir:
@@ -553,7 +553,7 @@ class OctaveEngine:
         im = SVG(data=data)  # type: ignore[no-untyped-call]
         try:
             im.data = self._fix_svg_size(im.data)
-        except Exception:
+        except Exception:  # noqa: S110
             pass
         return im
 
@@ -564,7 +564,7 @@ class OctaveEngine:
         """
         # Minidom does not support parseUnicode, so it must be decoded
         # to accept unicode characters
-        parsed = minidom.parseString(data.encode("utf-8"))
+        parsed = minidom.parseString(data.encode("utf-8"))  # noqa: S318
         (svg,) = parsed.getElementsByTagName("svg")
 
         viewbox = svg.getAttribute("viewBox").split(" ")
@@ -673,7 +673,7 @@ class OctaveEngine:
         """Validate the Octave executable."""
         cmd = shlex.split(f"{executable} --eval 'disp(version)'")
         try:
-            return subprocess.check_output(cmd, text=True).strip()
+            return subprocess.check_output(cmd, text=True).strip()  # noqa: S603
         except subprocess.CalledProcessError as e:
             if "OCTAVE_EXECUTABLE" in os.environ:
                 prefix = f"OCTAVE_EXECUTABLE ({executable})"
