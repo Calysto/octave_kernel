@@ -2,6 +2,27 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 1.0.0rc1
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v1.0.0rc0...224ab46cb99875e02c9233bf4de0d1e0ba72b309))
+
+### Maintenance and upkeep improvements
+
+- Bump minimum metakernel version to 1.0.0rc0 [#299](https://github.com/Calysto/octave_kernel/pull/299) ([@blink1073](https://github.com/blink1073), [@claude](https://github.com/claude))
+- Bump minimum dependency versions to drop outdated releases [#298](https://github.com/Calysto/octave_kernel/pull/298) ([@blink1073](https://github.com/blink1073), [@claude](https://github.com/claude))
+- Add validate-pyproject hook and lint justfile target [#297](https://github.com/Calysto/octave_kernel/pull/297) ([@blink1073](https://github.com/blink1073), [@claude](https://github.com/claude))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2026-03-16&to=2026-03-17&type=c))
+
+@blink1073 ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2026-03-16..2026-03-17&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Aclaude+updated%3A2026-03-16..2026-03-17&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 1.0.0rc0
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.39.0...9705df5362005198589e167de1fe364a66ecac82))
@@ -48,8 +69,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2026-03-09&to=2026-03-16&type=c))
 
 @blink1073 ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2026-03-09..2026-03-16&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Aclaude+updated%3A2026-03-09..2026-03-16&type=Issues)) | @codecov-commenter ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Acodecov-commenter+updated%3A2026-03-09..2026-03-16&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.39.0
 
