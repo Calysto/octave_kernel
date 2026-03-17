@@ -1094,7 +1094,7 @@ wheels = [
 
 [[package]]
 name = "metakernel"
-version = "0.31.0"
+version = "1.0.0rc0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "comm" },
@@ -1103,9 +1103,9 @@ dependencies = [
     { name = "jupyter-core" },
     { name = "pexpect" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fe/6e/46bc45385ee5f7566e9d97e25c9507bc014ce0d13d80b97c26405d500cd9/metakernel-0.31.0.tar.gz", hash = "sha256:eeb6cbd357925709cb2b390a78d9b503a1267b48c13c0bf4eaf0d51068526e3f", size = 448687, upload-time = "2026-03-03T13:49:33.139Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/95/8c701945db21580e8db4762c20f202acae3e10a6a05477161202e0d1f334/metakernel-1.0.0rc0.tar.gz", hash = "sha256:b6f020cfe5cbb118bd8d676baa8ef9eef734fc6607576bd38e131919e218a0a5", size = 478129, upload-time = "2026-03-16T11:57:47.949Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5d/9b/e9eeffefab5cafa6778d6275ead313c0914e1467e22969d652fb9e22af17/metakernel-0.31.0-py3-none-any.whl", hash = "sha256:da3ba87a353d04b3c77cf70ea78bced53ba31a930e7aedade8fea0a721262644", size = 196043, upload-time = "2026-03-03T13:49:30.892Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/71/3c3a516a131f786fdb7d499fa816c511aaf20dfc4967bbedef94bf75f3fb/metakernel-1.0.0rc0-py3-none-any.whl", hash = "sha256:cbd476469e1e07411c79982dee29c59070e6043337e72d70971dde812c8f592f", size = 204409, upload-time = "2026-03-16T11:57:46.027Z" },
 ]
 
 [[package]]
@@ -1416,7 +1416,7 @@ typing = [
 requires-dist = [
     { name = "ipykernel", specifier = ">=6.22.0" },
     { name = "jupyter-client", specifier = ">=8.1.0" },
-    { name = "metakernel", specifier = ">=0.29.5" },
+    { name = "metakernel", specifier = ">=1.0.0rc0" },
 ]
 
 [package.metadata.requires-dev]
