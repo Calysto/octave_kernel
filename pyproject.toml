@@ -21,9 +21,9 @@ classifiers = [
 urls = {Homepage = "http://github.com/Calysto/octave_kernel"}
 requires-python = ">=3.10"
 dependencies = [
-    "metakernel >=0.24.0",
-    "jupyter_client >=4.3.0",
-    "ipykernel",
+    "metakernel >=0.29.5",
+    "jupyter_client >=8.1.0",
+    "ipykernel >=6.22.0",
 ]
 dynamic = ["version"]
 
