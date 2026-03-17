@@ -38,6 +38,9 @@ typing:
 run-notebook:
     uv run --with notebook --with ./ jupyter notebook octave_kernel.ipynb
 
+lint:
+    uv tool run prek run validate-pyproject ruff-format ruff-check --all-files
+
 pre-commit *args="":
     uv tool run prek --all-files {{args}}
 
