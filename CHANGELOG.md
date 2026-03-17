@@ -2,6 +2,55 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 1.0.0rc0
+
+([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.39.0...9705df5362005198589e167de1fe364a66ecac82))
+
+### Enhancements made
+
+- Add --no-line-editing flag to Octave startup command [#296](https://github.com/Calysto/octave_kernel/pull/296) ([@blink1073](https://github.com/blink1073))
+- Add load_octaverc trait to skip sourcing ~/.octaverc on startup [#290](https://github.com/Calysto/octave_kernel/pull/290) ([@blink1073](https://github.com/blink1073))
+- Fix kernel hang when calling doc() or open() [#282](https://github.com/Calysto/octave_kernel/pull/282) ([@blink1073](https://github.com/blink1073))
+- Add MkDocs documentation site [#277](https://github.com/Calysto/octave_kernel/pull/277) ([@blink1073](https://github.com/blink1073))
+
+### Bugs fixed
+
+- Use importlib.resources to load kernel.json [#284](https://github.com/Calysto/octave_kernel/pull/284) ([@blink1073](https://github.com/blink1073))
+- Fix input() prompt garbled when called inside a for-loop [#283](https://github.com/Calysto/octave_kernel/pull/283) ([@blink1073](https://github.com/blink1073))
+- Fix do_shutdown coroutine warning and improve console UX [#280](https://github.com/Calysto/octave_kernel/pull/280) ([@blink1073](https://github.com/blink1073))
+- Fix pause() prompt not shown when called from a user-defined function [#279](https://github.com/Calysto/octave_kernel/pull/279) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Add GitHub issue templates and improve check.py diagnostics [#295](https://github.com/Calysto/octave_kernel/pull/295) ([@blink1073](https://github.com/blink1073))
+- Add S (flake8-bandit) ruff checks [#294](https://github.com/Calysto/octave_kernel/pull/294) ([@blink1073](https://github.com/blink1073))
+- Add pull request template [#293](https://github.com/Calysto/octave_kernel/pull/293) ([@blink1073](https://github.com/blink1073))
+- Restructure coverage handling with dedicated cover-linux job [#291](https://github.com/Calysto/octave_kernel/pull/291) ([@blink1073](https://github.com/blink1073))
+- Fix project coverage threshold and add docstrings to semiprivate methods [#289](https://github.com/Calysto/octave_kernel/pull/289) ([@blink1073](https://github.com/blink1073))
+- Fix codecov.yml: move after_n_builds to codecov.notify [#288](https://github.com/Calysto/octave_kernel/pull/288) ([@blink1073](https://github.com/blink1073), [@codecov-commenter](https://github.com/codecov-commenter))
+- Allow benchmark job to be skipped in tests_check [#287](https://github.com/Calysto/octave_kernel/pull/287) ([@blink1073](https://github.com/blink1073), [@codecov-commenter](https://github.com/codecov-commenter))
+- Add Codecov integration with 95% coverage thresholds [#286](https://github.com/Calysto/octave_kernel/pull/286) ([@blink1073](https://github.com/blink1073), [@codecov-commenter](https://github.com/codecov-commenter))
+- Add ASV benchmark suite with CI comparison job [#285](https://github.com/Calysto/octave_kernel/pull/285) ([@blink1073](https://github.com/blink1073))
+- Tear down kernel after each test in OctaveKernelTests [#281](https://github.com/Calysto/octave_kernel/pull/281) ([@blink1073](https://github.com/blink1073))
+- Add run-notebook justfile target [#276](https://github.com/Calysto/octave_kernel/pull/276) ([@blink1073](https://github.com/blink1073))
+- Add cleanup steps to binder [#275](https://github.com/Calysto/octave_kernel/pull/275) ([@blink1073](https://github.com/blink1073))
+
+### Documentation improvements
+
+- Add debugging instructions for the kernel [#278](https://github.com/Calysto/octave_kernel/pull/278) ([@blink1073](https://github.com/blink1073), [@claude](https://github.com/claude))
+- Add dedicated docs section for managing the Octave executable [#274](https://github.com/Calysto/octave_kernel/pull/274) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2026-03-09&to=2026-03-16&type=c))
+
+@blink1073 ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2026-03-09..2026-03-16&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Aclaude+updated%3A2026-03-09..2026-03-16&type=Issues)) | @codecov-commenter ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Acodecov-commenter+updated%3A2026-03-09..2026-03-16&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.39.0
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.38.0...42ddad5cafa20b0ec91251fd58591ccdd3d2a884))
@@ -25,8 +74,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/Calysto/octave_kernel/graphs/contributors?from=2026-03-07&to=2026-03-09&type=c))
 
 @blink1073 ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Ablink1073+updated%3A2026-03-07..2026-03-09&type=Issues)) | @claude ([activity](https://github.com/search?q=repo%3ACalysto%2Foctave_kernel+involves%3Aclaude+updated%3A2026-03-07..2026-03-09&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.38.0
 

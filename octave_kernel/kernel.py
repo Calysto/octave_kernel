@@ -592,7 +592,7 @@ class OctaveEngine:
         cmd = self.executable
         # Interactive mode prevents crashing on Windows on syntax errors.
         # Delay sourcing the "~/.octaverc" file in case it displays a pager.
-        cmd += " --no-gui --interactive --quiet --no-init-file "
+        cmd += " --no-gui --interactive --quiet --no-init-file --no-line-editing "
 
         # Add cli options provided by the user.
         cmd += os.environ.get("OCTAVE_CLI_OPTIONS", self.cli_options)
