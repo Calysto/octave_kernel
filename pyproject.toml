@@ -2,16 +2,6 @@
 requires = ["hatchling >=1.5"]
 build-backend = "hatchling.build"
 
-[tool.poetry]
-name = "octave_kernel"
-version = "1.0.0rc1"
-description = "A Jupyter kernel for Octave."
-authors = ["Steven Silvester <steven.silvester@ieee.org>"]
-license = "BSD"
-readme = "README.md"
-homepage = "http://github.com/Calysto/octave_kernel"
-repository = "http://github.com/Calysto/octave_kernel"
-
 [project]
 name = "octave_kernel"
 description = "'A Jupyter kernel for Octave.'"
@@ -30,12 +20,12 @@ classifiers = [
 ]
 urls = {Homepage = "http://github.com/Calysto/octave_kernel"}
 requires-python = ">=3.10"
+version = "1.0.0rc1"
 dependencies = [
     "metakernel >=1.0.0rc0",
     "jupyter_client >=8.1.0",
     "ipykernel >=6.22.0",
 ]
-dynamic = ["version"]
 
 [project.readme]
 file = "README.md"
@@ -66,10 +56,6 @@ include = [
     "/*.py",
     "/mkdocs.yml",
 ]
-
-[tool.hatch.version]
-path = "octave_kernel/_version.py"
-validate-bump = false
 
 [tool.coverage.run]
 relative_files = true
