@@ -38,11 +38,7 @@ jobs:
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
     - name: Install Poetry
-      uses: snok/install-poetry@76e04a911780d5b312d89783f7b1cd627778900a # v1.4.1
-      with:
-        version: "2.3"
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+      run: pipx install "poetry>=2.3,<3"
     - name: Setup octave
       uses: ./
       with:
@@ -77,11 +73,7 @@ jobs:
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
     - name: Install Poetry
-      uses: snok/install-poetry@76e04a911780d5b312d89783f7b1cd627778900a # v1.4.1
-      with:
-        version: "2.3"
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+      run: pipx install "poetry>=2.3,<3"
     - name: Install just
       uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
     - name: Setup octave
@@ -112,11 +104,7 @@ jobs:
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
     - name: Install Poetry
-      uses: snok/install-poetry@76e04a911780d5b312d89783f7b1cd627778900a # v1.4.1
-      with:
-        version: "2.3"
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+      run: pipx install "poetry>=2.3,<3"
     - name: Install just
       uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
     - name: Setup octave
@@ -142,11 +130,7 @@ jobs:
       with:
         python-version: '3.10'
     - name: Install Poetry
-      uses: snok/install-poetry@76e04a911780d5b312d89783f7b1cd627778900a # v1.4.1
-      with:
-        version: "2.3"
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+      run: pipx install "poetry>=2.3,<3"
     - name: Setup octave
       uses: ./
       with:
@@ -193,11 +177,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
       - name: Install Poetry
-        uses: snok/install-poetry@76e04a911780d5b312d89783f7b1cd627778900a # v1.4.1
-        with:
-          version: "2.3"
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+        run: pipx install "poetry>=2.3,<3"
       - name: Install just
         uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3
       - name: Run pre-commit
@@ -213,11 +193,7 @@ jobs:
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
       - name: Install Poetry
-        uses: snok/install-poetry@76e04a911780d5b312d89783f7b1cd627778900a # v1.4.1
-        with:
-          version: "2.3"
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+        run: pipx install "poetry>=2.3,<3"
       - name: Check Release
         uses: jupyter-server/jupyter_releaser/.github/actions/check-release@3e74486d1011d24cd5e9977202fd349dece0db9c # v2
         with:
@@ -243,11 +219,7 @@ jobs:
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v2
     - name: Install Poetry
-      uses: snok/install-poetry@76e04a911780d5b312d89783f7b1cd627778900a # v1.4.1
-      with:
-        version: "2.3"
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+      run: pipx install "poetry>=2.3,<3"
     - name: Install just
       uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
     - name: Setup octave
