@@ -2,6 +2,16 @@
 requires = ["hatchling >=1.5"]
 build-backend = "hatchling.build"
 
+[tool.poetry]
+name = "octave_kernel"
+version = "1.0.0rc1"
+description = "A Jupyter kernel for Octave."
+authors = ["Steven Silvester <steven.silvester@ieee.org>"]
+license = "BSD"
+readme = "README.md"
+homepage = "http://github.com/Calysto/octave_kernel"
+repository = "http://github.com/Calysto/octave_kernel"
+
 [project]
 name = "octave_kernel"
 description = "'A Jupyter kernel for Octave.'"
@@ -32,6 +42,7 @@ file = "README.md"
 content-type = "text/markdown"
 
 [dependency-groups]
+dev = ["pre-commit"]
 test = ["pytest", "nbconvert", "jupyter_kernel_test"]
 typing = [{ include-group = "test" }, "pip", "mypy>=1.0"]
 coverage = ["pytest", "pytest-cov"]

@@ -37,8 +37,12 @@ jobs:
     - uses: actions/checkout@v6
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-    - name: Install uv
-      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+    - name: Install Poetry
+      uses: snok/install-poetry@76e46d60e5be2d224c3a02c2b2df066883df3375 # v1
+      with:
+        version: "2.3"
+        virtualenvs-create: true
+        virtualenvs-in-project: true
     - name: Setup octave
       uses: ./
       with:
@@ -51,11 +55,11 @@ jobs:
         just docker-build
     - name: Run test on linux
       run: |
-         uv run python -m octave_kernel.check
+         poetry run python -m octave_kernel.check
          just test
          just test-kernel
          just test-notebook
-         uv run python -m octave_kernel install --user
+         poetry run python -m octave_kernel install --user
 
   test-other-systems:
     strategy:
@@ -72,8 +76,12 @@ jobs:
     - uses: actions/checkout@v6
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-    - name: Install uv
-      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+    - name: Install Poetry
+      uses: snok/install-poetry@76e46d60e5be2d224c3a02c2b2df066883df3375 # v1
+      with:
+        version: "2.3"
+        virtualenvs-create: true
+        virtualenvs-in-project: true
     - name: Install just
       uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
     - name: Setup octave
@@ -103,8 +111,12 @@ jobs:
     - uses: actions/checkout@v6
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-    - name: Install uv
-      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+    - name: Install Poetry
+      uses: snok/install-poetry@76e46d60e5be2d224c3a02c2b2df066883df3375 # v1
+      with:
+        version: "2.3"
+        virtualenvs-create: true
+        virtualenvs-in-project: true
     - name: Install just
       uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
     - name: Setup octave
@@ -129,8 +141,12 @@ jobs:
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
       with:
         python-version: '3.10'
-    - name: Install uv
-      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+    - name: Install Poetry
+      uses: snok/install-poetry@76e46d60e5be2d224c3a02c2b2df066883df3375 # v1
+      with:
+        version: "2.3"
+        virtualenvs-create: true
+        virtualenvs-in-project: true
     - name: Setup octave
       uses: ./
       with:
@@ -176,8 +192,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-      - name: Install uv
-        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+      - name: Install Poetry
+        uses: snok/install-poetry@76e46d60e5be2d224c3a02c2b2df066883df3375 # v1
+        with:
+          version: "2.3"
+          virtualenvs-create: true
+          virtualenvs-in-project: true
       - name: Install just
         uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3
       - name: Run pre-commit
@@ -192,8 +212,12 @@ jobs:
         uses: actions/checkout@v6
       - name: Base Setup
         uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-      - name: Install uv
-        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+      - name: Install Poetry
+        uses: snok/install-poetry@76e46d60e5be2d224c3a02c2b2df066883df3375 # v1
+        with:
+          version: "2.3"
+          virtualenvs-create: true
+          virtualenvs-in-project: true
       - name: Check Release
         uses: jupyter-server/jupyter_releaser/.github/actions/check-release@3e74486d1011d24cd5e9977202fd349dece0db9c # v2
         with:
@@ -218,8 +242,12 @@ jobs:
         persist-credentials: false
     - name: Base Setup
       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v2
-    - name: Install uv
-      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
+    - name: Install Poetry
+      uses: snok/install-poetry@76e46d60e5be2d224c3a02c2b2df066883df3375 # v1
+      with:
+        version: "2.3"
+        virtualenvs-create: true
+        virtualenvs-in-project: true
     - name: Install just
       uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
     - name: Setup octave
