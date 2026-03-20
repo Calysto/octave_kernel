@@ -17,6 +17,7 @@ docker-run:
     docker run -it --rm -p {{PORT}}:8888 calysto/octave-notebook
 
 test *args="":
+    poetry install --with test
     poetry run pytest {{args}}
 
 test-kernel:
@@ -26,6 +27,7 @@ test-kernel:
     poetry run python test_octave_kernel.py
 
 test-notebook:
+    poetry install --with test
     poetry run jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null
 
 cover *args="":
@@ -38,15 +40,18 @@ typing:
     poetry run mypy . --install-types --non-interactive
 
 run-notebook:
+    poetry install --with test
     poetry run jupyter notebook octave_kernel.ipynb
 
 lint:
+    poetry install --with dev
     poetry run pre-commit run ruff-format --all-files
     poetry run pre-commit run ruff-check --all-files
     poetry run pre-commit run validate-pyproject --all-files
     poetry run pre-commit run poetry-check --all-files
 
 pre-commit *args="":
+    poetry install --with dev
     poetry run pre-commit run --all-files {{args}}
 
 _asv-setup:
