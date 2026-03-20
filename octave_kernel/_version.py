@@ -1,3 +1,5 @@
 """Version file."""
 
-__version__ = "1.0.0rc1"
+from importlib.metadata import version
+
+__version__ = version("octave_kernel")
