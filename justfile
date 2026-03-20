@@ -22,6 +22,7 @@ test *args="":
 
 test-kernel:
     poetry install --with test
+    poetry run python -m octave_kernel install --sys-prefix
     poetry run python -m unittest -v test_octave_kernel.py
     poetry run python -m octave_kernel.check
     poetry run python test_octave_kernel.py
