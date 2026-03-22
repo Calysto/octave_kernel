@@ -63,15 +63,18 @@ runs:
       id: cache-brew-octave
       uses: actions/cache@v4
       with:
-        path: ~/Library/Caches/Homebrew/downloads
+        path: ~/brew-octave-cellar.tar
         key: macos-brew-octave-${{ env.OCTAVE_VERSION }}
 
-    - name: Install octave (macos)
-      if: inputs.install-type == 'macos'
+    - name: Install Octave from cache (macos)
+      if: inputs.install-type == 'macos' && steps.cache-brew-octave.outputs.cache-hit == 'true'
       shell: bash
-      run: |
-        set -eu
-        brew install octave
+      run: bash "${{ github.action_path }}/.github/scripts/macos-install-cache.sh"
+
+    - name: Install octave (macos)
+      if: inputs.install-type == 'macos' && steps.cache-brew-octave.outputs.cache-hit != 'true'
+      shell: bash
+      run: bash "${{ github.action_path }}/.github/scripts/macos-install.sh"
 
     - name: Set up Octave installer cache (windows)
       if: inputs.install-type == 'windows'
