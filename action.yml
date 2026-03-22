@@ -20,7 +20,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/apt-cache
-        key: apt-${{ inputs.install-type }}-${{ runner.os }}
+        key: apt-${{ inputs.install-type }}-${{ env.ImageOS }}
 
     - name: Restore apt packages from cache (ubuntu)
       if: startsWith(inputs.install-type, 'ubuntu')
