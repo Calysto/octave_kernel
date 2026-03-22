@@ -9,7 +9,7 @@ on:
         required: true
         type: string
       dry_run:
-        description: "Dry run (deletes draft release, does not push changes, does not publish to PyPI"
+        description: "Dry run (deletes draft release, does not push changes, does not publish to PyPI or quay.io)"
         required: false
         type: boolean
         default: false
@@ -54,6 +54,41 @@ jobs:
           persist-credentials: false
 
       - uses: hynek/build-and-inspect-python-package@efb823f52190ad02594531168b7a2d5790e66516 # v2.14.0
+
+  publish-docker:
+    needs: [release]
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ needs.release.outputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Log in to quay.io
+        if: ${{ !inputs.dry_run }}
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          push: ${{ !inputs.dry_run && !contains(needs.release.outputs.tag, 'dev') && !contains(needs.release.outputs.tag, 'rc') && !contains(needs.release.outputs.tag, 'alpha') && !contains(needs.release.outputs.tag, 'beta') }}
+          tags: |
+            quay.io/calysto_kernels/octave_kernel:latest
+            quay.io/calysto_kernels/octave_kernel:${{ needs.release.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   publish:
     needs: [build-package]
