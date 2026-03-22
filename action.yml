@@ -11,11 +11,23 @@ runs:
   steps:
     - name: Install octave (ubuntu)
       if: inputs.install-type == 'ubuntu'
+      uses: tecolicom/actions-use-apt-tools@065d3fb036b7fc85487573596f97732ed0d3fce1 # v1.7
+      with:
+        tools: octave gnuplot
+
+    - name: Get Octave version for cache key (macos)
+      if: inputs.install-type == 'macos'
       shell: bash
       run: |
-        set -eu
-        sudo apt-get update
-        sudo apt-get install -y octave gnuplot
+        OCTAVE_VERSION=$(brew info --json octave | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['versions']['stable'])")
+        echo "OCTAVE_VERSION=$OCTAVE_VERSION" >> $GITHUB_ENV
+
+    - name: Restore Octave bottle from cache (macos)
+      if: inputs.install-type == 'macos'
+      uses: actions/cache@v4
+      with:
+        path: ~/Library/Caches/Homebrew/downloads
+        key: macos-brew-octave-${{ env.OCTAVE_VERSION }}
 
     - name: Install octave (macos)
       if: inputs.install-type == 'macos'
@@ -24,51 +36,43 @@ runs:
         set -eu
         brew install octave
 
+    - name: Set up Octave installer cache (windows)
+      if: inputs.install-type == 'windows'
+      shell: pwsh
+      run: |
+        & "${{ github.action_path }}/.github/scripts/windows-setup-cache.ps1"
+
+    - name: Restore Octave installer from cache (windows)
+      if: inputs.install-type == 'windows'
+      id: cache-octave-windows
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.OCTAVE_CACHE_PATH }}
+        key: windows-octave-${{ env.OCTAVE_VERSION }}
+
+    - name: Download Octave installer (windows)
+      if: inputs.install-type == 'windows' && steps.cache-octave-windows.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: |
+        winget download --id GNU.Octave -e --download-directory $env:OCTAVE_CACHE_PATH
+
     - name: Install Octave (windows)
       if: inputs.install-type == 'windows'
       shell: pwsh
       run: |
-        $maxRetries = 3
-        $retryDelay = 10
-        $attempt = 0
-        $success = $false
+        & "${{ github.action_path }}/.github/scripts/windows-install.ps1"
 
-        while ($attempt -lt $maxRetries -and -not $success) {
-            $attempt++
-            Write-Host "Attempt ${attempt} of ${maxRetries}: Installing GNU Octave..."
+    - name: Install flatpak and dbus-x11 (ubuntu-flatpak)
+      if: inputs.install-type == 'ubuntu-flatpak'
+      uses: tecolicom/actions-use-apt-tools@065d3fb036b7fc85487573596f97732ed0d3fce1 # v1.7
+      with:
+        tools: flatpak dbus-x11
 
-            winget install --id GNU.Octave -e --silent --accept-source-agreements --accept-package-agreements
-
-            if ($LASTEXITCODE -eq 0) {
-                $success = $true
-                Write-Host "Installation succeeded on attempt ${attempt}."
-            } else {
-                Write-Host "Attempt ${attempt} failed (exit code: ${LASTEXITCODE})."
-                if ($attempt -lt $maxRetries) {
-                    Write-Host "Retrying in ${retryDelay} seconds..."
-                    Start-Sleep -Seconds $retryDelay
-                }
-            }
-        }
-
-        if (-not $success) {
-            throw "GNU Octave installation failed after ${maxRetries} attempts."
-        }
-
-        $octaveRoot = Get-ChildItem "$env:LOCALAPPDATA\Programs\GNU Octave" -Directory | Select-Object -First 1 -ExpandProperty FullName
-        $octaveBin = "$octaveRoot\mingw64\bin"
-        echo "Octave bin: $octaveBin"
-        echo "$octaveBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        $bashPath = $octaveBin -replace '\\', '/' -replace '^C:', '/c'
-        echo "$bashPath" >> $env:GITHUB_PATH
-
-    - name: Install flatpak and octave via flatpak (ubuntu-flatpak)
+    - name: Install octave via flatpak (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
       shell: bash
       run: |
         set -eu
-        sudo apt-get update
-        sudo apt-get install -y flatpak dbus-x11
         sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         sudo flatpak install -y --noninteractive flathub org.octave.Octave
 
