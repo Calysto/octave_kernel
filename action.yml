@@ -28,7 +28,7 @@ runs:
       run: find ~/apt-cache -name "*.deb" -exec sudo cp {} /var/cache/apt/archives/ \;
 
     - name: Update apt package lists (ubuntu)
-      if: startsWith(inputs.install-type, 'ubuntu') && steps.cache-apt.outputs.cache-hit != 'true'
+      if: startsWith(inputs.install-type, 'ubuntu')
       shell: bash
       run: sudo apt-get update
 
