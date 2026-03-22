@@ -22,6 +22,16 @@ conda install octave_kernel
 conda install texinfo # For the inline documentation (shift-tab) to appear.
 ```
 
+To use the pre-built Docker image (published to [quay.io](https://quay.io/repository/calysto_kernels/octave_kernel)):
+
+```shell
+docker pull quay.io/calysto_kernels/octave_kernel:latest
+docker run -p 8888:8888 quay.io/calysto_kernels/octave_kernel:latest
+```
+
+After starting the container, look for a URL in the output that includes a token, such as
+`http://127.0.0.1:8888/lab?token=...`. Click or copy that URL into your browser to open JupyterLab.
+
 We require the `octave-cli` or `octave` executable to run the kernel. Add that executable's directory to the `PATH` environment variable or create the environment variable `OCTAVE_EXECUTABLE` to point to the executable itself. Note that on Octave 5+ on Windows, the executable is in `"Octave-x.x.x.x\mingw64\bin"`.
 
 We automatically install a Jupyter kernelspec when installing the python package. This location can be found using `jupyter kernelspec list`. If the default location is not desired, remove the directory for the `octave` kernel, and install using `python -m octave_kernel install`. See `python -m octave_kernel install --help` for available options.

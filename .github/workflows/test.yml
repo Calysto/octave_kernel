@@ -191,6 +191,7 @@ jobs:
       contents: read
     steps:
     - uses: actions/checkout@v6
+    - uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
     - name: Build Docker image
@@ -198,9 +199,12 @@ jobs:
       with:
         context: .
         push: false
+        load: true
         tags: calysto/octave-notebook:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
+    - name: Test Docker image
+      run: just test-docker
 
   tests_check: # This job does nothing and is only used for the branch protection
     if: always()
