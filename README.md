@@ -190,6 +190,10 @@ For [Binder](https://mybinder.org)-based deployments, place a `start` script in 
 
 Specify a different format using the `%plot -f <backend>` magic or using a configuration setting. On some systems, the default `'png'` produces a black plot. On other systems `'svg'` produces a black plot.
 
+## Version Support
+
+This project follows [SPEC 0](https://scientific-python.org/specs/spec-0000/) for minimum supported Python and dependency versions.
+
 ## Local Installation
 
 To install from a git checkout run:
