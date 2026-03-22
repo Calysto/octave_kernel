@@ -175,6 +175,8 @@ jobs:
         persist-credentials: false
     - name: Base Setup
       uses: calysto/maintainer_tools/actions/base-setup@v1
+      with:
+        python-version: '3.11'
     - name: Setup octave
       uses: ./
       with:

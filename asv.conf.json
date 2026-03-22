@@ -5,7 +5,6 @@
     "repo": ".",
     "branches": ["main"],
     "environment_type": "virtualenv",
-    "pythons": ["3.11"],
     "show_commit_url": "https://github.com/Calysto/octave_kernel/commit/",
     "benchmarks_dir": "benchmarks",
     "build_cache_size": 2,
