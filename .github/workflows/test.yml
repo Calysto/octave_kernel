@@ -30,23 +30,19 @@ jobs:
         python-version: ['3.11', '3.12', '3.13', '3.14', '3.14t']
         include:
           - os: ubuntu-22.04
-            python-version: '3.10'
+            python-version: '3.11'
       fail-fast: false
 
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-    - name: Install Poetry
-      run: pipx install "poetry>=2.3,<3"
+      uses: calysto/maintainer_tools/actions/base-setup@v1
+      with:
+        python-version: ${{ matrix.python-version }}
     - name: Setup octave
       uses: ./
       with:
         install-type: ubuntu
-    - name: Install just
-      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3
-    - name: Install dependencies
-      run: just install
     - name: Run test on linux
       run: |
          poetry run python -m octave_kernel.check
@@ -69,11 +65,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-    - name: Install Poetry
-      run: pipx install "poetry>=2.3,<3"
-    - name: Install just
-      uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
+      uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Setup octave
       uses: ./
       with:
@@ -100,17 +92,11 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-    - name: Install Poetry
-      run: pipx install "poetry>=2.3,<3"
-    - name: Install just
-      uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
+      uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Setup octave
       uses: ./
       with:
         install-type: ${{ matrix.install-type }}
-    - name: Install dependencies
-      run: just install
     - name: Run tests
       run: |
         just test
@@ -124,19 +110,11 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-      with:
-        python-version: '3.10'
-    - name: Install Poetry
-      run: pipx install "poetry>=2.3,<3"
+      uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Setup octave
       uses: ./
       with:
         install-type: ubuntu
-    - name: Install just
-      uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3
-    - name: Install dependencies
-      run: just install
     - name: Run coverage
       run: just cover
     - name: Upload coverage to Codecov
@@ -149,14 +127,15 @@ jobs:
         fail_ci_if_error: false
 
   make_sdist:
-    name: Make SDist
+    name: Build and Inspect Package
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-      - uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3
-      - uses: jupyterlab/maintainer-tools/.github/actions/make-sdist@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+        with:
+          persist-credentials: false
+      - uses: calysto/maintainer_tools/actions/base-setup@v1
+      - uses: hynek/build-and-inspect-python-package@efb823f52190ad02594531168b7a2d5790e66516 # v2.14.0
 
   test_sdist:
     runs-on: ubuntu-latest
@@ -164,8 +143,15 @@ jobs:
     name: Install from SDist and Test
     timeout-minutes: 20
     steps:
-      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-      - uses: jupyterlab/maintainer-tools/.github/actions/test-sdist@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: calysto/maintainer_tools/actions/base-setup@v1
+      - name: Setup octave
+        uses: ./
+        with:
+          install-type: ubuntu
+      - uses: calysto/maintainer_tools/actions/test-sdist@v1
         with:
           test_command: "jupyter kernelspec list | grep octave"
 
@@ -173,24 +159,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-      - name: Install Poetry
-        run: pipx install "poetry>=2.3,<3"
-      - name: Install just
-        uses: extractions/setup-just@f8a3cce218d9f83db3a2ecd90e41ac3de6cdfd9b # v3
+      - uses: calysto/maintainer_tools/actions/base-setup@v1
       - name: Run pre-commit
-        run: just pre-commit
+        run: just pre-commit --hook-stage=manual
       - name: Run typing check
         run: just typing
-
-  link_check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-      - uses: jupyterlab/maintainer-tools/.github/actions/check-links@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
-        with:
-          ignore_links: "http://nbviewer.ipython.org/*"
 
   benchmark:
     if: github.event_name == 'pull_request'
@@ -201,17 +174,13 @@ jobs:
         fetch-depth: 0
         persist-credentials: false
     - name: Base Setup
-      uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v2
-    - name: Install Poetry
-      run: pipx install "poetry>=2.3,<3"
-    - name: Install just
-      uses: extractions/setup-just@dd310ad5a97d8e7b41793f8ef055398d51ad4de6 # v2
+      uses: calysto/maintainer_tools/actions/base-setup@v1
+      with:
+        python-version: '3.11'
     - name: Setup octave
       uses: ./
       with:
         install-type: ubuntu
-    - name: Install dependencies
-      run: just install
     - name: Run benchmark comparison
       run: just benchmark-compare
 
@@ -243,7 +212,6 @@ jobs:
       - make_sdist
       - test_sdist
       - static
-      - link_check
       - benchmark
       - docker-build
     runs-on: ubuntu-latest
