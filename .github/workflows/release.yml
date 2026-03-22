@@ -73,7 +73,7 @@ jobs:
 
       - name: Log in to quay.io
         if: ${{ !inputs.dry_run }}
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
@@ -83,7 +83,7 @@ jobs:
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: .
-          push: ${{ !inputs.dry_run }}
+          push: ${{ !inputs.dry_run && !contains(needs.release.outputs.tag, 'dev') && !contains(needs.release.outputs.tag, 'rc') && !contains(needs.release.outputs.tag, 'alpha') && !contains(needs.release.outputs.tag, 'beta') }}
           tags: |
             quay.io/calysto_kernels/octave_kernel:latest
             quay.io/calysto_kernels/octave_kernel:${{ needs.release.outputs.tag }}
