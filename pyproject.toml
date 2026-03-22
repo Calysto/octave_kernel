@@ -5,11 +5,11 @@ build-backend = "hatchling.build"
 [project]
 name = "octave_kernel"
 description = "'A Jupyter kernel for Octave.'"
-license = {file = "LICENSE.txt"}
+license = "BSD-3-Clause"
+license-files = ["LICENSE.txt"]
 authors = [{name = "'Steven Silvester'", email = "steven.silvester@ieee.org"}]
 classifiers = [
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
