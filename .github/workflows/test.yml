@@ -37,6 +37,8 @@ jobs:
     - uses: actions/checkout@v6
     - name: Base Setup
       uses: calysto/maintainer_tools/actions/base-setup@v1
+      with:
+        python-version: ${{ matrix.python-version }}
     - name: Setup octave
       uses: ./
       with:
@@ -145,6 +147,10 @@ jobs:
         with:
           persist-credentials: false
       - uses: calysto/maintainer_tools/actions/base-setup@v1
+      - name: Setup octave
+        uses: ./
+        with:
+          install-type: ubuntu
       - uses: calysto/maintainer_tools/actions/test-sdist@v1
         with:
           test_command: "jupyter kernelspec list | grep octave"
