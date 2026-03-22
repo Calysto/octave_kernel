@@ -12,7 +12,9 @@ runs:
     - name: Set up apt cache dir (ubuntu)
       if: startsWith(inputs.install-type, 'ubuntu')
       shell: bash
-      run: mkdir -p ~/apt-cache
+      run: |
+        mkdir -p ~/apt-cache
+        echo "OS_VERSION=$(. /etc/os-release && echo $VERSION_ID)" >> $GITHUB_ENV
 
     - name: Cache apt packages (ubuntu)
       if: startsWith(inputs.install-type, 'ubuntu')
@@ -20,7 +22,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/apt-cache
-        key: apt-${{ inputs.install-type }}-${{ env.ImageOS }}
+        key: apt-${{ inputs.install-type }}-${{ env.OS_VERSION }}
 
     - name: Restore apt packages from cache (ubuntu)
       if: startsWith(inputs.install-type, 'ubuntu')
