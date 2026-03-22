@@ -9,12 +9,22 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Set up apt cache dir (ubuntu)
+      if: startsWith(inputs.install-type, 'ubuntu')
+      shell: bash
+      run: mkdir -p ~/apt-cache
+
     - name: Cache apt packages (ubuntu)
       if: startsWith(inputs.install-type, 'ubuntu')
       uses: actions/cache@v4
       with:
-        path: /var/cache/apt/archives
+        path: ~/apt-cache
         key: apt-${{ inputs.install-type }}-${{ runner.os }}
+
+    - name: Restore apt packages from cache (ubuntu)
+      if: startsWith(inputs.install-type, 'ubuntu')
+      shell: bash
+      run: find ~/apt-cache -name "*.deb" -exec sudo cp {} /var/cache/apt/archives/ \;
 
     - name: Install octave (ubuntu)
       if: inputs.install-type == 'ubuntu'
@@ -30,6 +40,7 @@ runs:
       run: |
         set -eu
         sudo apt-get autoclean
+        find /var/cache/apt/archives -name "*.deb" -exec cp {} ~/apt-cache/ \;
         sudo rm -f /var/cache/apt/archives/lock
         sudo rm -rf /var/cache/apt/archives/partial
 
