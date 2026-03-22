@@ -161,7 +161,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: calysto/maintainer_tools/actions/base-setup@v1
       - name: Run pre-commit
-        run: just pre-commit
+        run: just pre-commit --hook-stage=manual
       - name: Run typing check
         run: just typing
 
