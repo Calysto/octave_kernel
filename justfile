@@ -13,6 +13,10 @@ install:
 docker-build:
     docker build --rm --force-rm -t calysto/octave-notebook:latest .
 
+test-docker: docker-build
+    docker run --rm calysto/octave-notebook:latest jupyter kernelspec list | grep octave
+    docker run --rm calysto/octave-notebook:latest octave --version
+
 docker-run:
     docker run -it --rm -p {{PORT}}:8888 calysto/octave-notebook
 
