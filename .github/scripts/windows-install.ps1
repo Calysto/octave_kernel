@@ -1,5 +1,7 @@
 $installer = Get-ChildItem $env:OCTAVE_CACHE_PATH -Filter "*.exe" | Select-Object -First 1
+echo "Running installer: $($installer.FullName)"
 Start-Process -FilePath $installer.FullName -ArgumentList "/S" -Wait -NoNewWindow
+echo "Installer completed"
 
 $searchPaths = @(
   "$env:LOCALAPPDATA\Programs",
@@ -9,6 +11,7 @@ $searchPaths = @(
 )
 $octaveExe = $null
 foreach ($path in $searchPaths) {
+  echo "Searching: $path"
   $octaveExe = Get-ChildItem $path -Recurse -Filter "octave.exe" -ErrorAction SilentlyContinue |
     Select-Object -First 1
   if ($octaveExe) { break }

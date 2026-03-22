@@ -16,6 +16,7 @@ runs:
 
     - name: Cache apt packages (ubuntu)
       if: startsWith(inputs.install-type, 'ubuntu')
+      id: cache-apt
       uses: actions/cache@v4
       with:
         path: ~/apt-cache
@@ -26,12 +27,16 @@ runs:
       shell: bash
       run: find ~/apt-cache -name "*.deb" -exec sudo cp {} /var/cache/apt/archives/ \;
 
+    - name: Update apt package lists (ubuntu)
+      if: startsWith(inputs.install-type, 'ubuntu') && steps.cache-apt.outputs.cache-hit != 'true'
+      shell: bash
+      run: sudo apt-get update
+
     - name: Install octave (ubuntu)
       if: inputs.install-type == 'ubuntu'
       shell: bash
       run: |
         set -eu
-        sudo apt-get update
         sudo apt-get install -y octave gnuplot
 
     - name: Clean apt package cache (ubuntu)
@@ -51,19 +56,27 @@ runs:
         OCTAVE_VERSION=$(brew info --json octave | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['versions']['stable'])")
         echo "OCTAVE_VERSION=$OCTAVE_VERSION" >> $GITHUB_ENV
 
-    - name: Restore Octave bottle from cache (macos)
+    - name: Restore Octave from cache (macos)
       if: inputs.install-type == 'macos'
+      id: cache-brew-octave
       uses: actions/cache@v4
       with:
-        path: ~/Library/Caches/Homebrew/downloads
+        path: /opt/homebrew/Cellar/octave
         key: macos-brew-octave-${{ env.OCTAVE_VERSION }}
 
     - name: Install octave (macos)
-      if: inputs.install-type == 'macos'
+      if: inputs.install-type == 'macos' && steps.cache-brew-octave.outputs.cache-hit != 'true'
       shell: bash
       run: |
         set -eu
         brew install octave
+
+    - name: Link octave (macos)
+      if: inputs.install-type == 'macos' && steps.cache-brew-octave.outputs.cache-hit == 'true'
+      shell: bash
+      run: |
+        set -eu
+        brew link octave
 
     - name: Set up Octave installer cache (windows)
       if: inputs.install-type == 'windows'
@@ -96,7 +109,6 @@ runs:
       shell: bash
       run: |
         set -eu
-        sudo apt-get update
         sudo apt-get install -y flatpak dbus-x11
 
     - name: Install octave via flatpak (ubuntu-flatpak)
