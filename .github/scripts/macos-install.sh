@@ -10,5 +10,5 @@ while IFS= read -r f; do
   [ -d "/opt/homebrew/Cellar/$f" ] && PATHS+=("/opt/homebrew/Cellar/$f")
   [ -e "/opt/homebrew/opt/$f" ] && PATHS+=("/opt/homebrew/opt/$f")
 done <<< "$NEW_FORMULAE"
-sudo tar -cf ~/brew-octave-cellar.tar "${PATHS[@]}"
+tar -cf ~/brew-octave-cellar.tar "${PATHS[@]}"
 echo "Cache archive created: ~/brew-octave-cellar.tar"
