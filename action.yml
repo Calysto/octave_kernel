@@ -10,11 +10,11 @@ runs:
   using: composite
   steps:
     - name: Cache apt packages (ubuntu)
-      if: inputs.install-type == 'ubuntu'
+      if: startsWith(inputs.install-type, 'ubuntu')
       uses: actions/cache@v4
       with:
         path: /var/cache/apt/archives
-        key: apt-octave-gnuplot-${{ runner.os }}
+        key: apt-${{ inputs.install-type }}-${{ runner.os }}
 
     - name: Install octave (ubuntu)
       if: inputs.install-type == 'ubuntu'
@@ -25,7 +25,7 @@ runs:
         sudo apt-get install -y octave gnuplot
 
     - name: Clean apt package cache (ubuntu)
-      if: inputs.install-type == 'ubuntu'
+      if: startsWith(inputs.install-type, 'ubuntu')
       shell: bash
       run: |
         set -eu
@@ -82,9 +82,11 @@ runs:
 
     - name: Install flatpak and dbus-x11 (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
-      uses: tecolicom/actions-use-apt-tools@065d3fb036b7fc85487573596f97732ed0d3fce1 # v1.7
-      with:
-        tools: flatpak dbus-x11
+      shell: bash
+      run: |
+        set -eu
+        sudo apt-get update
+        sudo apt-get install -y flatpak dbus-x11
 
     - name: Install octave via flatpak (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
