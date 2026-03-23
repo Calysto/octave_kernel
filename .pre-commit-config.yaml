@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-ast
       - id: check-merge-conflict
@@ -25,7 +25,7 @@ repos:
         additional_dependencies: [black==24.*]
 
   - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
-    rev: v1.7.7.23
+    rev: v1.7.11.24
     hooks:
       - id: actionlint
 
@@ -37,7 +37,7 @@ repos:
         exclude: ^docs/index\.md$
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.24.3
+    rev: v8.30.0
     hooks:
       - id: gitleaks
 
@@ -61,21 +61,21 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.2
+    rev: v0.15.7
     hooks:
       - id: ruff-format
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
 
   - repo: https://github.com/PyCQA/doc8
-    rev: "v1.1.2"
+    rev: "v2.0.0"
     hooks:
       - id: doc8
         args: ["--quiet", "--max-line-length=200"]
         files: ^(docs/source/.*|.*\.md|.*\.rst)$
 
   - repo: https://github.com/codespell-project/codespell
-    rev: "v2.2.6"
+    rev: "v2.4.2"
     hooks:
       - id: codespell
         args: ["-L", "ect,ans,astroid"]
