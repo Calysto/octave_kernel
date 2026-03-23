@@ -1,5 +1,34 @@
 # Changelog
 
+## 1.0.0rc3
+
+## Maintenance and upkeep improvements
+
+- ci: fix quay.io Docker login
+  - PR: #307
+
+## 1.0.0rc2
+
+## Enhancements Made
+
+- ci: publish Docker image to quay.io on release
+  - PR: #305
+
+## Maintenance and upkeep improvements
+
+- chore: pre-commit maintenance updates
+  - PR: #300
+- Migrate from uv to Poetry
+  - PR: #301
+- ci: cache apt, Homebrew, and Windows installer for Octave installs
+  - PR: #302
+- ci: add dedicated docker-build job and modernize Dockerfile
+  - PR: #303
+- ci: migrate to calysto/maintainer_tools
+  - PR: #304
+- Add Docker docs and test-docker justfile target
+  - PR: #306
+
 <!-- <START NEW CHANGELOG ENTRY> -->
 
 ## 1.0.0rc1
