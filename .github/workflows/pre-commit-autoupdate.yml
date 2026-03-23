@@ -36,3 +36,4 @@ jobs:
           commit-message: 'chore: pre-commit autoupdate'
           title: 'chore: pre-commit autoupdate'
           branch: pre-commit-autoupdate
+          labels: maintenance
