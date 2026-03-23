@@ -2,16 +2,18 @@
 name: Pre-commit autoupdate
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 9 * * 1'  # Every Monday at 9am
 
 permissions:
-  pull-requests: write
+  contents: read
 
 jobs:
   autoupdate:
     if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     runs-on: ubuntu-latest
+    environment: release
     steps:
       - name: Generate app token
         id: app-token
