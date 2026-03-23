@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0rc3
+
+## Maintenance and upkeep improvements
+
+- ci: fix quay.io Docker login
+  - PR: #307
+
 ## 1.0.0rc2
 
 ## Enhancements Made
