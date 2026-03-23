@@ -18,6 +18,7 @@ on:
 
 jobs:
   release:
+    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -40,6 +41,7 @@ jobs:
 
   # Build the package from the release tag so the artifact matches what was released.
   build-package:
+    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     name: Build & verify package
     needs: [release]
     runs-on: ubuntu-latest
@@ -56,6 +58,7 @@ jobs:
       - uses: hynek/build-and-inspect-python-package@efb823f52190ad02594531168b7a2d5790e66516 # v2.14.0
 
   publish-docker:
+    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     needs: [release]
     runs-on: ubuntu-latest
     environment: release
@@ -90,6 +93,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   publish:
+    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     needs: [build-package]
     runs-on: ubuntu-latest
     environment: release
