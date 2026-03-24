@@ -207,6 +207,9 @@ jobs:
           version: patch
           dry_run: "true"
           ref: ${{ github.head_ref }}
+      - name: Debug changed files
+        if: always()
+        run: git diff --name-only HEAD && git diff HEAD
 
   docker-build:
     if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
