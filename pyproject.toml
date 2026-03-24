@@ -22,7 +22,7 @@ urls = {Homepage = "http://github.com/Calysto/octave_kernel"}
 requires-python = ">=3.11"
 version = "1.0.0rc3"
 dependencies = [
-    "metakernel >=1.0.0rc0",
+    "metakernel >=1.0",
     "jupyter_client >=8.1.0",
     "ipykernel >=6.22.0",
 ]
