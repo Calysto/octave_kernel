@@ -35,7 +35,7 @@ jobs:
         id: dry-run
         env:
           DRY_RUN: ${{ github.event_name == 'schedule' && 'true' || inputs.dry_run }}
-        run: echo "value=$DRY_RUN" >> $GITHUB_OUTPUT
+        run: echo "value=$DRY_RUN" >> "$GITHUB_OUTPUT"
       - uses: calysto/maintainer_tools/actions/release@v1
         id: release
         with:
