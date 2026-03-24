@@ -37,7 +37,7 @@ test = ["pytest", "nbconvert", "jupyter_kernel_test"]
 typing = [{ include-group = "test" }, "pip", "mypy>=1.0"]
 coverage = ["pytest", "pytest-cov"]
 benchmark = ["asv"]
-docs = ["mkdocs>=1.5", "mkdocs-material>=9.0", "mkdocstrings[python]>=0.24", "mkdocs-jupyter>=0.24"]
+docs = ["mkdocs>=1.5", "mkdocs-material>=9.0", "mkdocstrings[python]>=0.24", "mkdocs-jupyter>=0.24,!=0.26.0"]
 
 [tool.poetry]
 package-mode = true
