@@ -22,7 +22,7 @@ urls = {Homepage = "http://github.com/Calysto/octave_kernel"}
 requires-python = ">=3.11"
 version = "1.0.0rc3"
 dependencies = [
-    "metakernel >=1.0.0rc0",
+    "metakernel >=1.0",
     "jupyter_client >=8.1.0",
     "ipykernel >=6.22.0",
 ]
@@ -37,7 +37,7 @@ test = ["pytest", "nbconvert", "jupyter_kernel_test"]
 typing = [{ include-group = "test" }, "pip", "mypy>=1.0"]
 coverage = ["pytest", "pytest-cov"]
 benchmark = ["asv"]
-docs = ["mkdocs>=1.5", "mkdocs-material>=9.0", "mkdocstrings[python]>=0.24", "mkdocs-jupyter>=0.24"]
+docs = ["mkdocs>=1.5", "mkdocs-material>=9.0", "mkdocstrings[python]>=0.24", "mkdocs-jupyter>=0.24,!=0.26.0"]
 
 [tool.poetry]
 package-mode = true
