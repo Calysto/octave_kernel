@@ -25,16 +25,22 @@ jobs:
       contents: write
     outputs:
       tag: ${{ steps.release.outputs.tag }}
+      dry_run: ${{ steps.dry-run.outputs.value }}
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: calysto/maintainer_tools/actions/base-setup@v1
+      - name: Set dry_run output
+        id: dry-run
+        env:
+          DRY_RUN: ${{ github.event_name == 'schedule' && 'true' || inputs.dry_run }}
+        run: echo "value=$DRY_RUN" >> "$GITHUB_OUTPUT"
       - uses: calysto/maintainer_tools/actions/release@v1
         id: release
         with:
           version: ${{ github.event_name == 'schedule' && '10.10.10.10' || inputs.version }}
-          dry_run: ${{ github.event_name == 'schedule' && 'true' || inputs.dry_run }}
+          dry_run: ${{ steps.dry-run.outputs.value }}
           app_id: ${{ vars.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
           ref: ${{ github.ref_name }}
@@ -85,7 +91,7 @@ jobs:
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: .
-          push: ${{ !inputs.dry_run && !contains(needs.release.outputs.tag, 'dev') && !contains(needs.release.outputs.tag, 'rc') && !contains(needs.release.outputs.tag, 'alpha') && !contains(needs.release.outputs.tag, 'beta') }}
+          push: ${{ needs.release.outputs.dry_run != 'true' && !contains(needs.release.outputs.tag, 'dev') && !contains(needs.release.outputs.tag, 'rc') && !contains(needs.release.outputs.tag, 'alpha') && !contains(needs.release.outputs.tag, 'beta') }}
           tags: |
             quay.io/calysto_kernels/octave_kernel:latest
             quay.io/calysto_kernels/octave_kernel:${{ needs.release.outputs.tag }}
@@ -94,7 +100,7 @@ jobs:
 
   publish:
     if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
-    needs: [build-package]
+    needs: [release, build-package]
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -111,11 +117,11 @@ jobs:
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
           repository-url: https://test.pypi.org/legacy/
-          skip-existing: ${{ inputs.dry_run }}
-          verbose: ${{ inputs.dry_run }}
+          skip-existing: ${{ needs.release.outputs.dry_run == 'true' }}
+          verbose: ${{ needs.release.outputs.dry_run == 'true' }}
 
       - name: Upload package to PyPI
-        if: ${{ !inputs.dry_run }}
+        if: ${{ needs.release.outputs.dry_run != 'true' }}
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
           attestations: false

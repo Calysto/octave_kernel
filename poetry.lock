@@ -826,6 +826,7 @@ python-versions = ">=3.10"
 groups = ["docs"]
 files = [
     {file = "griffelib-2.0.0-py3-none-any.whl", hash = "sha256:01284878c966508b6d6f1dbff9b6fa607bc062d8261c5c7253cb285b06422a7f"},
+    {file = "griffelib-2.0.0.tar.gz", hash = "sha256:e504d637a089f5cab9b5daf18f7645970509bf4f53eda8d79ed71cce8bd97934"},
 ]
 
 [package.extras]
@@ -1464,26 +1465,26 @@ files = [
 
 [[package]]
 name = "metakernel"
-version = "1.0.0rc1"
-description = ""
+version = "1.0.0"
+description = "A Jupyter/IPython Kernel base class in Python"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "metakernel-1.0.0rc1-py3-none-any.whl", hash = "sha256:d880ffcce58930a271d52c95af0d4b0766f527f6615bbf3c9d6e68781d0b64a9"},
-    {file = "metakernel-1.0.0rc1.tar.gz", hash = "sha256:12815bb50ac37af5d037445b94b1ca43494c0b05824601a8351f25094cc8fcd8"},
+    {file = "metakernel-1.0.0-py3-none-any.whl", hash = "sha256:9f90660ce583baffe0235316f3e1a0abf75bbf60039e811ccbedd68ef612fa44"},
+    {file = "metakernel-1.0.0.tar.gz", hash = "sha256:76f2b8926cbad5a089deb6f727399c4e34e8915af97896a8bb7968ebe02da21c"},
 ]
 
 [package.dependencies]
 comm = ">=0.1.3"
-ipykernel = ">=6.21.3"
+ipykernel = ">=6.22.0"
 jedi = ">=0.19.0"
-jupyter-core = ">=5.3.0"
+jupyter_core = ">=5.3.1"
 pexpect = ">=4.9.0"
 
 [package.extras]
-activity = ["portalocker"]
-parallel = ["ipyparallel"]
+activity = ["portalocker (>=2.8.0)"]
+parallel = ["ipyparallel (>=8.5.1)"]
 
 [[package]]
 name = "mistune"
@@ -2877,4 +2878,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "0876885fb5261f2ce7eb47789bebc344545dff81dbbe697025d93086391384d3"
+content-hash = "780d7fa039167708f56fd624241cdfc52535c345a846a4d0b058db6287b4e7e3"
