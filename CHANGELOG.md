@@ -1,5 +1,48 @@
 # Changelog
 
+## 1.0.0
+
+### Highlights
+
+This is the first stable 1.0 release of octave_kernel. It includes a significant round of bug fixes for long-standing
+interactive prompt issues, a new documentation site, Docker image publishing, performance improvements, and a
+modernized project toolchain.
+
+### Bugs fixed
+
+- Fix `input()` prompt garbled when called inside a for-loop (closes [#179](https://github.com/Calysto/octave_kernel/issues/179)) [#283](https://github.com/Calysto/octave_kernel/pull/283)
+- Fix kernel hang when calling `doc()` or `open()` (closes [#184](https://github.com/Calysto/octave_kernel/issues/184)) [#282](https://github.com/Calysto/octave_kernel/pull/282)
+- Fix `pause()` prompt not shown when called from a user-defined function [#279](https://github.com/Calysto/octave_kernel/pull/279)
+- Fix `do_shutdown` coroutine warning and improve console UX [#280](https://github.com/Calysto/octave_kernel/pull/280)
+
+### Enhancements
+
+- Add `load_octaverc` trait to allow skipping `~/.octaverc` on startup [#290](https://github.com/Calysto/octave_kernel/pull/290)
+- Add `--no-line-editing` flag to Octave startup command for improved performance [#296](https://github.com/Calysto/octave_kernel/pull/296)
+- Improve `check.py` diagnostics and add GitHub issue templates [#295](https://github.com/Calysto/octave_kernel/pull/295)
+- Publish Docker image to [quay.io](https://quay.io/repository/calysto/octave_kernel) on release [#305](https://github.com/Calysto/octave_kernel/pull/305)
+- Modernize Dockerfile [#303](https://github.com/Calysto/octave_kernel/pull/303)
+
+### Documentation
+
+- Add [MkDocs documentation site](https://calysto.github.io/octave_kernel) [#277](https://github.com/Calysto/octave_kernel/pull/277)
+- Add debugging instructions for the kernel [#278](https://github.com/Calysto/octave_kernel/pull/278)
+- Add dedicated docs section for managing the Octave executable [#274](https://github.com/Calysto/octave_kernel/pull/274)
+- Add Docker usage documentation [#306](https://github.com/Calysto/octave_kernel/pull/306)
+
+### Dependency updates
+
+- Drop support for outdated dependencies and Python versions following [SPEC 0](https://scientific-python.org/specs/spec-0000/) [#298](https://github.com/Calysto/octave_kernel/pull/298)
+- Require metakernel >= 1.0 [#299](https://github.com/Calysto/octave_kernel/pull/299), [#312](https://github.com/Calysto/octave_kernel/pull/312)
+
+#### Maintenance and upkeep
+
+- Adopt `poetry` for dependency management and development workflows [#301](https://github.com/Calysto/octave_kernel/pull/301)
+- Add ASV benchmark suite with CI performance comparison job [#285](https://github.com/Calysto/octave_kernel/pull/285)
+- Add Codecov integration with 95% coverage thresholds [#286](https://github.com/Calysto/octave_kernel/pull/286)
+- Cache apt, Homebrew, and Windows Octave installers in CI for faster builds [#302](https://github.com/Calysto/octave_kernel/pull/302)
+- Migrate CI to `calysto/maintainer_tools` [#304](https://github.com/Calysto/octave_kernel/pull/304)
+
 ## 0.39.0
 
 ([Full Changelog](https://github.com/Calysto/octave_kernel/compare/v0.38.0...42ddad5cafa20b0ec91251fd58591ccdd3d2a884))
