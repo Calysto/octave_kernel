@@ -41,9 +41,6 @@ docs = ["mkdocs>=1.5", "mkdocs-material>=9.0", "mkdocstrings[python]>=0.24", "mk
 
 [tool.poetry]
 package-mode = true
-include = [
-    { path = "tests", format = "sdist" },
-]
 
 # Used to call hatch_build.py
 [tool.hatch.build.hooks.custom]
@@ -56,6 +53,7 @@ artifacts = ["jupyter-data"]
 include = [
     "/jupyter-data",
     "/octave_kernel",
+    "/tests",
     "/docs",
     "/*.md",
     "/*.ipynb",
