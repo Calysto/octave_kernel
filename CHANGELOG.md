@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1
+
+### Bugs Fixed
+
+- fix: include tests in sdist and only skip CI on forks when secrets needed
+  - PR: #316
+
 ## 1.0.0
 
 ### Highlights

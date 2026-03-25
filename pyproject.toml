@@ -20,7 +20,7 @@ classifiers = [
 ]
 urls = {Homepage = "http://github.com/Calysto/octave_kernel"}
 requires-python = ">=3.11"
-version = "1.0.1.dev0"
+version = "1.0.1"
 dependencies = [
     "metakernel >=1.0",
     "jupyter_client >=8.1.0",
