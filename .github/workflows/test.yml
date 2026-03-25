@@ -23,7 +23,6 @@ permissions:
 
 jobs:
   test-linux:
-    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -53,7 +52,6 @@ jobs:
          poetry run python -m octave_kernel install --user
 
   test-other-systems:
-    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     strategy:
       matrix:
         os: [macos-latest, windows-latest]
@@ -77,7 +75,7 @@ jobs:
         just cover
         just test-kernel
     - name: Upload coverage to Codecov
-      if: always() && matrix.os == 'windows-latest'
+      if: always() && matrix.os == 'windows-latest' && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -86,7 +84,6 @@ jobs:
         fail_ci_if_error: false
 
   test-other-ubuntu:
-    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     strategy:
       matrix:
         install-type: [ubuntu-flatpak, ubuntu-snap]
@@ -109,7 +106,6 @@ jobs:
       run: just test-notebook
 
   cover-linux:
-    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -122,7 +118,7 @@ jobs:
     - name: Run coverage
       run: just cover
     - name: Upload coverage to Codecov
-      if: always()
+      if: always() && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -131,7 +127,6 @@ jobs:
         fail_ci_if_error: false
 
   make_sdist:
-    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     name: Build and Inspect Package
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -143,7 +138,6 @@ jobs:
       - uses: hynek/build-and-inspect-python-package@efb823f52190ad02594531168b7a2d5790e66516 # v2.14.0
 
   test_sdist:
-    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     runs-on: ubuntu-latest
     needs: [make_sdist]
     name: Install from SDist and Test
@@ -162,7 +156,6 @@ jobs:
           test_command: "jupyter kernelspec list | grep octave"
 
   static:
-    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -173,7 +166,7 @@ jobs:
         run: just typing
 
   benchmark:
-    if: (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel') && github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -209,7 +202,6 @@ jobs:
           ref: ${{ github.head_ref }}
 
   docker-build:
-    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -232,7 +224,7 @@ jobs:
       run: just test-docker
 
   tests_check: # This job does nothing and is only used for the branch protection
-    if: always() && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
+    if: always()
     needs:
       - test-linux
       - test-other-systems

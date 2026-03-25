@@ -53,6 +53,7 @@ artifacts = ["jupyter-data"]
 include = [
     "/jupyter-data",
     "/octave_kernel",
+    "/tests",
     "/docs",
     "/*.md",
     "/*.ipynb",
