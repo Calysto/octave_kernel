@@ -25,7 +25,7 @@ modernized project toolchain.
 
 ### Documentation
 
-- Add [MkDocs documentation site](https://calysto.github.io/octave_kernel) [#277](https://github.com/Calysto/octave_kernel/pull/277)
+- Add [MkDocs documentation site](https://octave-kernel.readthedocs.io/en/latest) [#277](https://github.com/Calysto/octave_kernel/pull/277)
 - Add debugging instructions for the kernel [#278](https://github.com/Calysto/octave_kernel/pull/278)
 - Add dedicated docs section for managing the Octave executable [#274](https://github.com/Calysto/octave_kernel/pull/274)
 - Add Docker usage documentation [#306](https://github.com/Calysto/octave_kernel/pull/306)
