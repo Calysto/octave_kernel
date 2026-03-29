@@ -76,7 +76,7 @@ jobs:
         just cover
         just test-kernel
     - name: Upload coverage to Codecov
-      if: always() && matrix.os == 'windows-latest' && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
+      if: always() && matrix.os == 'windows-latest' && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork || github.event.pull_request.base.repo.full_name == 'Calysto/octave_kernel') && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -120,7 +120,7 @@ jobs:
     - name: Run coverage
       run: just cover
     - name: Upload coverage to Codecov
-      if: always() && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
+      if: always() && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork || github.event.pull_request.base.repo.full_name == 'Calysto/octave_kernel') && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
