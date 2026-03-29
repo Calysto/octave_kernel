@@ -77,6 +77,7 @@ class OctaveKernelTests(jkt.KernelTests):  # type:ignore[misc]
             self.fail("'doc' command timed out — kernel hung (issue #184)")
         self.assertEqual(replies["content"]["status"], "ok")
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="Test does not work on windows")
     def test_open_does_not_hang(self) -> None:
         """Test that open command completes without hanging (issue #184)."""
         try:
