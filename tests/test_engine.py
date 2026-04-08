@@ -601,6 +601,60 @@ class TestGetExecutable:
 
 
 # ---------------------------------------------------------------------------
+# _validate_executable
+# ---------------------------------------------------------------------------
+
+
+class TestValidateExecutable:
+    """Tests for OctaveEngine._validate_executable()."""
+
+    def test_returns_version_string(self, mock_engine):
+        with patch(
+            "octave_kernel.kernel.subprocess.check_output", return_value="9.2.0\n"
+        ):
+            result = mock_engine._validate_executable("/usr/bin/octave")
+        assert result == "9.2.0"
+
+    def test_xvfb_run_gets_auto_servernum_injected(self, mock_engine):
+        captured = {}
+
+        def fake_check_output(cmd, **kwargs):
+            captured["cmd"] = cmd
+            return "9.2.0\n"
+
+        with patch("octave_kernel.kernel.subprocess.check_output", fake_check_output):
+            mock_engine._validate_executable("xvfb-run /usr/bin/octave")
+
+        assert captured["cmd"][0] == "xvfb-run"
+        assert captured["cmd"][1] == "--auto-servernum"
+        assert "/usr/bin/octave" in captured["cmd"]
+
+    def test_xvfb_run_with_existing_auto_servernum_not_duplicated(self, mock_engine):
+        captured = {}
+
+        def fake_check_output(cmd, **kwargs):
+            captured["cmd"] = cmd
+            return "9.2.0\n"
+
+        with patch("octave_kernel.kernel.subprocess.check_output", fake_check_output):
+            mock_engine._validate_executable(
+                "xvfb-run --auto-servernum /usr/bin/octave"
+            )
+
+        assert captured["cmd"].count("--auto-servernum") == 1
+
+    def test_raises_oserror_on_failure(self, mock_engine):
+        import subprocess
+
+        with patch(
+            "octave_kernel.kernel.subprocess.check_output",
+            side_effect=subprocess.CalledProcessError(1, "octave"),
+        ):
+            with pytest.raises(OSError, match="does not point to a valid octave"):
+                mock_engine._validate_executable("/usr/bin/octave")
+
+
+# ---------------------------------------------------------------------------
 # _interrupt
 # ---------------------------------------------------------------------------
 
