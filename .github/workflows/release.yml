@@ -47,8 +47,8 @@ jobs:
           version: ${{ github.event_name == 'schedule' && '10.10.10.10' || inputs.version }}
           dry_run: ${{ steps.dry-run.outputs.value }}
           changelog_body: ${{ inputs.changelog_body }}
-          app_id: ${{ vars.APP_ID }}
-          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          app_id: ${{ github.event_name != 'schedule' && vars.APP_ID || '' }}
+          app_private_key: ${{ github.event_name != 'schedule' && secrets.APP_PRIVATE_KEY || '' }}
           ref: ${{ github.ref_name }}
 
   # Build the package from the release tag so the artifact matches what was released.
