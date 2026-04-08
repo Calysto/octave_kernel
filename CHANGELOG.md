@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.2
+
+### Bugs Fixed
+
+- fix: add --auto-servernum to xvfb-run validation to prevent kernel restart failures
+  - PR: #321
+
+### Maintenance and upkeep improvements
+
+- ci: rename make_sdist to build, add dynamic Python matrix, and free-threading support
+  - PR: #317
+- chore: pre-commit autoupdate
+  - PR: #318
+- chore: pre-commit autoupdate
+  - PR: #319
+
 ## 1.0.1
 
 ### Bugs Fixed
