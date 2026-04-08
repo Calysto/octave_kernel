@@ -23,11 +23,12 @@ permissions:
 
 jobs:
   test-linux:
+    needs: build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.11', '3.12', '3.13', '3.14', '3.14t']
+        python-version: ${{ fromJSON(needs.build.outputs.supported_python_classifiers_json_array) }}
         include:
           - os: ubuntu-22.04
             python-version: '3.11'
@@ -75,7 +76,7 @@ jobs:
         just cover
         just test-kernel
     - name: Upload coverage to Codecov
-      if: always() && matrix.os == 'windows-latest' && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
+      if: always() && matrix.os == 'windows-latest' && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork || github.event.pull_request.base.repo.full_name == 'Calysto/octave_kernel') && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -84,6 +85,7 @@ jobs:
         fail_ci_if_error: false
 
   test-other-ubuntu:
+    needs: build
     strategy:
       matrix:
         install-type: [ubuntu-flatpak, ubuntu-snap]
@@ -118,7 +120,7 @@ jobs:
     - name: Run coverage
       run: just cover
     - name: Upload coverage to Codecov
-      if: always() && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
+      if: always() && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork || github.event.pull_request.base.repo.full_name == 'Calysto/octave_kernel') && (github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel')
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -126,20 +128,25 @@ jobs:
         flags: linux
         fail_ci_if_error: false
 
-  make_sdist:
+  build:
     name: Build and Inspect Package
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      supported_python_classifiers_json_array: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: calysto/maintainer_tools/actions/base-setup@v1
       - uses: hynek/build-and-inspect-python-package@efb823f52190ad02594531168b7a2d5790e66516 # v2.14.0
+        id: baipp
+        with:
+          include-free-threaded: "true"
 
   test_sdist:
     runs-on: ubuntu-latest
-    needs: [make_sdist]
+    needs: [build]
     name: Install from SDist and Test
     timeout-minutes: 20
     steps:
@@ -166,7 +173,7 @@ jobs:
         run: just typing
 
   benchmark:
-    if: github.event_name == 'pull_request'
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -185,8 +192,8 @@ jobs:
       run: just benchmark-compare
 
   test_release:
-    if: github.event_name == 'pull_request'
     name: Test Release (Dry Run)
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -202,6 +209,7 @@ jobs:
           ref: ${{ github.head_ref }}
 
   docker-build:
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -230,7 +238,7 @@ jobs:
       - test-other-systems
       - test-other-ubuntu
       - cover-linux
-      - make_sdist
+      - build
       - test_sdist
       - static
       - benchmark

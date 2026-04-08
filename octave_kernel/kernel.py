@@ -671,7 +671,16 @@ class OctaveEngine:
 
     def _validate_executable(self, executable: str) -> str:
         """Validate the Octave executable."""
-        cmd = shlex.split(f"{executable} --eval 'disp(version)'")
+        parts = shlex.split(executable)
+        # When xvfb-run wraps octave, use --auto-servernum so validation
+        # doesn't conflict with an already-running Xvfb (e.g. on kernel restart).
+        if (
+            parts
+            and os.path.basename(parts[0]) == "xvfb-run"
+            and "--auto-servernum" not in parts
+        ):
+            parts.insert(1, "--auto-servernum")
+        cmd = [*parts, "--eval", "disp(version)"]
         try:
             return subprocess.check_output(cmd, text=True).strip()  # noqa: S603
         except subprocess.CalledProcessError as e:
