@@ -338,7 +338,7 @@ class OctaveEngine:
             logger = logging.getLogger(__name__)
             logging.basicConfig()
         self.logger = logger
-        self.executable = self._get_executable(executable)
+        self._executable = self._get_executable(executable)
         self.version = self._validate_executable(self.executable)
         self.tmp_dir = self._get_temp_dir()
         self.cli_options = cli_options
@@ -665,22 +665,25 @@ class OctaveEngine:
                         self.stream_handler(line)
         return "\n".join(lines)
 
-    def _get_executable(self, executable: str = "") -> str:
-        """Find the best octave executable."""
-        return get_octave_executable(executable)
-
-    def _validate_executable(self, executable: str) -> str:
-        """Validate the Octave executable."""
-        parts = shlex.split(executable)
-        # When xvfb-run wraps octave, use --auto-servernum so validation
-        # doesn't conflict with an already-running Xvfb (e.g. on kernel restart).
+    @property
+    def executable(self) -> str:
+        """The Octave executable string, with --auto-servernum injected for xvfb-run."""
+        parts = shlex.split(self._executable)
         if (
             parts
             and os.path.basename(parts[0]) == "xvfb-run"
             and "--auto-servernum" not in parts
         ):
             parts.insert(1, "--auto-servernum")
-        cmd = [*parts, "--eval", "disp(version)"]
+        return shlex.join(parts)
+
+    def _get_executable(self, executable: str = "") -> str:
+        """Find the best octave executable."""
+        return get_octave_executable(executable)
+
+    def _validate_executable(self, executable: str) -> str:
+        """Validate the Octave executable."""
+        cmd = [*shlex.split(executable), "--eval", "disp(version)"]
         try:
             return subprocess.check_output(cmd, text=True).strip()  # noqa: S603
         except subprocess.CalledProcessError as e:

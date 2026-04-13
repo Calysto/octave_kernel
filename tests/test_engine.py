@@ -601,6 +601,27 @@ class TestGetExecutable:
 
 
 # ---------------------------------------------------------------------------
+# executable property
+# ---------------------------------------------------------------------------
+
+
+class TestExecutableProperty:
+    """Tests for OctaveEngine.executable property."""
+
+    def test_plain_executable_returned_unchanged(self, mock_engine):
+        mock_engine._executable = "/usr/bin/octave"
+        assert mock_engine.executable == "/usr/bin/octave"
+
+    def test_xvfb_run_gets_auto_servernum_injected(self, mock_engine):
+        mock_engine._executable = "xvfb-run /usr/bin/octave"
+        assert mock_engine.executable == "xvfb-run --auto-servernum /usr/bin/octave"
+
+    def test_xvfb_run_with_existing_auto_servernum_not_duplicated(self, mock_engine):
+        mock_engine._executable = "xvfb-run --auto-servernum /usr/bin/octave"
+        assert mock_engine.executable.count("--auto-servernum") == 1
+
+
+# ---------------------------------------------------------------------------
 # _validate_executable
 # ---------------------------------------------------------------------------
 
@@ -614,34 +635,6 @@ class TestValidateExecutable:
         ):
             result = mock_engine._validate_executable("/usr/bin/octave")
         assert result == "9.2.0"
-
-    def test_xvfb_run_gets_auto_servernum_injected(self, mock_engine):
-        captured = {}
-
-        def fake_check_output(cmd, **kwargs):
-            captured["cmd"] = cmd
-            return "9.2.0\n"
-
-        with patch("octave_kernel.kernel.subprocess.check_output", fake_check_output):
-            mock_engine._validate_executable("xvfb-run /usr/bin/octave")
-
-        assert captured["cmd"][0] == "xvfb-run"
-        assert captured["cmd"][1] == "--auto-servernum"
-        assert "/usr/bin/octave" in captured["cmd"]
-
-    def test_xvfb_run_with_existing_auto_servernum_not_duplicated(self, mock_engine):
-        captured = {}
-
-        def fake_check_output(cmd, **kwargs):
-            captured["cmd"] = cmd
-            return "9.2.0\n"
-
-        with patch("octave_kernel.kernel.subprocess.check_output", fake_check_output):
-            mock_engine._validate_executable(
-                "xvfb-run --auto-servernum /usr/bin/octave"
-            )
-
-        assert captured["cmd"].count("--auto-servernum") == 1
 
     def test_raises_oserror_on_failure(self, mock_engine):
         import subprocess

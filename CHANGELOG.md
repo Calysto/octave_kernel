@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.3
+
+### Bugs Fixed
+
+- ci: skip GitHub release API call in nightly dry run
+  - PR: #322
+- fix: inject --auto-servernum via executable property to fix xvfb-run on kernel restart
+  - PR: #323
+
 ## 1.0.2
 
 ### Bugs Fixed
