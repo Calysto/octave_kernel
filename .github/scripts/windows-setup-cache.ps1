@@ -5,7 +5,7 @@ $maxAttempts = 3
 $version = $null
 for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
   if ($attempt -gt 1) {
-    Write-Host "Attempt $attempt/$maxAttempts: refreshing winget sources..."
+    Write-Host "Attempt $attempt/${maxAttempts}: refreshing winget sources..."
     winget source update 2>$null
     Start-Sleep -Seconds 5
   }
@@ -14,7 +14,7 @@ for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
     Select-Object -First 1 |
     ForEach-Object { ($_ -replace "^Version:\s*", "").Trim() }
   if ($version) { break }
-  Write-Host "Attempt $attempt/$maxAttempts failed to get Octave version."
+  Write-Host "Attempt $attempt/${maxAttempts} failed to get Octave version."
 }
 if (-not $version) {
   throw "Failed to determine Octave version from winget after $maxAttempts attempts"
