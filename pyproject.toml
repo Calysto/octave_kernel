@@ -37,7 +37,7 @@ file = "README.md"
 content-type = "text/markdown"
 
 [dependency-groups]
-dev = ["pre-commit"]
+dev = ["pre-commit", "jupyter-console"]
 test = ["pytest", "nbconvert", "jupyter_kernel_test"]
 typing = [{ include-group = "test" }, "pip", "mypy>=1.0"]
 coverage = ["pytest", "pytest-cov"]
