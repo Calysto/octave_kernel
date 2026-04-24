@@ -48,6 +48,11 @@ run-notebook:
     poetry install --with test
     poetry run jupyter notebook octave_kernel.ipynb
 
+test-manual:
+    poetry install --with dev
+    poetry run python -m octave_kernel install --sys-prefix
+    poetry run jupyter-console --kernel=octave
+
 lint:
     poetry install --with dev
     poetry run pre-commit run ruff-format --all-files
