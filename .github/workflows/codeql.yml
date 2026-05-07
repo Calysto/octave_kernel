@@ -33,7 +33,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Analyze (${{ matrix.language }})
-      uses: Calysto/maintainer_tools/codeql@v1
+      uses: Calysto/maintainer_tools/actions/codeql@v1
       with:
         language: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}

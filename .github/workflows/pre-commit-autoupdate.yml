@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: Calysto/maintainer_tools/pre-commit-autoupdate@v1
+      - uses: Calysto/maintainer_tools/actions/pre-commit-autoupdate@v1
         with:
           app-id: ${{ vars.APP_ID }}
           app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
