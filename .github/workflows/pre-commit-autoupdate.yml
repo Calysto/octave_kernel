@@ -15,25 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: release
     steps:
-      - name: Generate app token
-        id: app-token
-        uses: actions/create-github-app-token@v2
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: calysto/maintainer_tools/actions/pre-commit-autoupdate@v1
         with:
           app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-          cache: pip
-      - run: pip install pre-commit
-      - run: pre-commit autoupdate
-      - uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c  # v6
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-          commit-message: 'chore: pre-commit autoupdate'
-          title: 'chore: pre-commit autoupdate'
-          branch: pre-commit-autoupdate
-          labels: maintenance
+          app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
