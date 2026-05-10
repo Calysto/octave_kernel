@@ -68,6 +68,10 @@ class OctaveKernelTests(jkt.KernelTests):  # type:ignore[misc]
     code_inspect_sample = "ones"
 
     @unittest.skipIf(sys.platform == "win32", "Test does not work on windows")
+    def test_inspect(self) -> None:
+        super().test_inspect()
+
+    @unittest.skipIf(sys.platform == "win32", "Test does not work on windows")
     def test_doc_does_not_hang(self) -> None:
         """Test that doc command completes without hanging (issue #184)."""
         try:
