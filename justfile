@@ -7,7 +7,7 @@ default:
     @just --list
 
 install:
-    poetry install --with dev,test
+    poetry install --only main,dev,test
     poetry run pre-commit install
 
 docker-build:
