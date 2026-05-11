@@ -33,7 +33,7 @@ test-kernel:
 
 test-notebook:
     poetry install --with test
-    poetry run jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=octave --ExecutePreprocessor.timeout=60 --stdout octave_kernel.ipynb > /dev/null
+    poetry run jupyter execute --kernel_name octave octave_kernel.ipynb
 
 cover *args="":
     poetry install --with coverage
