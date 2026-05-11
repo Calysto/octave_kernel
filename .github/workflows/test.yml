@@ -139,7 +139,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: calysto/maintainer_tools/actions/base-setup@v1
-      - uses: hynek/build-and-inspect-python-package@efb823f52190ad02594531168b7a2d5790e66516 # v2.14.0
+      - uses: hynek/build-and-inspect-python-package@ebd3b6c6d32b78607276633a23bdd4481bd23ca8 # v2.18.0
         id: baipp
         with:
           include-free-threaded: "true"
