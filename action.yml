@@ -64,7 +64,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/brew-octave-cellar.tar
-        key: macos-brew-octave-${{ env.OCTAVE_VERSION }}
+        key: macos-brew-octave-${{ env.OCTAVE_VERSION }}-image-${{ env.ImageVersion }}
 
     - name: Install Octave from cache (macos)
       if: inputs.install-type == 'macos' && steps.cache-brew-octave.outputs.cache-hit == 'true'
