@@ -31,6 +31,7 @@ dependencies = [
     "metakernel >=1.0",
     "jupyter_client >=8.1.0",
     "ipykernel >=6.22.0",
+    "rpds-py (>=2026.5.1)",
 ]
 
 [project.readme]
