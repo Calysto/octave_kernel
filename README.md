@@ -49,7 +49,7 @@ jupyter console --kernel octave
 
 This kernel is based on [MetaKernel](http://pypi.python.org/pypi/metakernel), which means it features a standard set of magics (such as `%%html`). For a full list of magics, run `%lsmagic` in a cell.
 
-A sample notebook is available [online](http://nbviewer.ipython.org/github/Calysto/octave_kernel/blob/main/octave_kernel.ipynb).
+A sample notebook is available [online](https://nbviewer.jupyter.org/github/Calysto/octave_kernel/blob/main/octave_kernel.ipynb).
 
 ## Configuration
 

@@ -1,5 +1,39 @@
 # Changelog
 
+## 1.0.4
+
+### Bugs Fixed
+
+- fix: include runner image version in macOS Octave cache key
+  - PR: #337
+
+### Maintenance and upkeep improvements
+
+- chore: pre-commit autoupdate
+  - PR: #324
+- fix: use unittest.skipIf instead of pytest.mark.skipif for Windows skips
+  - PR: #325
+- chore: pre-commit autoupdate
+  - PR: #326
+- ci: retry winget version lookup on Windows with source refresh
+  - PR: #327
+- chore: add test-manual justfile target for jupyter-console
+  - PR: #328
+- chore: pre-commit autoupdate
+  - PR: #329
+- chore: pre-commit autoupdate
+  - PR: #330
+- ci: use maintainer_tools actions for zizmor, codeql, pre-commit-run, and pre-commit-autoupdate
+  - PR: #331
+- test: skip test_inspect on Windows
+  - PR: #332
+- chore: pre-commit autoupdate
+  - PR: #333
+- chore: pre-commit autoupdate
+  - PR: #335
+- chore: pre-commit autoupdate
+  - PR: #336
+
 ## 1.0.3
 
 ### Bugs Fixed
