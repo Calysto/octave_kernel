@@ -7,7 +7,7 @@
             "pattern": "^https://nbviewer.jupyter.org/"
         },
         {
-            "pattern": "^https://.*\\.readthedocs\\.io"
+            "pattern": "^https://.*\\.readthedocs\\.(io|org)"
         }
     ]
 }
