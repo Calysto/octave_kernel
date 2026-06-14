@@ -17,6 +17,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Programming Language :: Python :: Free Threading",
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development",
@@ -30,6 +31,7 @@ dependencies = [
     "metakernel >=1.0",
     "jupyter_client >=8.1.0",
     "ipykernel >=6.22.0",
+    "rpds-py (>=2026.5.1)",
 ]
 
 [project.readme]
@@ -38,7 +40,7 @@ content-type = "text/markdown"
 
 [dependency-groups]
 dev = ["pre-commit", "jupyter-console"]
-test = ["pytest", "nbconvert", "jupyter_kernel_test"]
+test = ["pytest", "nbclient", "jupyter_kernel_test"]
 typing = [{ include-group = "test" }, "pip", "mypy>=1.0"]
 coverage = ["pytest", "pytest-cov"]
 benchmark = ["asv"]
