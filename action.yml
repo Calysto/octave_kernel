@@ -81,7 +81,7 @@ runs:
         set -eu
         export CONDA_PKGS_DIRS="$HOME/conda_pkgs_dir"
         conda install -c conda-forge octave --yes
-        echo "$CONDA_PREFIX/bin" >> "$GITHUB_PATH"
+        echo "$CONDA/bin" >> "$GITHUB_PATH"
 
     - name: Install Octave via conda-forge (windows)
       if: inputs.install-type == 'windows'
@@ -89,8 +89,9 @@ runs:
       run: |
         $env:CONDA_PKGS_DIRS = "$HOME/conda_pkgs_dir"
         conda install -c conda-forge octave --yes
-        echo "$env:CONDA_PREFIX\Library\bin" >> $env:GITHUB_PATH
-        echo "$env:CONDA_PREFIX\Scripts" >> $env:GITHUB_PATH
+        echo "$env:CONDA\Library\bin" >> $env:GITHUB_PATH
+        echo "$env:CONDA\Scripts" >> $env:GITHUB_PATH
+        echo "$env:CONDA" >> $env:GITHUB_PATH
 
     - name: Install flatpak and dbus-x11 (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
