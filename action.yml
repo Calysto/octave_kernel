@@ -58,13 +58,21 @@ runs:
         auto-update-conda: true
         auto-activate-base: true
 
-    - name: Get Octave version for cache key (macos, windows)
-      if: ${{ inputs.install-type == 'macos' || inputs.install-type == 'windows' }}
+    - name: Get Octave version for cache key (macos)
+      if: inputs.install-type == 'macos'
       shell: bash
       run: |
         set -eu
         OCTAVE_VERSION=$(conda search -c conda-forge octave --json | python3 -c "import sys,json; pkgs=json.load(sys.stdin)['octave']; print(sorted(pkgs, key=lambda p: p['build_number'])[-1]['version'])")
         echo "OCTAVE_VERSION=$OCTAVE_VERSION" >> $GITHUB_ENV
+
+    - name: Get Octave version for cache key (windows)
+      if: inputs.install-type == 'windows'
+      shell: pwsh
+      run: |
+        $json = conda search -c conda-forge octave --json | ConvertFrom-Json
+        $version = ($json.octave | Sort-Object build_number)[-1].version
+        echo "OCTAVE_VERSION=$version" >> $env:GITHUB_ENV
 
     - name: Cache conda packages (macos, windows)
       if: ${{ inputs.install-type == 'macos' || inputs.install-type == 'windows' }}
@@ -82,6 +90,7 @@ runs:
         export CONDA_PKGS_DIRS="$HOME/conda_pkgs_dir"
         conda install -c conda-forge octave --yes
         echo "$CONDA/bin" >> "$GITHUB_PATH"
+        echo "$CONDA/condabin" >> "$GITHUB_PATH"
 
     - name: Install Octave via conda-forge (windows)
       if: inputs.install-type == 'windows'
@@ -131,6 +140,8 @@ runs:
         if [ "${{ inputs.install-type }}" == "ubuntu-flatpak" ]; then
           export EXE="flatpak run org.octave.Octave"
         fi
+        which octave || true
+        ls -la "$(which octave)" || true
         $EXE --version
         $EXE --eval "available_graphics_toolkits"
         $EXE --eval "graphics_toolkit"
