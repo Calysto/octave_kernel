@@ -51,6 +51,13 @@ runs:
         sudo rm -f /var/cache/apt/archives/lock
         sudo rm -rf /var/cache/apt/archives/partial
   
+    - name: Set up Miniconda (macos, windows)
+      if: ${{ inputs.install-type == 'macos' || inputs.install-type == 'windows' }}
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: true
+        auto-activate-base: true
+
     - name: Get Octave version for cache key (macos, windows)
       if: ${{ inputs.install-type == 'macos' || inputs.install-type == 'windows' }}
       shell: bash
