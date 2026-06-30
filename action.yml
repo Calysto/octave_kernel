@@ -50,57 +50,17 @@ runs:
         sudo find /var/cache/apt/archives -name "*.deb" -exec cp {} ~/apt-cache/ \;
         sudo rm -f /var/cache/apt/archives/lock
         sudo rm -rf /var/cache/apt/archives/partial
-
-    - name: Get Octave version for cache key (macos)
-      if: inputs.install-type == 'macos'
-      shell: bash
-      run: |
-        OCTAVE_VERSION=$(brew info --json octave | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['versions']['stable'])")
-        echo "OCTAVE_VERSION=$OCTAVE_VERSION" >> $GITHUB_ENV
-
-    - name: Restore Octave from cache (macos)
-      if: inputs.install-type == 'macos'
-      id: cache-brew-octave
-      uses: actions/cache@v4
-      with:
-        path: ~/brew-octave-cellar.tar
-        key: macos-brew-octave-${{ env.OCTAVE_VERSION }}-image-${{ env.ImageVersion }}
-
-    - name: Install Octave from cache (macos)
-      if: inputs.install-type == 'macos' && steps.cache-brew-octave.outputs.cache-hit == 'true'
-      shell: bash
-      run: bash "${{ github.action_path }}/.github/scripts/macos-install-cache.sh"
-
+  
     - name: Install octave (macos)
       if: inputs.install-type == 'macos' && steps.cache-brew-octave.outputs.cache-hit != 'true'
       shell: bash
       run: bash "${{ github.action_path }}/.github/scripts/macos-install.sh"
 
-    - name: Set up Octave installer cache (windows)
-      if: inputs.install-type == 'windows'
-      shell: pwsh
-      run: |
-        & "${{ github.action_path }}/.github/scripts/windows-setup-cache.ps1"
-
-    - name: Restore Octave installer from cache (windows)
-      if: inputs.install-type == 'windows'
-      id: cache-octave-windows
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.OCTAVE_CACHE_PATH }}
-        key: windows-octave-${{ env.OCTAVE_VERSION }}
-
-    - name: Download Octave installer (windows)
-      if: inputs.install-type == 'windows' && steps.cache-octave-windows.outputs.cache-hit != 'true'
-      shell: pwsh
-      run: |
-        winget download --id GNU.Octave -e --download-directory $env:OCTAVE_CACHE_PATH
-
     - name: Install Octave (windows)
       if: inputs.install-type == 'windows'
       shell: pwsh
       run: |
-        & "${{ github.action_path }}/.github/scripts/windows-install.ps1"
+        conda install -c conda-forge octave --yes
 
     - name: Install flatpak and dbus-x11 (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
