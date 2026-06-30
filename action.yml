@@ -55,7 +55,8 @@ runs:
       if: ${{ inputs.install-type == 'macos' || inputs.install-type == 'windows' }}
       shell: bash
       run: |
-        OCTAVE_VERSION=$(conda run conda search -c conda-forge octave --json | python3 -c "import sys,json; pkgs=json.load(sys.stdin)['octave']; print(sorted(pkgs, key=lambda p: p['build_number'])[-1]['version'])")
+        set -eu
+        OCTAVE_VERSION=$(conda search -c conda-forge octave --json | python3 -c "import sys,json; pkgs=json.load(sys.stdin)['octave']; print(sorted(pkgs, key=lambda p: p['build_number'])[-1]['version'])")
         echo "OCTAVE_VERSION=$OCTAVE_VERSION" >> $GITHUB_ENV
 
     - name: Cache conda packages (macos, windows)
@@ -71,13 +72,14 @@ runs:
       shell: bash
       run: |
         set -eu
-        CONDA_PKGS_DIRS=~/conda_pkgs_dir conda install -c conda-forge octave --yes
+        export CONDA_PKGS_DIRS="$HOME/conda_pkgs_dir"
+        conda install -c conda-forge octave --yes
 
     - name: Install Octave via conda-forge (windows)
       if: inputs.install-type == 'windows'
       shell: pwsh
       run: |
-        $env:CONDA_PKGS_DIRS = "$HOME\conda_pkgs_dir"
+        $env:CONDA_PKGS_DIRS = "$HOME/conda_pkgs_dir"
         conda install -c conda-forge octave --yes
 
     - name: Install flatpak and dbus-x11 (ubuntu-flatpak)
