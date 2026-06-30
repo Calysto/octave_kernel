@@ -51,16 +51,34 @@ runs:
         sudo rm -f /var/cache/apt/archives/lock
         sudo rm -rf /var/cache/apt/archives/partial
   
-    - name: Install octave (macos)
-      if: inputs.install-type == 'macos' && steps.cache-brew-octave.outputs.cache-hit != 'true'
+    - name: Get Octave version for cache key (macos, windows)
+      if: inputs.install-type == 'macos' || inputs.install-type == 'windows'
       shell: bash
-      run: bash "${{ github.action_path }}/.github/scripts/macos-install.sh"
+      run: |
+        OCTAVE_VERSION=$(conda search -c conda-forge octave --json | python3 -c "import sys,json; pkgs=json.load(sys.stdin)['octave']; print(sorted(pkgs, key=lambda p: p['build_number'])[-1]['version'])")
+        echo "OCTAVE_VERSION=$OCTAVE_VERSION" >> $GITHUB_ENV
 
-    - name: Install Octave (windows)
+    - name: Cache conda packages (macos, windows)
+      if: inputs.install-type == 'macos' || inputs.install-type == 'windows'
+      id: cache-conda-octave
+      uses: actions/cache@v4
+      with:
+        path: ~/conda_pkgs_dir
+        key: conda-octave-${{ inputs.install-type }}-${{ env.OCTAVE_VERSION }}
+
+    - name: Install Octave via conda-forge (macos)
+      if: inputs.install-type == 'macos'
+      shell: bash
+      run: |
+        set -eu
+        conda install -c conda-forge octave --yes --use-local-channel \
+          --pkgs-dirs ~/conda_pkgs_dir
+
+    - name: Install Octave via conda-forge (windows)
       if: inputs.install-type == 'windows'
       shell: pwsh
       run: |
-        conda install -c conda-forge octave --yes
+        conda install -c conda-forge octave --yes --pkgs-dirs ~/conda_pkgs_dir
 
     - name: Install flatpak and dbus-x11 (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
