@@ -71,14 +71,14 @@ runs:
       shell: bash
       run: |
         set -eu
-        conda install -c conda-forge octave --yes --use-local-channel \
-          --pkgs-dirs ~/conda_pkgs_dir
+        CONDA_PKGS_DIRS=~/conda_pkgs_dir conda install -c conda-forge octave --yes
 
     - name: Install Octave via conda-forge (windows)
       if: inputs.install-type == 'windows'
       shell: pwsh
       run: |
-        conda install -c conda-forge octave --yes --pkgs-dirs ~/conda_pkgs_dir
+        $env:CONDA_PKGS_DIRS = "$HOME\conda_pkgs_dir"
+        conda install -c conda-forge octave --yes
 
     - name: Install flatpak and dbus-x11 (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
