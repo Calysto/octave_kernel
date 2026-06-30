@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.1.0
+
+### Maintenance and upkeep improvements
+
+- chore: pre-commit autoupdate
+  - PR: #338
+- chore: pre-commit autoupdate
+  - PR: #339
+- ci: fix nbviewer link and remove redundant readme file
+  - PR: #340
+- feat: add Python 3.15 to test matrix
+  - PR: #334
+- chore: pre-commit autoupdate
+  - PR: #341
+- chore: pre-commit autoupdate
+  - PR: #342
+- chore: pre-commit autoupdate
+  - PR: #343
+- CI: Fix Octave installation on MacOS
+  - PR: #346
+
 ## 1.0.4
 
 ### Bugs Fixed
