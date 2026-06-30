@@ -55,9 +55,9 @@ jobs:
   test-other-systems:
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-15, windows-latest]
         include:
-          - os: macos-latest
+          - os: macos-15
             install-type: macos
           - os: windows-latest
             install-type: windows
