@@ -53,7 +53,7 @@ runs:
   
     - name: Set up Miniconda (macos, windows)
       if: ${{ inputs.install-type == 'macos' || inputs.install-type == 'windows' }}
-      uses: conda-incubator/setup-miniconda@v3
+      uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5  # v4
       with:
         auto-update-conda: true
         auto-activate-base: true
@@ -81,6 +81,7 @@ runs:
         set -eu
         export CONDA_PKGS_DIRS="$HOME/conda_pkgs_dir"
         conda install -c conda-forge octave --yes
+        echo "$CONDA_PREFIX/bin" >> "$GITHUB_PATH"
 
     - name: Install Octave via conda-forge (windows)
       if: inputs.install-type == 'windows'
@@ -88,6 +89,8 @@ runs:
       run: |
         $env:CONDA_PKGS_DIRS = "$HOME/conda_pkgs_dir"
         conda install -c conda-forge octave --yes
+        echo "$env:CONDA_PREFIX\Library\bin" >> $env:GITHUB_PATH
+        echo "$env:CONDA_PREFIX\Scripts" >> $env:GITHUB_PATH
 
     - name: Install flatpak and dbus-x11 (ubuntu-flatpak)
       if: inputs.install-type == 'ubuntu-flatpak'
