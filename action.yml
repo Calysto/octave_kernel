@@ -52,14 +52,14 @@ runs:
         sudo rm -rf /var/cache/apt/archives/partial
   
     - name: Get Octave version for cache key (macos, windows)
-      if: inputs.install-type == 'macos' || inputs.install-type == 'windows'
+      if: ${{ inputs.install-type == 'macos' || inputs.install-type == 'windows' }}
       shell: bash
       run: |
         OCTAVE_VERSION=$(conda run conda search -c conda-forge octave --json | python3 -c "import sys,json; pkgs=json.load(sys.stdin)['octave']; print(sorted(pkgs, key=lambda p: p['build_number'])[-1]['version'])")
         echo "OCTAVE_VERSION=$OCTAVE_VERSION" >> $GITHUB_ENV
 
     - name: Cache conda packages (macos, windows)
-      if: inputs.install-type == 'macos' || inputs.install-type == 'windows'
+      if: ${{ inputs.install-type == 'macos' || inputs.install-type == 'windows' }}
       id: cache-conda-octave
       uses: actions/cache@v4
       with:
