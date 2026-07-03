@@ -141,8 +141,6 @@ jobs:
       - uses: calysto/maintainer_tools/actions/base-setup@v1
       - uses: calysto/maintainer_tools/actions/build@v1
         id: build
-        with:
-          include-free-threaded: "true"
 
   test_sdist:
     runs-on: ubuntu-latest
