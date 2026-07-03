@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ${{ fromJSON(needs.build.outputs.supported_python_classifiers_json_array) }}
+        python-version: ${{ fromJSON(needs.build.outputs.python-versions) }}
         include:
           - os: ubuntu-22.04
             python-version: '3.11'
@@ -133,14 +133,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      supported_python_classifiers_json_array: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
+      python-versions: ${{ steps.build.outputs.python-versions }}
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - uses: calysto/maintainer_tools/actions/base-setup@v1
-      - uses: hynek/build-and-inspect-python-package@ebd3b6c6d32b78607276633a23bdd4481bd23ca8 # v2.18.0
-        id: baipp
+      - uses: calysto/maintainer_tools/actions/build@v1
+        id: build
         with:
           include-free-threaded: "true"
 

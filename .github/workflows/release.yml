@@ -67,7 +67,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: hynek/build-and-inspect-python-package@ebd3b6c6d32b78607276633a23bdd4481bd23ca8 # v2.18.0
+      - uses: calysto/maintainer_tools/actions/build@v1
 
   publish-docker:
     if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
