@@ -10,6 +10,8 @@ updates:
       actions:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "calysto/octave_action"
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
