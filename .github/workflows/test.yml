@@ -41,7 +41,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Setup octave
-      uses: ./
+      uses: calysto/octave_action@v1
       with:
         install-type: ubuntu
     - name: Run test on linux
@@ -68,7 +68,7 @@ jobs:
     - name: Base Setup
       uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Setup octave
-      uses: ./
+      uses: calysto/octave_action@v1
       with:
         install-type: ${{ matrix.install-type }}
     - name: Run tests
@@ -96,7 +96,7 @@ jobs:
     - name: Base Setup
       uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Setup octave
-      uses: ./
+      uses: calysto/octave_action@v1
       with:
         install-type: ${{ matrix.install-type }}
     - name: Run tests
@@ -114,7 +114,7 @@ jobs:
     - name: Base Setup
       uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Setup octave
-      uses: ./
+      uses: calysto/octave_action@v1
       with:
         install-type: ubuntu
     - name: Run coverage
@@ -153,7 +153,7 @@ jobs:
           persist-credentials: false
       - uses: calysto/maintainer_tools/actions/base-setup@v1
       - name: Setup octave
-        uses: ./
+        uses: calysto/octave_action@v1
         with:
           install-type: ubuntu
       - uses: calysto/maintainer_tools/actions/test-sdist@v1
@@ -170,6 +170,19 @@ jobs:
       - name: Run typing check
         run: just typing
 
+  test-local-action:
+    # Exercises this repo's own deprecated action.yml so it keeps working
+    # until it is removed in octave_kernel v2 (see issue #348).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Setup octave
+        uses: ./
+        with:
+          install-type: ubuntu
+
   benchmark:
     needs: build
     runs-on: ubuntu-latest
@@ -183,7 +196,7 @@ jobs:
       with:
         python-version: '3.11'
     - name: Setup octave
-      uses: ./
+      uses: calysto/octave_action@v1
       with:
         install-type: ubuntu
     - name: Run benchmark comparison
@@ -239,6 +252,7 @@ jobs:
       - build
       - test_sdist
       - static
+      - test-local-action
       - benchmark
       - docker-build
       - test_release

@@ -1,0 +1,7 @@
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        actions/*: ref-pin
+        calysto/maintainer_tools/*: ref-pin
+        calysto/octave_action: ref-pin
