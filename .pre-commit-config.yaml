@@ -61,7 +61,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.21
+    rev: v0.15.22
     hooks:
       - id: ruff-format
       - id: ruff-check
@@ -75,7 +75,7 @@ repos:
         files: ^(docs/source/.*|.*\.md|.*\.rst)$
 
   - repo: https://github.com/codespell-project/codespell
-    rev: "v2.4.2"
+    rev: "v2.4.3"
     hooks:
       - id: codespell
         args: ["-L", "ect,ans,astroid"]
