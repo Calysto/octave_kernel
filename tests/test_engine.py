@@ -522,6 +522,18 @@ class TestCreateRepl:
             repl = mock_engine._create_repl()
         assert repl.child.delaybeforesend is None
 
+    def test_widens_delayafterclose(self, mock_engine):
+        with patch("octave_kernel.kernel.REPLWrapper") as MockRepl:
+            MockRepl.return_value = MagicMock()
+            repl = mock_engine._create_repl()
+        assert repl.child.delayafterclose == 0.5
+
+    def test_widens_delayafterterminate(self, mock_engine):
+        with patch("octave_kernel.kernel.REPLWrapper") as MockRepl:
+            MockRepl.return_value = MagicMock()
+            repl = mock_engine._create_repl()
+        assert repl.child.delayafterterminate == 0.5
+
     def test_appends_octave_cli_options_env_var(self, mock_engine):
         cmd = self._repl_cmd(mock_engine, OCTAVE_CLI_OPTIONS="--no-gui")
         assert "--no-gui" in cmd
