@@ -615,6 +615,13 @@ class OctaveEngine:
         repl.interrupt = self._interrupt  # type: ignore[method-assign]
         # Remove the default 50ms delay before sending lines.
         repl.child.delaybeforesend = None
+        # ptyprocess's close() sleeps `delayafterclose` (default 0.1s) then
+        # checks isalive() before raising "Could not terminate the child."
+        # On the free-threaded (no-GIL) build, process reaping can lag past
+        # that window even though the termination signal was already sent,
+        # producing a false positive. Give it more headroom.
+        repl.child.delayafterclose = 0.5
+        repl.child.delayafterterminate = 0.5
         return repl
 
     def _interrupt(self, continuation: bool = False, silent: bool = False) -> str:
