@@ -119,13 +119,6 @@ jobs:
           name: Packages
           path: dist
 
-      - name: Upload package to Test PyPI
-        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          skip-existing: ${{ needs.release.outputs.dry_run == 'true' }}
-          verbose: ${{ needs.release.outputs.dry_run == 'true' }}
-
       - name: Upload package to PyPI
         if: ${{ needs.release.outputs.dry_run != 'true' }}
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
