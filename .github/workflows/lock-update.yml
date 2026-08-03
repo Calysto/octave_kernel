@@ -1,0 +1,24 @@
+name: Lock update
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 6am
+
+permissions:
+  contents: read
+
+jobs:
+  lock-update:
+    if: github.event_name != 'schedule' || github.repository == 'Calysto/octave_kernel'
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: calysto/maintainer_tools/actions/base-setup@v1
+      - uses: calysto/maintainer_tools/actions/poetry-lock-update@v1
+        with:
+          app-id: ${{ vars.APP_ID }}
+          app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
