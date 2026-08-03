@@ -41,6 +41,8 @@ content-type = "text/markdown"
 [dependency-groups]
 dev = ["pre-commit", "jupyter-console"]
 test = ["pytest", "nbclient", "jupyter_kernel_test"]
+# Split out so `typing` stays a homogeneous array (all table entries) — a mixed
+# string/table array crashes Dependabot's Poetry resolver (toml-rb).
 typing-extra = ["pip", "mypy>=1.0"]
 typing = [{ include-group = "test" }, { include-group = "typing-extra" }]
 coverage = ["pytest", "pytest-cov"]
