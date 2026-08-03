@@ -16,3 +16,5 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # Security updates only; routine lock refreshes run in .github/workflows/lock-update.yml
+    open-pull-requests-limit: 0
