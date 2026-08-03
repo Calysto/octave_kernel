@@ -26,5 +26,5 @@ if __name__ == "__main__":
         toolkit = e.eval("disp(graphics_toolkit)", silent=True).strip()
         print(f"Graphics toolkit: {toolkit}")
         print(f"Available toolkits: {toolkits}")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(e)

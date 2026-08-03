@@ -205,9 +205,11 @@ class TestMakeFigures:
             "name": "Figure",
             "plot_dir": None,
         }
-        with patch.object(eng, "eval", return_value="error: make_figures failed"):
-            with pytest.raises(Exception, match="Inline plot failed"):
-                eng.make_figures()
+        with (
+            patch.object(eng, "eval", return_value="error: make_figures failed"),
+            pytest.raises(Exception, match="Inline plot failed"),
+        ):
+            eng.make_figures()
 
 
 # ---------------------------------------------------------------------------
@@ -595,12 +597,14 @@ class TestGetExecutable:
         assert result == "/usr/bin/octave-cli"
 
     def test_raises_when_nothing_found_and_no_flatpak(self):
-        with pytest.raises(OSError, match="octave not found"):
-            with patch(
+        with (
+            pytest.raises(OSError, match="octave not found"),
+            patch(
                 "octave_kernel._utils.subprocess.check_call",
                 side_effect=FileNotFoundError,
-            ):
-                self._call(which_map={})
+            ),
+        ):
+            self._call(which_map={})
 
     def test_uses_flatpak_as_last_resort(self):
         with patch("octave_kernel._utils.subprocess.check_call", return_value=0):
@@ -651,12 +655,14 @@ class TestValidateExecutable:
     def test_raises_oserror_on_failure(self, mock_engine):
         import subprocess
 
-        with patch(
-            "octave_kernel.kernel.subprocess.check_output",
-            side_effect=subprocess.CalledProcessError(1, "octave"),
+        with (
+            patch(
+                "octave_kernel.kernel.subprocess.check_output",
+                side_effect=subprocess.CalledProcessError(1, "octave"),
+            ),
+            pytest.raises(OSError, match="does not point to a valid octave"),
         ):
-            with pytest.raises(OSError, match="does not point to a valid octave"):
-                mock_engine._validate_executable("/usr/bin/octave")
+            mock_engine._validate_executable("/usr/bin/octave")
 
 
 # ---------------------------------------------------------------------------
@@ -668,41 +674,51 @@ class TestInterrupt:
     """Tests for OctaveEngine._interrupt()."""
 
     def test_calls_repl_wrapper_interrupt_on_posix(self, mock_engine):
-        with patch.object(os, "name", "posix"):
-            with patch.object(REPLWrapper, "interrupt", return_value="") as mock_int:
-                mock_engine._interrupt()
+        with (
+            patch.object(os, "name", "posix"),
+            patch.object(REPLWrapper, "interrupt", return_value="") as mock_int,
+        ):
+            mock_engine._interrupt()
         mock_int.assert_called_once_with(mock_engine.repl, continuation=False)
 
     def test_passes_continuation_flag_on_posix(self, mock_engine):
-        with patch.object(os, "name", "posix"):
-            with patch.object(REPLWrapper, "interrupt", return_value="") as mock_int:
-                mock_engine._interrupt(continuation=True)
+        with (
+            patch.object(os, "name", "posix"),
+            patch.object(REPLWrapper, "interrupt", return_value="") as mock_int,
+        ):
+            mock_engine._interrupt(continuation=True)
         mock_int.assert_called_once_with(mock_engine.repl, continuation=True)
 
     def test_warns_via_stream_handler_on_windows(self, mock_engine):
         stream_handler = MagicMock()
         mock_engine.stream_handler = stream_handler
-        with patch.object(os, "name", "nt"):
-            with patch.object(mock_engine, "_interrupt_expect", return_value=""):
-                mock_engine._interrupt()
+        with (
+            patch.object(os, "name", "nt"),
+            patch.object(mock_engine, "_interrupt_expect", return_value=""),
+        ):
+            mock_engine._interrupt()
         stream_handler.assert_called_once()
         assert "Windows" in stream_handler.call_args[0][0]
 
     def test_warns_via_logger_when_no_stream_handler_on_windows(self, mock_engine):
         mock_engine.stream_handler = None
         mock_engine.logger = MagicMock()
-        with patch.object(os, "name", "nt"):
-            with patch.object(mock_engine, "_interrupt_expect", return_value=""):
-                mock_engine._interrupt()
+        with (
+            patch.object(os, "name", "nt"),
+            patch.object(mock_engine, "_interrupt_expect", return_value=""),
+        ):
+            mock_engine._interrupt()
         mock_engine.logger.warning.assert_called_once()
 
     def test_calls_interrupt_expect_on_windows(self, mock_engine):
         mock_engine.stream_handler = MagicMock()
-        with patch.object(os, "name", "nt"):
-            with patch.object(
+        with (
+            patch.object(os, "name", "nt"),
+            patch.object(
                 mock_engine, "_interrupt_expect", return_value="out"
-            ) as mock_ie:
-                result = mock_engine._interrupt(silent=True)
+            ) as mock_ie,
+        ):
+            result = mock_engine._interrupt(silent=True)
         mock_ie.assert_called_once_with(True)
         assert result == "out"
 
