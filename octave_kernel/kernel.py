@@ -156,7 +156,7 @@ class OctaveKernel(ProcessMetaKernel):
         if not silent:
             try:
                 plot_dir = self.octave_engine.make_figures()
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 self.Error(e)
                 return val
             if plot_dir:
@@ -366,7 +366,7 @@ class OctaveEngine:
             self._startup()
             return
 
-        settings = settings or dict(backend="inline")
+        settings = settings or {"backend": "inline"}
         self._plot_settings = settings
 
         # Remove "None" keys so we can use setdefault below.
@@ -452,7 +452,7 @@ class OctaveEngine:
                 self.error_handler(e)
                 return ""
             else:
-                raise e
+                raise
 
     def make_figures(self, plot_dir: str | None = None) -> str | None:
         """Create figures for the current figures.
@@ -496,7 +496,7 @@ class OctaveEngine:
             if self.error_handler:
                 self.error_handler(resp)
             else:
-                raise Exception(resp)
+                raise RuntimeError(resp)
         return plot_dir
 
     def extract_figures(self, plot_dir: str, remove: bool = False) -> list[Any]:
@@ -529,7 +529,7 @@ class OctaveEngine:
                 if self.error_handler:
                     self.error_handler(e)
                 else:
-                    raise e
+                    raise
         if remove:
             shutil.rmtree(plot_dir, True)
         return images
@@ -553,7 +553,7 @@ class OctaveEngine:
         im = SVG(data=data)  # type: ignore[no-untyped-call]
         try:
             im.data = self._fix_svg_size(im.data)
-        except Exception:  # noqa: S110
+        except Exception:  # noqa: BLE001, S110
             pass
         return im
 
@@ -722,7 +722,7 @@ class OctaveEngine:
         """Clean up resources used by the session."""
         try:
             self.repl.terminate()
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             self.logger.debug(str(e))
         workspace = os.path.join(os.getcwd(), "octave-workspace")
         if os.path.exists(workspace):
