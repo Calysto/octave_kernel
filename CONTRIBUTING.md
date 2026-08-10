@@ -20,7 +20,8 @@ just cover                         # tests with coverage report
 ## Code Quality
 
 ```shell
-just pre-commit                    # run all pre-commit hooks
+just lint                          # run all pre-commit hooks
+just lint-all                      # also run manual-stage hooks (markdown-link-check)
 just typing                        # mypy strict type checking
 ```
 
