@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: release
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: calysto/maintainer_tools/actions/pre-commit-autoupdate@v1
