@@ -3,11 +3,15 @@ name: Enforce PR label
 on:
   pull_request:
     types: [labeled, unlabeled, opened, edited, synchronize]
+
+permissions:
+  contents: read
+
 jobs:
   enforce-label:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: calysto/maintainer_tools/actions/enforce-label@v1
