@@ -36,6 +36,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
     - name: Base Setup
       uses: calysto/maintainer_tools/actions/base-setup@v1
       with:
@@ -65,6 +67,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
     - name: Base Setup
       uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Setup octave
@@ -93,6 +97,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
     - name: Base Setup
       uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Setup octave
@@ -111,6 +117,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
     - name: Base Setup
       uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Setup octave
@@ -164,6 +172,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: calysto/maintainer_tools/actions/base-setup@v1
       - name: Run pre-commit
         uses: calysto/maintainer_tools/actions/pre-commit-run@v1
@@ -227,6 +237,8 @@ jobs:
       contents: read
     steps:
     - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
     - uses: calysto/maintainer_tools/actions/base-setup@v1
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
