@@ -1,5 +1,46 @@
 # Changelog
 
+## 1.1.1
+
+### Bugs Fixed
+
+- Widen pexpect close/terminate delay to avoid free-threaded teardown race
+  - PR: #354
+- Terminate the Octave process when engine startup fails
+  - PR: #363
+
+### Maintenance and upkeep improvements
+
+- CI: use maintainer_tools build action
+  - PR: #347
+- CI: switch tests to Calysto/octave_action, deprecate local action
+  - PR: #349
+- chore: pre-commit autoupdate
+  - PR: #350
+- chore: pre-commit autoupdate
+  - PR: #352
+- chore: pre-commit autoupdate
+  - PR: #353
+- ci: drop redundant Test PyPI upload step from release workflow
+  - PR: #355
+- chore: pre-commit autoupdate
+  - PR: #356
+- ci: security-only Dependabot + weekly poetry.lock updates
+  - PR: #357
+- chore: update poetry.lock
+  - PR: #358
+- chore: pre-commit autoupdate
+  - PR: #359
+- Standardize justfile targets
+  - PR: #360
+- chore: update poetry.lock
+  - PR: #361
+
+### Dependency updates
+
+- chore(deps): bump the actions group with 7 updates
+  - PR: #362
+
 ## 1.1.0
 
 ### Maintenance and upkeep improvements
