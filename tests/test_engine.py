@@ -797,6 +797,60 @@ class TestInterruptExpect:
 
 
 # ---------------------------------------------------------------------------
+# Startup failure
+# ---------------------------------------------------------------------------
+
+
+class TestStartupFailure:
+    """A failed startup must not leave the Octave process running.
+
+    ``__init__`` arms the atexit cleanup only after ``_startup()`` returns, and
+    it never returns an engine when startup raises, so nothing outside
+    ``__init__`` can reach ``self.repl`` to shut it down.
+    """
+
+    def test_repl_is_terminated_when_startup_raises(self):
+        """The spawned Octave process is killed when _startup() fails."""
+        created = []
+        real_create_repl = OctaveEngine._create_repl
+
+        def _capture_repl(engine_self):
+            repl = real_create_repl(engine_self)
+            created.append(repl)
+            return repl
+
+        with (
+            patch.object(OctaveEngine, "_create_repl", _capture_repl),
+            patch.object(
+                OctaveEngine, "_startup", side_effect=RuntimeError("startup failed")
+            ),
+            pytest.raises(RuntimeError, match="startup failed"),
+        ):
+            OctaveEngine()
+
+        assert created, "the repl should have been created before startup ran"
+        child = created[0].child
+        proc = getattr(child, "proc", None)
+        if proc is not None:  # PopenSpawn, used where there is no pty
+            assert proc.wait(timeout=10) is not None, "Octave is still running"
+        else:
+            assert not child.isalive(), "Octave is still running"
+
+    def test_deferred_startup_arms_cleanup(self):
+        """With defer_startup, a later _startup() failure is not a leak.
+
+        The caller holds the engine and atexit is already armed by then, so the
+        guard in __init__ deliberately does not cover that path.
+        """
+        with patch("atexit.register") as mock_register:
+            engine = OctaveEngine(defer_startup=True)
+        try:
+            assert mock_register.call_args_list[-1].args == (engine._cleanup,)
+        finally:
+            engine._cleanup()
+
+
+# ---------------------------------------------------------------------------
 # _cleanup
 # ---------------------------------------------------------------------------
 
