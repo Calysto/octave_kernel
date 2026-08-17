@@ -1436,14 +1436,14 @@ files = [
 
 [[package]]
 name = "metakernel"
-version = "1.0.0"
+version = "1.0.6"
 description = "A Jupyter/IPython Kernel base class in Python"
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "metakernel-1.0.0-py3-none-any.whl", hash = "sha256:9f90660ce583baffe0235316f3e1a0abf75bbf60039e811ccbedd68ef612fa44"},
-    {file = "metakernel-1.0.0.tar.gz", hash = "sha256:76f2b8926cbad5a089deb6f727399c4e34e8915af97896a8bb7968ebe02da21c"},
+    {file = "metakernel-1.0.6-py3-none-any.whl", hash = "sha256:98844d70e015890ea3d3a9f8f67e3a799861609f0cace4cec986e1a3d6a7f36e"},
+    {file = "metakernel-1.0.6.tar.gz", hash = "sha256:09f898f50d037f1e69ca180f4238d330989c407f9c424808fc333592e6367883"},
 ]
 
 [package.dependencies]
@@ -2855,4 +2855,4 @@ type = ["pytest-mypy (>=1.0.1) ; platform_python_implementation != \"PyPy\""]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "064e5d94c7680134afe3d099b9b508dc11eb7b7ce870744b6e017d4fc8fafb5b"
+content-hash = "de7c032026e4caaece4a2cb1c88b593ddfb9a085ae088fa57a11dc30511a96c0"

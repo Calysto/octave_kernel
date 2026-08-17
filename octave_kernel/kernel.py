@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import atexit
 import base64
+import contextlib
 import glob
 import json
 import logging
@@ -351,8 +352,18 @@ class OctaveEngine:
         self.line_handler = line_handler
         self._has_startup = False
         self._plot_settings = plot_settings
-        if not defer_startup:
-            self._startup()
+        try:
+            if not defer_startup:
+                self._startup()
+        except BaseException:
+            # _cleanup is not registered yet and __init__ will not return, so
+            # nothing else can reach self.repl.  Without this the Octave
+            # process runs for the life of the interpreter, unreferenced.
+            # A later _startup() (the defer_startup path) is not affected:
+            # by then the caller holds the engine and atexit is armed.
+            with contextlib.suppress(Exception):
+                self.repl.terminate()
+            raise
         atexit.register(self._cleanup)
 
     @property
