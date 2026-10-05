@@ -25,7 +25,7 @@ repos:
         additional_dependencies: [black==24.*]
 
   - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
-    rev: v1.7.12.24
+    rev: v1.7.12.25
     hooks:
       - id: actionlint
 
@@ -49,7 +49,7 @@ repos:
         pass_filenames: false
 
   - repo: https://github.com/jsh9/pydoclint
-    rev: 0.9.1
+    rev: "0.10.1"
     hooks:
       - id: pydoclint
 
@@ -61,7 +61,7 @@ repos:
         stages: [manual]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.7
+    rev: v0.16.9
     hooks:
       - id: ruff-format
       - id: ruff-check
