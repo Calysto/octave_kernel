@@ -53,13 +53,6 @@ repos:
     hooks:
       - id: pydoclint
 
-  - repo: https://github.com/tcort/markdown-link-check
-    rev: v3.15.0
-    hooks:
-      - id: markdown-link-check
-        args: ["-q", "-c", ".markdown_link_config.json"]
-        stages: [manual]
-
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.9
     hooks:

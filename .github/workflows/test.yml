@@ -180,6 +180,16 @@ jobs:
       - name: Run typing check
         run: just typing
 
+  markdown-link-check:
+    name: Markdown Link Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Check markdown links
+        uses: calysto/maintainer_tools/actions/markdown-link-check@v1
+
   test-local-action:
     # Exercises this repo's own deprecated action.yml so it keeps working
     # until it is removed in octave_kernel v2 (see issue #348).
@@ -264,6 +274,7 @@ jobs:
       - build
       - test_sdist
       - static
+      - markdown-link-check
       - test-local-action
       - benchmark
       - docker-build
