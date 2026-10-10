@@ -21,7 +21,7 @@ just cover                         # tests with coverage report
 
 ```shell
 just lint                          # run all pre-commit hooks
-just lint-all                      # also run manual-stage hooks (markdown-link-check)
+just lint-all                      # also run manual-stage hooks
 just typing                        # mypy strict type checking
 ```
 
