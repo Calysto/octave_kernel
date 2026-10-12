@@ -4,10 +4,11 @@ name: Pre-commit autoupdate
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 9 * * 1'  # Every Monday at 9am
+    - cron: '0 9 * * 3'  # Every Wednesday at 9am
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
   autoupdate:
@@ -22,3 +23,4 @@ jobs:
         with:
           app-id: ${{ vars.APP_ID }}
           app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          auto-merge: "true"
