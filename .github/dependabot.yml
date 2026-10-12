@@ -4,6 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "tuesday"
     cooldown:
       default-days: 7
     groups:
@@ -16,5 +17,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "tuesday"
     # Security updates only; routine lock refreshes run in .github/workflows/lock-update.yml
     open-pull-requests-limit: 0
